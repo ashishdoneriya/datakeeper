@@ -5,7 +5,7 @@
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Registration Form</span>
 				</div>
-				<el-form :label-position="'left'" ref="form"  label-width="120px">
+				<el-form :label-position="'left'" ref="form"  label-width="140px">
 					<el-form-item label="Name">
 						<el-input v-model="name"></el-input>
 					</el-form-item>
