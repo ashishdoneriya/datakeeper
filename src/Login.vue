@@ -5,7 +5,7 @@
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Login</span>
 				</div>
-				<el-form ref="form" :model="form" label-width="65px">
+				<el-form :label-position="'left'" ref="form" :model="form" label-width="80px">
 					<el-form-item label="Email">
 						<el-input v-model="form.email"></el-input>
 					</el-form-item>
@@ -37,13 +37,6 @@ import axios from 'axios';
 			}
 		},
 		methods: {
-			onSubmit() {
-				this.$notify({
-					title: 'Success',
-					message: 'This is a success message',
-					type: 'success'
-				});
-			},
 			login: function() {
 				if (!this.form.email && !this.form.password) {
 					this.$notify({
