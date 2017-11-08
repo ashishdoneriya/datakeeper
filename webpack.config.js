@@ -63,7 +63,8 @@ module.exports = (options = {}) => ({
 	],
 	resolve: {
 		alias: {
-			'~': resolve(__dirname, 'src')
+			'~': resolve(__dirname, 'src'),
+			'vue$': 'vue/dist/vue.esm.js' // Use the full build
 		}
 	},
 	devServer: {

@@ -6,4 +6,7 @@
 * {
 	font-family: 'Roboto', sans-serif;
 }
+a {
+	text-decoration : none;
+}
 </style>
