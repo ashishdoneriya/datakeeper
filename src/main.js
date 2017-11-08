@@ -4,6 +4,7 @@ import ElementUI  from 'element-ui'
 import './theme/index.css'
 const Admin = () => import('./Admin.vue');
 const AdminHome = () => import('./AdminHome.vue');
+const FormBuilder = () => import('./FormBuilder.vue');
 const Login = () => import('./Login.vue');
 const Register = () => import('./Register.vue');
 const Root = () => import('./Root.vue');
@@ -19,7 +20,7 @@ new Vue({
 		mode: 'history',
 		routes: [{
 			path: '/',
-			component: Login,
+			component: FormBuilder,
 			alias : '/login'
 		}, {
 			path: '/register',
