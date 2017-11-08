@@ -38,6 +38,9 @@ import axios from 'axios';
 		},
 		methods: {
 			login: function() {
+				this.$router.push({
+							path: '/admin'
+						});
 				if (!this.form.email && !this.form.password) {
 					this.$notify({
 						message: 'Please fill your email id and password',
