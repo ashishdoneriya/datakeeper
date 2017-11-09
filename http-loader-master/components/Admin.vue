@@ -15,7 +15,7 @@
 </template>
 
 <script>
-	export default {
+	module.exports = {
 		data() {
 			return {
 				options: [{
