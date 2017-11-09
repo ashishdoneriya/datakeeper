@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<title>Demo</title>
+		<meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" name="viewport" />
+		<meta content="yes" name="apple-mobile-web-app-capable" />
+		<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+		<meta content="telephone=no" name="format-detection" />
+		<link rel="stylesheet" href="css/theme/index.css">
+		<script src="js/vue.min.js"></script>
+		<script src="js/vue-router.min.js"></script>
+		<script src="js/httpVueLoader.js"></script>
+		<script src="js/elementui.min.js"></script>
+		<script src="js/axios.min.js"></script>
+		<style>
+			@import url('https://fonts.googleapis.com/css?family=Roboto');
+			* {
+				font-family: 'Roboto', sans-serif;
+			}
+			a {
+				text-decoration : none;
+			}
+			</style>
+	</head>
+
+	<body>
+		<div id="vapp">
+			<router-view></router-view>
+		</div>
+		<script type="module">
+
+			//	Vue.use(ElementUI);
+
+			//	Vue.use(Router);
+
+			new Vue({
+				el: '#vapp',
+				router: new VueRouter({
+					mode: 'history',
+					routes: [{
+						path: '/',
+						component: httpVueLoader('./components/Login.vue'),
+						alias: '/login'
+					}, {
+						path: '/register',
+						component: httpVueLoader('./components/Register.vue')
+					}, {
+						path: '/admin',
+						component: httpVueLoader('./components/AdminHome.vue')
+					}]
+				})
+			});
+		</script>
+	</body>
+
+
+</html>

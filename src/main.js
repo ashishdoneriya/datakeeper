@@ -20,7 +20,7 @@ new Vue({
 		mode: 'history',
 		routes: [{
 			path: '/',
-			component: FormBuilder,
+			component: Login,
 			alias : '/login'
 		}, {
 			path: '/register',

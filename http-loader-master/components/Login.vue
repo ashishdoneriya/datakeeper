@@ -25,9 +25,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 
-	export default {
+	module.exports = {
 		data() {
 			return {
 				form: {
