@@ -11,6 +11,7 @@
 		<meta content="telephone=no" name="format-detection" />
 		<link rel="stylesheet" href="/css/theme/index.css">
 		<link rel="stylesheet" href="/fonts/Roboto/roboto.css">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<script src="/js/vue.min.js"></script>
 		<script src="/js/vue-router.min.js"></script>
 		<script src="/js/httpVueLoader.js"></script>
@@ -23,6 +24,15 @@
 			a {
 				text-decoration : none;
 				color: #009688;
+			}
+			.text-center {
+				text-align: center;
+			}
+			.right-align {
+				text-align: right;
+			}
+			a, i {
+				cursor: pointer;
 			}
 			</style>
 	</head>
@@ -50,7 +60,11 @@
 							{
 								path: 'dashboard',
 								alias : '',
-								component : httpVueLoader('/components/UserDashboard.vue'),
+								component : httpVueLoader('/components/UserDashboard.vue')
+							},
+							{
+								path: 'form-builder',
+								component : httpVueLoader('/components/FormBuilder.vue')
 							}
 						]
 					}]

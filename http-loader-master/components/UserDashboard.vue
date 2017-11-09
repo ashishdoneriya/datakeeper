@@ -1,21 +1,36 @@
 <template>
-	<el-row type="flex" class="row-bg" justify="center" style="margin-top:100px">
-		<el-col :span="8">
-			<el-card class="box-card">
-				<div slot="header" class="clearfix">
-					<span>Tables</span>
-					<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus">Add</el-button>
-				</div>
-				<div v-for="o in 4" :key="o" class="text item">
-					{{'List item ' + o }}
+	<el-main>
+		<el-row type="flex" class="row-bg" justify="center" style="margin-top:100px">
+			<el-col :span="8">
+				<el-card class="box-card">
+					<div slot="header" class="clearfix">
+						<span>Tables</span>
+						<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addTable()">Add</el-button>
+					</div>
+					<div v-for="o in 4" :key="o" class="text item">
+						{{'List item ' + o }}
 
-					<el-button style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
-					<el-button style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
-				</div>
-			</el-card>
-		</el-col>
-	</el-row>
+						<el-button style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
+						<el-button style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
+					</div>
+				</el-card>
+			</el-col>
+		</el-row>
+	</el-main>
 </template>
+
+<script>
+	module.exports = {
+		methods: {
+			addTable() {
+				this.$router.push({
+					path: '/user/form-builder'
+				});
+			}
+		}
+	}
+</script>
+
 
 <style>
 	.text {
