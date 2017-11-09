@@ -3,7 +3,7 @@
 		<el-row>
 			<el-row type="flex" class="row-bg">
 				<el-col :span="8">
-					<el-button icon="el-icon-back" type="primary" round>Go Back</el-button>
+					<el-button icon="el-icon-back" type="primary" round><router-link to="/user/dashboard" style="color:#fff">Go Back</router-link></el-button>
 				</el-col>
 				<el-col :span="8">
 					<el-input placeholder="Table name" v-model="tableName"></el-input>
@@ -30,15 +30,14 @@
 								</el-col>
 							</el-row>
 							<div v-if="field.fieldType == 'radio' || field.fieldType == 'checkbox'  || field.fieldType == 'select'">
-								<el-row v-for="(option, i) of field.options" :key="option.value">
+								<el-row v-for="(option, j) of field.options" :key="option.value">
 									<el-col :span="16">
-										<input v-model="option.value " type="text">
-										<label>Option {{i + 1}}</label>
+										<el-input :placeholder="getOptionPlaceholder(j)" v-model="option.value"></el-input>
 									</el-col>
 									<el-col :span="8">
-										<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="removeOption(field, i)"></i>
-										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-up" @click="shiftOptionUp(field, i)"></i>
-										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftOptionDown(field, i)"></i>
+										<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="removeOption(field, j)"></i>
+										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-up" @click="shiftOptionUp(field, j)"></i>
+										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftOptionDown(field, j)"></i>
 									</el-col>
 								</el-row>
 								<el-button @click="addOption(field)" type="primary" size="small">Add Option</el-button>
@@ -55,8 +54,8 @@
 		</el-row>
 		<div class="fab">
 			<span class="fab-action-button" data-tooltip="Add Field">
-						        <i class="material-icons icon-material">add</i>
-						    </span>
+							        <i class="material-icons icon-material">add</i>
+							    </span>
 			<ul class="fab-buttons">
 				<li class="fab-buttons__item">
 					<a @click="addTextInput()" class="fab-buttons__link" data-tooltip="Text">
@@ -99,6 +98,9 @@
 		methods: {
 			goBack() {},
 			save() {},
+			getOptionPlaceholder(j) {
+				return 'Option ' + (j + 1);s
+			},
 
 			addTextInput() {
 				this.fields.push({
@@ -146,18 +148,20 @@
 				if (i == 0) {
 					return;
 				}
-				let temp = this.fields[i - 1];
-				this.fields[i - 1] = this.fields[i];
-				this.fields[i] = temp;
+				var temp = this.fields[i - 1];
+				var temp1 = this.fields[i];
+				Vue.set(this.fields, i - 1, temp1);
+				Vue.set(this.fields, i, temp);
 			},
 
 			shiftDown(i) {
 				if (i == this.fields.length - 1) {
 					return;
 				}
-				let temp = this.fields[i + 1];
-				this.fields[i + 1] = this.fields[i];
-				this.fields[i] = temp;
+				var temp = this.fields[i + 1];
+				var temp1 = this.fields[i];
+				Vue.set(this.fields, i + 1, temp1);
+				Vue.set(this.fields, i, temp);
 			},
 
 			addOption(field) {
@@ -174,18 +178,20 @@
 				if (i == 0) {
 					return;
 				}
-				let temp = field.options[i - 1];
-				field.options[i - 1] = field.options[i];
-				field.options[i] = temp;
+				var temp = field.options[i - 1];
+				var temp1 = field.options[i];
+				Vue.set(field.options, i - 1, temp1);
+				Vue.set(field.options, i, temp);
 			},
 
 			shiftOptionDown(field, i) {
 				if (i == field.options.length - 1) {
 					return;
 				}
-				let temp = field.options[i + 1];
-				field.options[i + 1] = field.options[i];
-				field.options[i] = temp;
+				var temp = field.options[i];
+				var temp1 = field.options[i + 1];
+				Vue.set(field.options, i, temp1);
+				Vue.set(field.options, i + 1, temp);
 			}
 		}
 	};
