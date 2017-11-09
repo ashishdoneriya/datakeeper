@@ -11,6 +11,7 @@
 				</el-menu-item>
 			</el-menu>
 		</el-header>
+		<el-main><router-view></router-view></el-main>
 	</el-container>
 </template>
 

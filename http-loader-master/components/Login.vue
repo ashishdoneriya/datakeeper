@@ -60,9 +60,9 @@
 					'email': this.form.email,
 					'password': this.form.password
 				}).then(result => {
-					if (result == 'success') {
+					if (result.data == 'success') {
 						this.$router.push({
-							path: '/admin'
+							path: '/admin/home'
 						});
 					} else {
 						this.$notify({

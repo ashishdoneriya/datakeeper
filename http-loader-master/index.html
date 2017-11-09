@@ -30,12 +30,7 @@
 		<div id="vapp">
 			<router-view></router-view>
 		</div>
-		<script type="module">
-
-			//	Vue.use(ElementUI);
-
-			//	Vue.use(Router);
-
+		<script>
 			new Vue({
 				el: '#vapp',
 				router: new VueRouter({
@@ -49,7 +44,13 @@
 						component: httpVueLoader('./components/Register.vue')
 					}, {
 						path: '/admin',
-						component: httpVueLoader('./components/AdminHome.vue')
+						component: httpVueLoader('./components/Admin.vue'),
+						children : [
+							{
+								path: 'home',
+								component : httpVueLoader('./components/AdminHome.vue'),
+							}
+						]
 					}]
 				})
 			});
