@@ -8,9 +8,14 @@ include_once './objects/users.php';
 $database = new Database();
 $db = $database->getConnection();
 $user = new User($db);
-$user->name = $_POST['name'];
-$user->email = $_POST['email'];
-$user->password = $_POST['password'];
+
+$data = json_decode(file_get_contents('php://input'), TRUE);
+$user->name = $data['name'];
+$user->email = $data['email'];
+$user->password = $data['password'];
+
+
+
 $user->register();
 echo "success";
 ?>

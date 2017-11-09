@@ -62,7 +62,7 @@
 				}).then(result => {
 					if (result.data == 'success') {
 						this.$router.push({
-							path: '/admin/home'
+							path: '/user/dashboard'
 						});
 					} else {
 						this.$notify({

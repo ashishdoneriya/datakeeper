@@ -59,10 +59,9 @@
 					'email': this.email,
 					'password': this.password
 				}).then(response => {
-					Vue.toasted.show('Registration Successful', this.toastOptionsSuccess)
 					this.$notify({
 						message: 'Registration Successful',
-						type: 'error'
+						type: 'success'
 					});
 					setTimeout(() => {
 						this.$router.push('/login');

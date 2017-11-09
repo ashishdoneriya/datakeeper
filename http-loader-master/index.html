@@ -9,13 +9,13 @@
 		<meta content="yes" name="apple-mobile-web-app-capable" />
 		<meta content="black" name="apple-mobile-web-app-status-bar-style" />
 		<meta content="telephone=no" name="format-detection" />
-		<link rel="stylesheet" href="css/theme/index.css">
-		<link rel="stylesheet" href="fonts/Roboto/roboto.css">
-		<script src="js/vue.min.js"></script>
-		<script src="js/vue-router.min.js"></script>
-		<script src="js/httpVueLoader.js"></script>
-		<script src="js/elementui.min.js"></script>
-		<script src="js/axios.min.js"></script>
+		<link rel="stylesheet" href="/css/theme/index.css">
+		<link rel="stylesheet" href="/fonts/Roboto/roboto.css">
+		<script src="/js/vue.min.js"></script>
+		<script src="/js/vue-router.min.js"></script>
+		<script src="/js/httpVueLoader.js"></script>
+		<script src="/js/elementui.min.js"></script>
+		<script src="/js/axios.min.js"></script>
 		<style>
 			* {
 				font-family: 'Roboto', sans-serif;
@@ -38,18 +38,19 @@
 					mode: 'history',
 					routes: [{
 						path: '/',
-						component: httpVueLoader('./components/Login.vue'),
+						component: httpVueLoader('/components/Login.vue'),
 						alias: '/login'
 					}, {
 						path: '/register',
-						component: httpVueLoader('./components/Register.vue')
+						component: httpVueLoader('/components/Register.vue')
 					}, {
-						path: '/admin',
-						component: httpVueLoader('./components/Admin.vue'),
+						path: '/user',
+						component: httpVueLoader('/components/User.vue'),
 						children : [
 							{
-								path: 'home',
-								component : httpVueLoader('./components/AdminHome.vue'),
+								path: 'dashboard',
+								alias : '',
+								component : httpVueLoader('/components/UserDashboard.vue'),
 							}
 						]
 					}]
