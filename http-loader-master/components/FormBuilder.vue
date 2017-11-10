@@ -1,7 +1,7 @@
 <template>
 	<el-main>
 		<el-row>
-			<el-row type="flex" class="row-bg">
+			<el-row type="flex" class="row-bg" style="margin-bottom:15px">
 				<el-col :span="8">
 					<el-button icon="el-icon-back" type="primary" round><router-link to="/user/dashboard" style="color:#fff">Go Back</router-link></el-button>
 				</el-col>
@@ -12,8 +12,8 @@
 					<el-button type="success">Save</el-button>
 				</el-col>
 			</el-row>
-			<el-row>
-				<el-col :span="12">
+			<el-row style="height:75vh">
+				<el-col :span="12" style="border-right:1px solid #ccc;overflow-y:auto;overflow-x:hidden;height:100%">
 					<div class="grid-content bg-purple">
 						<h2 class="text-center">Form Builder</h2>
 						<el-row v-for="(field, i) of fields" :key="field.fieldName">
@@ -24,15 +24,15 @@
 									<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftDown(i)"></i>
 								</el-col>
 							</el-row>
-							<el-row>
+							<el-row style="margin-bottom:3px;">
 								<el-col :span="24" class="right-align">
 									<el-input placeholder="Field name" v-model="field.fieldName"></el-input>
 								</el-col>
 							</el-row>
 							<div v-if="field.fieldType == 'radio' || field.fieldType == 'checkbox'  || field.fieldType == 'select'">
-								<el-row v-for="(option, j) of field.options" :key="option.value">
+								<el-row v-for="(option, j) of field.options" :key="option" style="margin-bottom:3px;">
 									<el-col :span="16">
-										<el-input :placeholder="getOptionPlaceholder(j)" v-model="option.value"></el-input>
+										<el-input :placeholder="getOptionPlaceholder(1)" v-model="option.value"></el-input>
 									</el-col>
 									<el-col :span="8">
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="removeOption(field, j)"></i>
