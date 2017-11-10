@@ -63,7 +63,7 @@
 					<div class="grid-content bg-purple-light" style="padding-left:30px;">
 						<h2 class="text-center">Preview{{maxFieldLabelLength}}</h2>
 						<el-card class="box-card">
-							<el-form :label-position="'left'" ref="form" :label-width="maxFieldLabelLength">
+							<el-form :label-position="'left'" ref="form" label-width="150px">
 								<el-form-item v-for="(field, i) of fields" :key="field" :label="field.name" class="maxlabel">
 									<el-input v-if="field.type && field.type=='Text' || field.type=='Number' || field.type=='Deimal Number'"></el-input>
 									<el-select v-if="field.type && field.type=='Select'" placeholder="Select">
@@ -77,8 +77,7 @@
 									<el-checkbox-group v-if="field.type && field.type=='Checkbox'">
 										<el-checkbox v-for="option in field.options" :key="option" :label="option.value"></el-checkbox>
 									</el-checkbox-group>
-									<el-radio-group v-if="field.type && field.type=='Radio Button'">
-										<el-radio label="option.value">1</el-radio>
+									<el-radio-group v-if="field.type && field.type=='Radio Button' && field.options.length > 0">
 										<el-radio v-for="(option, j) in field.options" :key="option" :label="option.value">1</el-radio>
 									</el-radio-group>
 								</el-form-item>
