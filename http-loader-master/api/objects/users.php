@@ -13,11 +13,11 @@
 		}
 
 		public function fetchUserInfo() {
-			$query = "select id, name from $this->tableName where email='$this->email' and password='$this->password'";
+			$query = "select userId, name from $this->tableName where email='$this->email' and password='$this->password'";
 			$rows = $this->conn->query($query);
 			if(count($rows) > 0) {
 				$row = $rows->fetch();
-				$this->id = $row["id"];
+				$this->id = $row["userId"];
 				$this->name = $row["name"];
 			} else {
 				$this->id = null;
@@ -38,7 +38,7 @@
 			$this->id=htmlspecialchars(strip_tags($this->id));
 			$this->password=htmlspecialchars(strip_tags($this->password));
 
-			$query = "update $this->table set password=$password where id=$this->id";
+			$query = "update $this->table set password=$password where userId=$this->id";
 			$this->conn->query($query);
 		}
 	}

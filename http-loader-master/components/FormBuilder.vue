@@ -12,37 +12,51 @@
 					<el-button type="success">Save</el-button>
 				</el-col>
 			</el-row>
-			<el-row style="height:75vh">
-				<el-col :span="12" style="border-right:1px solid #ccc;overflow-y:auto;overflow-x:hidden;height:100%">
+			<el-row style="height:calc(100vh - 180px)">
+				<el-col :span="12" style="border-right:1px solid #ccc;overflow-y:auto;overflow-x:hidden;height:100%;padding-right:30px;">
 					<div class="grid-content bg-purple">
 						<h2 class="text-center">Form Builder</h2>
-						<el-row v-for="(field, i) of fields" :key="field.fieldName">
+						<el-card class="box-card" v-for="(field, i) of fields" :key="field.fieldName" style="margin-bottom:10px;">
 							<el-row>
-								<el-col :span="24" class="right-align">
-									<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="deleteField(i)"></i>
-									<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-up" @click="shiftUp(i)"></i>
-									<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftDown(i)"></i>
+								<el-col :span="24" class="right-align clearfix" style="margin-bottom:5px;">
+									<el-tooltip content="Remove Field" placement="top" open-delay="200">
+										<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="deleteField(i)"></i>
+									</el-tooltip>
+									<el-tooltip content="Shift Field Up" placement="top" open-delay="200">
+										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-up" @click="shiftUp(i)"></i>
+									</el-tooltip>
+									<el-tooltip content="Shift Field Down" placement="top" open-delay="200">
+										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftDown(i)"></i>
+									</el-tooltip>
 								</el-col>
 							</el-row>
-							<el-row style="margin-bottom:3px;">
-								<el-col :span="24" class="right-align">
-									<el-input placeholder="Field name" v-model="field.fieldName"></el-input>
-								</el-col>
-							</el-row>
-							<div v-if="field.fieldType == 'radio' || field.fieldType == 'checkbox'  || field.fieldType == 'select'">
-								<el-row v-for="(option, j) of field.options" :key="option" style="margin-bottom:3px;">
-									<el-col :span="16">
-										<el-input :placeholder="getOptionPlaceholder(1)" v-model="option.value"></el-input>
-									</el-col>
-									<el-col :span="8">
+							<el-form :label-position="'left'" ref="form" label-width="120px">
+								<el-form-item label="Field Name">
+									<el-input v-model="field.name"></el-input>
+								</el-form-item>
+								<el-form-item label="Field Type">
+									<el-select v-model="field.type" placeholder="Select">
+										<el-option v-for="type in fieldTypes"
+											:key="type.value"
+											:label="type.label"
+											:value="type.value">
+										</el-option>
+									</el-select>
+								</el-form-item>
+								<el-form-item label="Options" v-if="isFieldEligible(field.type)">
+									<el-col :span="24" v-for="(option, j) of field.options" :key="option" style="margin-bottom:3px;">
+										<el-input v-model="option.value" :placeholder="'Option ' + (j+1)" style="width:calc(100% - 120px);margin-right:10px;"></el-input>
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="removeOption(field, j)"></i>
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-up" @click="shiftOptionUp(field, j)"></i>
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftOptionDown(field, j)"></i>
 									</el-col>
-								</el-row>
-								<el-button @click="addOption(field)" type="primary" size="small">Add Option</el-button>
-							</div>
-						</el-row>
+									<el-button @click="addOption(field)" type="primary" size="small">Add Option</el-button>
+								</el-form-item>
+								<el-form-item label="Is Compulsory">
+									<el-checkbox v-model="field.isCompulsory"></el-checkbox>
+								</el-form-item>
+							</el-form>
+						</el-card>
 					</div>
 				</el-col>
 				<el-col :span="12">
@@ -52,38 +66,13 @@
 				</el-col>
 			</el-row>
 		</el-row>
-		<div class="fab">
-			<span class="fab-action-button" data-tooltip="Add Field">
-							        <i class="material-icons icon-material">add</i>
-							    </span>
-			<ul class="fab-buttons">
-				<li class="fab-buttons__item">
-					<a @click="addTextInput()" class="fab-buttons__link" data-tooltip="Text">
-						<i class="material-icons icon-material">text_format</i>
-					</a>
-				</li>
-				<li class="fab-buttons__item">
-					<a @click="addCheckbox()" class="fab-buttons__link" data-tooltip="Checkboxes">
-						<i class="material-icons icon-material">check_box</i>
-					</a>
-				</li>
-				<li class="fab-buttons__item">
-					<a @click="addRadio()" class="fab-buttons__link" data-tooltip="Radio Buttons">
-						<i class="material-icons icon-material">radio_button_checked</i>
-					</a>
-				</li>
-				<li class="fab-buttons__item">
-					<a @click="addSelect()" class="fab-buttons__link" data-tooltip="Select">
-						<i class="material-icons icon-material">reorder</i>
-					</a>
-				</li>
-				<li class="fab-buttons__item">
-					<a @click="addTextArea()" class="fab-buttons__link" data-tooltip="Text Area">
-						<i class="material-icons icon-material">keyboard</i>
-					</a>
-				</li>
-			</ul>
-		</div>
+		<a class="float" @click="addField()">
+			<i class="material-icons my-float" style="
+    font-size: 40px;
+    margin-top: 11px;
+    margin-left: 2px;
+">add</i>
+		</a>
 	</el-main>
 </template>
 
@@ -92,51 +81,47 @@
 		data() {
 			return {
 				fields: [],
-				tableName: ""
+				tableName: "",
+				fieldTypes : [
+					{ value : 'Select', label : 'Select'},
+					{ value : 'Checkbox', label : 'Checkbox'},
+					{ value : 'Radio Button', label : 'Radio Button'},
+					{ value : 'Text', label : 'Text'},
+					{ value : 'Number', label : 'Number'},
+					{ value : 'Deimal Numbers', label : 'Deimal Numbers'},
+					{ value : 'Date', label : 'Date'},
+					{ value : 'Time', label : 'Time'},
+					{ value : 'Date Time', label : 'Date Time'},
+					{ value : 'Tags', label : 'Tags'},
+					{ value : 'Switch', label : 'Switch'},
+					{ value : 'Picture', label : 'Picture'}
+				]
 			};
 		},
 		methods: {
 			goBack() {},
 			save() {},
-			getOptionPlaceholder(j) {
-				return 'Option ' + (j + 1);s
+			isFieldEligible(type) {
+				if (!type) {
+					return false;
+				}
+				switch (type){
+					case 'Select':
+					case 'Checkbox':
+					case 'Radio Button':
+					case 'Tags':
+					case 'Switch':
+						return true;
+					default : return false;
+				}
 			},
 
-			addTextInput() {
+			addField() {
 				this.fields.push({
-					fieldName: "",
-					fieldType: "textinput"
-				});
-			},
-
-			addTextArea() {
-				this.fields.push({
-					fieldName: "",
-					fieldType: "textarea"
-				});
-			},
-
-			addCheckbox() {
-				this.fields.push({
-					fieldName: "",
-					fieldType: "checkbox",
-					options: []
-				});
-			},
-
-			addRadio() {
-				this.fields.push({
-					fieldName: "",
-					fieldType: "radio",
-					options: []
-				});
-			},
-
-			addSelect() {
-				this.fields.push({
-					fieldName: "",
-					fieldType: "select",
-					options: []
+					name: '',
+					type: '',
+					isCompulsory: false,
+					options : []
 				});
 			},
 
@@ -198,109 +183,50 @@
 </script>
 
 <style scoped>
-	.fab {
-		position: fixed;
-		width: 56px;
-		right: 15px;
-		bottom: 15px;
-		margin-left: -28px;
-	}
+.float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	right:40px;
+	background-color:#F44336;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+}
 
-	.fab:hover .fab-buttons {
-		opacity: 1;
-		visibility: visible;
-		cursor: pointer;
-	}
+.my-float{
+	margin-top:22px;
+}
 
-	.fab:hover .fab-buttons__link {
-		transform: scaleY(1) scaleX(1) translateY(-16px) translateX(0px);
-	}
+[data-tooltip]:before {
+	top: 50%;
+	margin-top: -11px;
+	font-weight: 600;
+	border-radius: 2px;
+	background: #585858;
+	color: #fff;
+	content: attr(data-tooltip);
+	font-size: 12px;
+	text-decoration: none;
+	visibility: hidden;
+	opacity: 0;
+	padding: 4px 7px;
+	margin-right: 12px;
+	position: absolute;
+	transform: scale(0);
+	right: 100%;
+	white-space: nowrap;
+	transform-origin: top right;
+	transition: all .3s cubic-bezier(.25, .8, .25, 1);
+}
 
-	.fab-action-button:hover+.fab-buttons .fab-buttons__link:before {
-		visibility: visible;
-		opacity: 1;
-		transform: scale(1);
-		transform-origin: right center 0;
-		transition-delay: 0.3s;
-	}
-
-	.fab-action-button {
-		position: absolute;
-		bottom: 0;
-		display: block;
-		width: 56px;
-		height: 56px;
-		background-color: #29B6F6;
-		border-radius: 50%;
-		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-	}
-
-	.fab-buttons {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 50px;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		opacity: 0;
-		visibility: hidden;
-		transition: 0.2s;
-	}
-
-	.fab-buttons__item {
-		display: block;
-		text-align: center;
-		margin: 12px 0;
-	}
-
-	.fab-buttons__link {
-		display: inline-block;
-		width: 40px;
-		height: 40px;
-		text-decoration: none;
-		background-color: #ffffff;
-		border-radius: 50%;
-		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-		transform: scaleY(0.5) scaleX(0.5) translateY(0px) translateX(0px);
-		-moz-transition: .3s;
-		-webkit-transition: .3s;
-		-o-transition: .3s;
-		transition: .3s;
-	}
-
-	[data-tooltip]:before {
-		top: 50%;
-		margin-top: -11px;
-		font-weight: 600;
-		border-radius: 2px;
-		background: #585858;
-		color: #fff;
-		content: attr(data-tooltip);
-		font-size: 12px;
-		text-decoration: none;
-		visibility: hidden;
-		opacity: 0;
-		padding: 4px 7px;
-		margin-right: 12px;
-		position: absolute;
-		transform: scale(0);
-		right: 100%;
-		white-space: nowrap;
-		transform-origin: top right;
-		transition: all .3s cubic-bezier(.25, .8, .25, 1);
-	}
-
-	[data-tooltip]:hover:before {
-		visibility: visible;
-		opacity: 1;
-		transform: scale(1);
-		transform-origin: right center 0;
-	}
-
-	.icon-material {
-		display: inline-block;
-		width: 40px;
-		height: 40px;
-	}
+[data-tooltip]:hover:before {
+	visibility: visible;
+	opacity: 1;
+	transform: scale(1);
+	transform-origin: right center 0;
+}
 </style>
+

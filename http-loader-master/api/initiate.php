@@ -8,7 +8,7 @@ include_once './objects/users.php';
 $database = new Database();
 $db = $database->getConnection();
 // Creating table 'users'
-$query = "create table if not exists users ( userId int primary key not null auto_increment, firstname varchar(50), lastname varchar(30), email varchar(70) not null, password varchar(15) not null)";
+$query = "create table if not exists users ( userId int primary key not null auto_increment, name varchar(80), email varchar(70) not null, password varchar(15) not null)";
 $db->query($query);
 
 // Creating table 'users_tables'
