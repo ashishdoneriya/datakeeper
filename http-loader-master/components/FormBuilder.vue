@@ -32,7 +32,7 @@
 							</el-row>
 							<el-form :label-position="'left'" ref="form" label-width="120px">
 								<el-form-item label="Field Name">
-									<el-input v-model="field.name"></el-input>
+									<el-input v-on:keyup="calcMaxFieldLabelLength()" v-model="field.name"></el-input>
 								</el-form-item>
 								<el-form-item label="Field Type">
 									<el-select v-model="field.type" placeholder="Select">
@@ -60,8 +60,30 @@
 					</div>
 				</el-col>
 				<el-col :span="12">
-					<div class="grid-content bg-purple-light">
-						<h2 class="text-center">Preview</h2>
+					<div class="grid-content bg-purple-light" style="padding-left:30px;">
+						<h2 class="text-center">Preview{{maxFieldLabelLength}}</h2>
+						<el-card class="box-card">
+							<el-form :label-position="'left'" ref="form" :label-width="maxFieldLabelLength">
+								<el-form-item v-for="(field, i) of fields" :key="field" :label="field.name" class="maxlabel">
+									<el-input v-if="field.type && field.type=='Text' || field.type=='Number' || field.type=='Deimal Number'"></el-input>
+									<el-select v-if="field.type && field.type=='Select'" placeholder="Select">
+										<el-option
+											v-for="item in field.options"
+											:key="item.value"
+											:label="item.value"
+											:value="item.value">
+										</el-option>
+									</el-select>
+									<el-checkbox-group v-if="field.type && field.type=='Checkbox'">
+										<el-checkbox v-for="option in field.options" :key="option" :label="option.value"></el-checkbox>
+									</el-checkbox-group>
+									<el-radio-group v-if="field.type && field.type=='Radio Button'">
+										<el-radio label="option.value">1</el-radio>
+										<el-radio v-for="(option, j) in field.options" :key="option" :label="option.value">1</el-radio>
+									</el-radio-group>
+								</el-form-item>
+							</el-form>
+						</el-card>
 					</div>
 				</el-col>
 			</el-row>
@@ -88,17 +110,30 @@
 					{ value : 'Radio Button', label : 'Radio Button'},
 					{ value : 'Text', label : 'Text'},
 					{ value : 'Number', label : 'Number'},
-					{ value : 'Deimal Numbers', label : 'Deimal Numbers'},
+					{ value : 'Deimal Number', label : 'Deimal Number'},
 					{ value : 'Date', label : 'Date'},
 					{ value : 'Time', label : 'Time'},
 					{ value : 'Date Time', label : 'Date Time'},
 					{ value : 'Tags', label : 'Tags'},
 					{ value : 'Switch', label : 'Switch'},
 					{ value : 'Picture', label : 'Picture'}
-				]
+				],
+				maxFieldLabelLength : '0px'
 			};
 		},
+		computed : {
+		},
 		methods: {
+			calcMaxFieldLabelLength() {
+				console.log('inside'+new Date());
+				var max = 0;
+				for (e of document.querySelectorAll('.maxlabel > label')) {
+					if (max < e.clientWidth) {
+						max = e.clientWidth;
+					}
+				}
+				this.maxFieldLabelLength = max + 'px';
+			},
 			goBack() {},
 			save() {},
 			isFieldEligible(type) {
