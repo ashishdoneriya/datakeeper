@@ -68,9 +68,6 @@
 					}, 1000);
 				}).catch(error => {
 					this.showError('Unable to register');
-					setTimeout(() => {
-						this.$router.push('/login');
-					}, 1000);
 				});
 			},
 			showError(msg) {

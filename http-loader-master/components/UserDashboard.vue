@@ -7,8 +7,8 @@
 						<span>Tables</span>
 						<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addTable()">Add</el-button>
 					</div>
-					<div v-for="o in 4" :key="o" class="text item">
-						{{'List item ' + o }}
+					<div v-for="table in tablesList" :key="table" class="text item">
+						{{table.displayedTableName }}
 
 						<el-button style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
 						<el-button style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
@@ -21,6 +21,11 @@
 
 <script>
 	module.exports = {
+		computed: {
+			tablesList() {
+				return this.$store.state.list;
+			}
+		},
 		methods: {
 			addTable() {
 				this.$router.push({

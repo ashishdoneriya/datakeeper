@@ -14,9 +14,9 @@ $user->password = $data['password'];
 $user->fetchUserInfo();
 if ($user->id != null) {
 	session_start();
-	$_SESSION["user.id"] = $user->id;
-	$_SESSION["user.name"] = $user->name;
-	$_SESSION["user.email"] = $user->email;
+	$_SESSION["userId"] = $user->id;
+	$_SESSION["name"] = $user->name;
+	$_SESSION["email"] = $user->email;
 	echo "success";
 } else {
 	echo "failed";

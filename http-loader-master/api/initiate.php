@@ -12,7 +12,7 @@ $query = "create table if not exists users ( userId int primary key not null aut
 $db->query($query);
 
 // Creating table 'users_tables'
-$query = "create table if not exists users_tables ( userId int not null, tableName varchar(30) not null, displayedTableName  varchar(100) not null, tableJson text not null, readPermission tinyint not null, writePermission tinyint not null, foreign key (userId) references users(userId))";
+$query = "create table if not exists users_tables ( userId int not null, tableName varchar(30) not null, displayedTableName varchar(100) not null, fields text not null, readPermission tinyint not null, writePermission tinyint not null, foreign key (userId) references users(userId))";
 $db->query($query);
 
 // Creating table 'guests_permissions'

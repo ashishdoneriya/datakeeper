@@ -7,13 +7,12 @@
 				</el-menu-item>
 				<el-menu-item index="2">
 					<el-select v-model="value" placeholder="Select Table">
-						<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+						<el-option v-for="table in tablesList" :key="table" :label="table.displayedTableName" :value="table.name">
 						</el-option>
 					</el-select>
 				</el-menu-item>
 				<el-submenu index="3" style="float:right;min-width:75px;text-align:right">
-					<template slot="title">Hi {{user.name}}
-</template>
+					<template slot="title">Hi {{user.name}}</template>
 					<el-menu-item index="3-1" @click="logout()" style="max-width:75px;min-width:75px;">Logout</el-menu-item>
 				</el-submenu>
 			</el-menu>
@@ -27,40 +26,23 @@
 		data() {
 			return {
 				user: {},
-				options: [{
-						value: "Option1",
-						label: "Option1"
-					},
-					{
-						value: "Option2",
-						label: "Option2"
-					},
-					{
-						value: "Option3",
-						label: "Option3"
-					},
-					{
-						value: "Option4",
-						label: "Option4"
-					},
-					{
-						value: "Option5",
-						label: "Option5"
-					}
-				],
 				value: ""
 			};
 		},
+		computed: {
+			tablesList() {
+				return this.$store.state.list;
+			}
+		},
 		created: function() {
 			this.getUserInfo();
+			this.$store.commit('update');
 		},
 		methods: {
 			getUserInfo() {
 				axios.get('/api/user/info.php')
 					.then(result => {
-						console.log(result);
 						this.user = result.data;
-
 					}).catch(error => {
 						this.$notify({
 							message: 'Unable to fetch your details',

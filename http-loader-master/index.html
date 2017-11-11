@@ -13,6 +13,7 @@
 		<link rel="stylesheet" href="/fonts/Roboto/roboto.css">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<script src="/js/vue.min.js"></script>
+		<script src="/js/vuex.min.js"></script>
 		<script src="/js/vue-router.min.js"></script>
 		<script src="/js/httpVueLoader.js"></script>
 		<script src="/js/elementui.min.js"></script>
@@ -21,20 +22,25 @@
 			* {
 				font-family: 'Roboto', sans-serif;
 			}
+
 			a {
-				text-decoration : none;
+				text-decoration: none;
 				color: #009688;
 			}
+
 			.text-center {
 				text-align: center;
 			}
+
 			.right-align {
 				text-align: right;
 			}
-			a, i {
+
+			a,
+			i {
 				cursor: pointer;
 			}
-			</style>
+		</style>
 	</head>
 
 	<body>
@@ -42,8 +48,24 @@
 			<router-view></router-view>
 		</div>
 		<script>
+			Vue.use(Vuex);
 			new Vue({
 				el: '#vapp',
+				store: new Vuex.Store({
+					state: {
+						list: []
+					},
+					mutations: {
+						update() {
+							axios.get('/api/tables-list.php')
+								.then(result => {
+									this.state.list = result.data;
+								}).catch(error => {
+									console.error(error);
+								});
+						}
+					}
+				}),
 				router: new VueRouter({
 					mode: 'history',
 					routes: [{
@@ -56,15 +78,15 @@
 					}, {
 						path: '/user',
 						component: httpVueLoader('/components/User.vue'),
-						children : [
+						children: [
 							{
 								path: 'dashboard',
-								alias : '',
-								component : httpVueLoader('/components/UserDashboard.vue')
+								alias: '',
+								component: httpVueLoader('/components/UserDashboard.vue')
 							},
 							{
 								path: 'form-builder',
-								component : httpVueLoader('/components/FormBuilder.vue')
+								component: httpVueLoader('/components/FormBuilder.vue')
 							}
 						]
 					}]
