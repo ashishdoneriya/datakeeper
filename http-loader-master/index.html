@@ -17,6 +17,7 @@
 		<script src="/js/vue-router.min.js"></script>
 		<script src="/js/httpVueLoader.js"></script>
 		<script src="/js/elementui.min.js"></script>
+		<script src="/js/element.en.js"></script>
 		<script src="/js/axios.min.js"></script>
 		<style>
 			* {
@@ -49,6 +50,7 @@
 		</div>
 		<script>
 			Vue.use(Vuex);
+			ELEMENT.locale(ELEMENT.lang.en);
 			new Vue({
 				el: '#vapp',
 				store: new Vuex.Store({
@@ -87,6 +89,14 @@
 							{
 								path: 'form-builder',
 								component: httpVueLoader('/components/FormBuilder.vue')
+							},
+							{
+								path :'table/:tableName',
+								component: httpVueLoader('/components/Search.vue')
+							},
+							{
+								path : 'table/:tableName/add',
+								component : httpVueLoader('/components/AddRecord.vue')
 							}
 						]
 					}]
@@ -97,3 +107,13 @@
 
 
 </html>
+
+<!--
+TODO :
+
+1. Approvals before entering information
+2. Restricted view to public, some people and the rest of the world.
+
+
+
+-->

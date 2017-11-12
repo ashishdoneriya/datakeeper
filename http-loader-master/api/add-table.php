@@ -9,6 +9,9 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $displayedTableName = $data['displayedTableName'];
 $fields = $data['fields'];
+foreach($fields as $field) {
+	$field['id'] =str_replace(' ', '_', $field['name']);;
+}
 $encodedFields = json_encode($fields);
 $userId = $_SESSION['userId'];
 $tableName = $userId . '_' . time();
@@ -18,7 +21,7 @@ $db->query($query);
 // Creating table
 $tempFields = array();
 foreach($fields as $field) {
-	array_push($tempFields, '' . $field['name'] . ' ' . getMysqlFieldType($field['type']) . getRequired($fields['isCompulsory']));
+	array_push($tempFields, '' . $field['id'] . ' ' . getMysqlFieldType($field['type']) . getRequired($fields['isCompulsory']));
 }
 
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';

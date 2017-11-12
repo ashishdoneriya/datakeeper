@@ -6,8 +6,8 @@
 					<router-link to="/user/dashboard">Home</router-link>
 				</el-menu-item>
 				<el-menu-item index="2">
-					<el-select v-model="value" placeholder="Select Table">
-						<el-option v-for="table in tablesList" :key="table" :label="table.displayedTableName" :value="table.name">
+					<el-select v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
+						<el-option v-for="table in tablesList" :key="table" :label="table.displayedTableName" :value="table.tableName">
 						</el-option>
 					</el-select>
 				</el-menu-item>
@@ -26,7 +26,7 @@
 		data() {
 			return {
 				user: {},
-				value: ""
+				selectedTable : ''
 			};
 		},
 		computed: {
@@ -39,6 +39,9 @@
 			this.$store.commit('update');
 		},
 		methods: {
+			openTable(tableName) {
+				this.$router.push('/user/table/' + this.selectedTable);
+			},
 			getUserInfo() {
 				axios.get('/api/user/info.php')
 					.then(result => {
