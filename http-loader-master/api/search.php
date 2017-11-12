@@ -1,6 +1,6 @@
 <?php
 
-header("Access-Control-Allow-Methods: GET");
+header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
 

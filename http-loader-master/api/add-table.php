@@ -7,21 +7,22 @@ session_start();
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$displayedTableName = $data['displayedTableName'];
-$fields = $data['fields'];
+$data = json_decode(json_encode($data));
+$displayedTableName = $data ->displayedTableName;
+$fields = $data->fields;
 foreach($fields as $field) {
-	$field['id'] =str_replace(' ', '_', $field['name']);;
+	$field->id = str_replace(' ', '_', $field->name);
 }
 $encodedFields = json_encode($fields);
 $userId = $_SESSION['userId'];
 $tableName = $userId . '_' . time();
-$query = "insert into users_tables (userId, tableName, displayedTableName, fields, readPermission , writePermission ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', 0, 0)";
+$query = "insert into users_tables (userId, tableName, displayedTableName, fields, publicRole ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', 'none')";
 $db->query($query);
 
 // Creating table
 $tempFields = array();
 foreach($fields as $field) {
-	array_push($tempFields, '' . $field['id'] . ' ' . getMysqlFieldType($field['type']) . getRequired($fields['isCompulsory']));
+	array_push($tempFields, '' . $field->id . ' ' . getMysqlFieldType($field->type) . getRequired($field->isCompulsory));
 }
 
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';

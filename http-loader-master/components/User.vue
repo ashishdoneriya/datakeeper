@@ -37,6 +37,10 @@
 		created: function() {
 			this.getUserInfo();
 			this.$store.commit('update');
+			var tableName = this.$route.params.tableName;
+			if (tableName) {
+				this.selectedTable = tableName;
+			}
 		},
 		methods: {
 			openTable(tableName) {

@@ -12,15 +12,17 @@ $query = "create table if not exists users ( userId int primary key not null aut
 $db->query($query);
 
 // Creating table 'users_tables'
-$query = "create table if not exists users_tables ( userId int not null, tableName varchar(30) not null, displayedTableName varchar(100) not null, fields text not null, readPermission tinyint not null, writePermission tinyint not null, foreign key (userId) references users(userId))";
+//public role = none/user/contributor
+$query = "create table if not exists users_tables ( userId int not null, tableName varchar(30) not null, displayedTableName varchar(100) not null, fields text not null, publicRole varchar(15) not null, foreign key (userId) references users(userId))";
 $db->query($query);
 
 // Creating table 'guests_permissions'
-$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(30) not null, canRead tinyint(1) not null, canWrite tinyint(1) not null, foreign key (userId) references users(userId))";
+//role = administrator / contributor / user
+$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(30) not null, role varchar(30) not null, foreign key (userId) references users(userId))";
 $db->query($query);
 
 // Creating table 'access_requests'
-$query = "create table if not exists access_requests ( userId int, refreeId int not null, email varchar(30), tableName varchar(30) not null, canRead tinyint(1) not null, canWrite tinyint(1) not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
+$query = "create table if not exists write_requests ( userId int not null, tableName varchar(30) not null, fields text not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
 $db->query($query);
 
 ?>

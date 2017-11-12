@@ -139,7 +139,24 @@
 				]
 			};
 		},
-		computed: {},
+		created: function() {
+			this.tableName = this.$route.params.tableName;
+			if (this.tableName) {
+				axios.get(`/api/table-info.php?tableName=${this.tableName}`)
+					.then(result => {
+						this.displayedTableName = result.data.displayedTableName;
+						this.fields = result.data.fields;
+						for (var field of this.fields) {
+							field['value'] = undefined;
+						}
+					}).catch(error => {
+						this.$notify({
+							message: 'Unable to fetch table information',
+							type: 'error'
+						});
+					});
+			}
+		},
 		methods: {
 			goBack() {},
 			save() {
@@ -183,6 +200,7 @@
 						message: 'Table Added',
 						type: 'success'
 					});
+					this.$store.commit('update');
 					setTimeout(() => {
 						this.$router.push('/user/dashboard');
 					}, 1000);
@@ -192,19 +210,24 @@
 			},
 			updateTable() {
 				axios.post('/api/update-table.php', {
-					'tableName' : this.tableName,
+					'tableName': this.tableName,
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
 				}).then(response => {
-					this.$notify({
-						message: 'Table Added',
-						type: 'success'
-					});
-					setTimeout(() => {
-						this.$router.push('/user/dashboard');
-					}, 2000);
+					if (response.data == 'success') {
+						this.$notify({
+							message: 'Table Updated',
+							type: 'success'
+						});
+						this.$store.commit('update');
+						setTimeout(() => {
+							this.$router.push('/user/dashboard');
+						}, 2000);
+					} else {
+						this.showError('Unable to update table');
+					}
 				}).catch(error => {
-					this.showError('Unable to add table');
+
 				});
 			},
 			isFieldEligible(type) {

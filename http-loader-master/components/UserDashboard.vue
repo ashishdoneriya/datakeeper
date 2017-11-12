@@ -8,10 +8,9 @@
 						<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addTable()">Add</el-button>
 					</div>
 					<div v-for="table in tablesList" :key="table" class="text item">
-						{{table.displayedTableName }}
-
-						<el-button style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
-						<el-button style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
+						<a @click="openTable(table.tableName)"> {{table.displayedTableName }}</a>
+						<el-button @click="removeTable(table)" style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
+						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
 					</div>
 				</el-card>
 			</el-col>
@@ -27,9 +26,38 @@
 			}
 		},
 		methods: {
+			openTable(tableName) {
+				this.$router.push(`/user/table/${tableName}`);
+			},
 			addTable() {
-				this.$router.push({
-					path: '/user/form-builder'
+				this.$router.push('/user/form-builder');
+			},
+			modifyTable(table) {
+				this.$router.push(`/user/form-builder/${table.tableName}`);
+			},
+			removeTable(table) {
+				this.$confirm(`Are you sure want to remove the table '${table.displayedTableName}' ?`, 'Warning', {
+					confirmButtonText: 'OK',
+					cancelButtonText: 'Cancel',
+					type: 'warning'
+				}).then(() => {
+					axios.post('/api/remove-table.php', {
+						tableName: table.tableName
+					}).then((result => {
+						this.$message({
+							type: 'success',
+							message: `Table '${table.displayedTableName}' has been removed`
+						});
+						this.$store.commit('update');
+					})).catch(error => {
+
+					});
+
+				}).catch(() => {
+					this.$message({
+						type: 'info',
+						message: `Unable to remove table '${table.displayedTableName}'`
+					});
 				});
 			}
 		}

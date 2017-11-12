@@ -13,8 +13,8 @@ $tableName = $data['tableName'];
 $fieldsIdArr = array();
 $valuesArr = array();
 foreach($fields as $field) {
-	array_push($fieldsIdArr, $field.id);
-	if (toAddQuotes($field.type)) {
+	array_push($fieldsIdArr, $field['id']);
+	if (toAddQuotes($field['type'])) {
 		array_push($valuesArr, "'" . $field['value'] . "'");
 	} else {
 		array_push($valuesArr, $field['value']);

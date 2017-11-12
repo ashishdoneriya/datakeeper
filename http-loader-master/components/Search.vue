@@ -35,14 +35,14 @@
 			};
 		},
 		created() {
-
+			this.search();
 		},
 		methods: {
 			search() {
 				var data = {
 					tableName: this.tableName
 				}
-				axios.get('/api/search.php', data)
+				axios.post('/api/search.php', data)
 					.then(result => {
 						this.tableData = result.data;
 					}).catch(error => {

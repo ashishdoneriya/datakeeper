@@ -91,11 +91,15 @@
 								component: httpVueLoader('/components/FormBuilder.vue')
 							},
 							{
+								path: 'form-builder/:tableName',
+								component: httpVueLoader('/components/FormBuilder.vue')
+							},
+							{
 								path :'table/:tableName',
 								component: httpVueLoader('/components/Search.vue')
 							},
 							{
-								path : 'table/:tableName/add',
+								path : 'table/:tableName/add-record',
 								component : httpVueLoader('/components/AddRecord.vue')
 							}
 						]
