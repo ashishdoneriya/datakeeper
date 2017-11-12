@@ -1,8 +1,8 @@
 <template>
 	<el-main>
 		<el-row type="flex" class="row-bg" justify="center" style="margin-top:100px">
-			<el-col :span="8">
-				<el-card class="box-card">
+			<el-col :span="16">
+				<el-card class="box-card" style="width:100%">
 					<div slot="header" class="clearfix">
 						<span>Tables</span>
 						<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addTable()">Add</el-button>
@@ -11,6 +11,7 @@
 						<a @click="openTable(table.tableName)"> {{table.displayedTableName }}</a>
 						<el-button @click="removeTable(table)" style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
 						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
+						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text"> Change Permissions</el-button>
 					</div>
 				</el-card>
 			</el-col>
@@ -25,8 +26,12 @@
 				return this.$store.state.list;
 			}
 		},
+		created() {
+			this.$store.commit('setCurrentTable', '');
+		},
 		methods: {
 			openTable(tableName) {
+				this.$store.commit('setCurrentTable', tableName);
 				this.$router.push(`/user/table/${tableName}`);
 			},
 			addTable() {

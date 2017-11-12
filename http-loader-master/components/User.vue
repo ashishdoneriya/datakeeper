@@ -12,7 +12,8 @@
 					</el-select>
 				</el-menu-item>
 				<el-submenu index="3" style="float:right;min-width:75px;text-align:right">
-					<template slot="title">Hi {{user.name}}</template>
+					<template slot="title">Hi {{user.name}}
+</template>
 					<el-menu-item index="3-1" @click="logout()" style="max-width:75px;min-width:75px;">Logout</el-menu-item>
 				</el-submenu>
 			</el-menu>
@@ -26,12 +27,20 @@
 		data() {
 			return {
 				user: {},
-				selectedTable : ''
+				selectedTable: ''
 			};
 		},
 		computed: {
+			storeCurrentTable() {
+				return this.$store.state.currentTable;
+			},
 			tablesList() {
 				return this.$store.state.list;
+			}
+		},
+		watch : {
+			storeCurrentTable(newTable, oldTable) {
+				this.selectedTable = newTable;
 			}
 		},
 		created: function() {

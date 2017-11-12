@@ -250,7 +250,8 @@
 					type: '',
 					isCompulsory: false,
 					options: [],
-					value: undefined
+					value: undefined,
+					isVisible : false
 				});
 			},
 

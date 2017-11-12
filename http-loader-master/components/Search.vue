@@ -9,8 +9,8 @@
 		</el-row>
 		<el-row>
 			<el-col :span="24">
-				<el-table :data="tableData" style="width: 100%">
-					<el-table-column v-for="field in fields" :key="field" :prop="field.id" :label="field.name">
+				<el-table :data="tableData">
+					<el-table-column v-for="(value, key) in tableData[0]" :key="key" :prop="key" :label="key">
 					</el-table-column>
 				</el-table>
 			</el-col>
@@ -42,7 +42,7 @@
 				var data = {
 					tableName: this.tableName
 				}
-				axios.post('/api/search.php', data)
+				axios.get(`/api/search.php?tableName=${this.tableName}`)
 					.then(result => {
 						this.tableData = result.data;
 					}).catch(error => {
