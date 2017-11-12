@@ -31,7 +31,7 @@ if ($userId == null) {
 	$result['fields'] = $publicFields;
 } else if ($userId == $row['userId']) {
 	//get private fields
-	$result['fields'] = $row['fields'];
+	$result['fields'] = json_decode($row['fields'], true);
 } else {
 	// checking if the other user has permissions to read or not
 	$rows = $db->query("select userId, tableName, role from guest_permissions where tableName='$tableName'");
@@ -51,9 +51,8 @@ if ($userId == null) {
 		}
 		$result['fields'] = $publicFields;
 	} else {
-		$result['fields'] = $row['fields'];
+		$result['fields'] = json_decode($row['fields'], true);
 	}
 }
-$result['fields'] = json_decode($result['fields']);
 echo json_encode($result);
 ?>
