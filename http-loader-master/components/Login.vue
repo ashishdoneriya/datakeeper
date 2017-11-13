@@ -38,19 +38,19 @@
 		methods: {
 			login: function() {
 				if (!this.form.email && !this.form.password) {
-					this.$notify({
+					this.$message({
 						message: 'Please fill your email id and password',
 						type: 'error'
 					});
 					return;
 				} else if (!this.form.email) {
-					this.$notify({
+					this.$message({
 						message: 'Please fill your email id',
 						type: 'error'
 					});
 					return;
 				} else if (!this.form.password) {
-					this.$notify({
+					this.$message({
 						message: 'Please fill your password',
 						type: 'error'
 					});
@@ -65,13 +65,13 @@
 							path: '/user/dashboard'
 						});
 					} else {
-						this.$notify({
-							title: 'Unable to login',
+						this.$message({
+							message: 'Invalid email or password',
 							type: 'error'
 						});
 					}
 				}).catch(error => {
-					this.$notify({
+					this.$message({
 						message: 'Error while checking login details',
 						type: 'error'
 					});

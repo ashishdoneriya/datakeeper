@@ -61,28 +61,35 @@
 				<el-col :span="12">
 					<div class="grid-content bg-purple-light" style="padding-left:30px;">
 						<h2 class="text-center">Preview</h2>
-						<el-card class="box-card" v-show="fields.length > 0">
-							<el-form :label-position="'left'" ref="form" label-width="150px">
-								<el-form-item v-for="(field, i) of fields" :key="field" :label="field.name" class="maxlabel">
-									<el-input v-if="field.type && field.type=='Text' || field.type=='Number' || field.type=='Deimal Number'"></el-input>
-									<el-select v-if="field.type && field.type=='Select'" placeholder="Select" v-model="field.value">
+						<table v-show="fields.length > 0">
+							<tr v-for="field in fields" :key="field">
+								<td class="label">{{field.name}}</td>
+								<td>
+									<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number'" v-model="field.value" :ref="field.id"></el-input>
+									<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.id">
 										<el-option v-for="item in field.options" :key="item.value" :label="item.value" :value="item.value">
 										</el-option>
 									</el-select>
-									<el-checkbox-group v-if="field.type && field.type=='Checkbox'" v-model="field.value">
+									<el-checkbox-group v-if="field.type=='Checkbox'" v-model="field.value" :ref="field.id">
 										<el-checkbox v-for="option in field.options" :key="option.value" :label="option.value"></el-checkbox>
 									</el-checkbox-group>
-									<el-radio-group v-if="field.type && field.type=='Radio Button' && field.options.length > 0" v-model="field.value">
+									<el-radio-group :ref="field.id" v-if="field.type=='Radio Button' && field.options.length > 0" v-model="field.value">
 										<el-radio v-for="(option, j) in field.options" :key="option.value" :label="option.value">{{option.value}}</el-radio>
 									</el-radio-group>
-									<el-date-picker v-if="field.type && field.type=='Date'" v-model="field.value" type="date" placeholder="Pick a day">
+									<el-date-picker :ref="field.id" v-if="field.type=='Date'" v-model="field.value" type="date" placeholder="Pick a day" value-format="yyyy-MM-dd">
 									</el-date-picker>
-									<el-time-select v-if="field.type && field.type=='Time'" v-model="field.value" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
+									<el-time-select :ref="field.id" v-if="field.type=='Time'" v-model="field.value" value-format="HH:mm:ss" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
 									</el-time-select>
-									<el-date-picker v-if="field.type && field.type=='Date Time'" v-model="field.value" type="datetime" placeholder="Select date and time"></el-date-picker>
-								</el-form-item>
-							</el-form>
-						</el-card>
+									<el-date-picker :ref="field.id" v-if="field.type=='Date Time'" v-model="field.value" type="datetime" placeholder="Select date and time" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<el-button>Save</el-button>
+								</td>
+							</tr>
+						</table>
 					</div>
 				</el-col>
 			</el-row>
@@ -150,7 +157,7 @@
 							field['value'] = undefined;
 						}
 					}).catch(error => {
-						this.$notify({
+						this.$message({
 							message: 'Unable to fetch table information',
 							type: 'error'
 						});
@@ -171,14 +178,14 @@
 					temp.push(field);
 				}
 				if (this.fields.length == 0) {
-					this.$notify({
+					this.$message({
 						message: 'No adding table since some fields are not properly filled',
 						type: 'info'
 					});
 					return;
 				}
 				if (this.displayedTableName.trim().length == 0) {
-					this.$notify({
+					this.$message({
 						message: 'Please specify table name',
 						type: 'error'
 					});
@@ -196,8 +203,8 @@
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
 				}).then(response => {
-					this.$notify({
-						message: 'Table Added',
+					this.$message({
+						message: 'Table added successfully',
 						type: 'success'
 					});
 					this.$store.commit('update');
@@ -208,6 +215,12 @@
 					this.showError('Unable to add table');
 				});
 			},
+			showError(msg) {
+				this.$message({
+					message: msg,
+					type: 'error'
+				});
+			},
 			updateTable() {
 				axios.post('/api/update-table.php', {
 					'tableName': this.tableName,
@@ -215,8 +228,8 @@
 					'fields': this.fields
 				}).then(response => {
 					if (response.data == 'success') {
-						this.$notify({
-							message: 'Table Updated',
+						this.$message({
+							message: 'Table updated',
 							type: 'success'
 						});
 						this.$store.commit('update');
@@ -357,6 +370,18 @@
 		opacity: 1;
 		transform: scale(1);
 		transform-origin: right center 0;
+	}
+		table {
+		width: 100%;
+	}
+
+	tr>td {
+		padding-bottom: 10px;
+	}
+
+	.label {
+		font-size: 14px;
+		color: #5a5e66;
 	}
 </style>
 

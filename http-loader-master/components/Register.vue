@@ -59,19 +59,26 @@
 					'email': this.email,
 					'password': this.password
 				}).then(response => {
-					this.$notify({
-						message: 'Registration Successful',
-						type: 'success'
-					});
-					setTimeout(() => {
-						this.$router.push('/login');
-					}, 1000);
+					if (response.data.status == 'success') {
+						this.$message({
+							message: response.data.message,
+							type: 'success'
+						});
+						setTimeout(() => {
+							this.$router.push('/login');
+						}, 2000);
+					} else {
+						this.$message({
+							message: response.data.message,
+							type: 'error'
+						});
+					}
 				}).catch(error => {
 					this.showError('Unable to register');
 				});
 			},
 			showError(msg) {
-				this.$notify({
+				this.$message({
 					message: msg,
 					type: 'error'
 				});

@@ -25,4 +25,6 @@ $db->query($query);
 $query = "create table if not exists write_requests ( userId int not null, tableName varchar(30) not null, fields text not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
 $db->query($query);
 
+echo "success";
+
 ?>
