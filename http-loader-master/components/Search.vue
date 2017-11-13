@@ -10,7 +10,7 @@
 		<el-row>
 			<el-col :span="24">
 				<el-table :data="tableData">
-					<el-table-column v-for="(value, key) in tableData[0]" :key="key" :prop="key" :label="key">
+					<el-table-column v-for="field in fields" :key="field" :prop="field.id" :label="field.name">
 					</el-table-column>
 				</el-table>
 			</el-col>
@@ -31,7 +31,8 @@
 				tableName: this.$route.params.tableName,
 				fields: [],
 				tableData: [],
-				query: ''
+				searchQuery: '',
+				displayedTableName : '',
 			};
 		},
 		created() {
@@ -46,18 +47,22 @@
 					.then(result => {
 						this.tableData = result.data;
 					}).catch(error => {
-						this.$notify({
+						this.$message({
 							message: 'Unable to fetch records',
 							type: 'error'
 						});
 					});
 			},
 			getTableInfo() {
-				axios.get('/api/tableInfo.php')
+				axios.get(`/api/table-info.php?tableName=${this.tableName}`)
 					.then(result => {
-						this.fields = result.data;
+						this.displayedTableName = result.data.displayedTableName;
+						this.fields = result.data.fields;
+						for (var field of this.fields) {
+							field['value'] = undefined;
+						}
 					}).catch(error => {
-						this.$notify({
+						this.$message({
 							message: 'Unable to fetch table information',
 							type: 'error'
 						});
