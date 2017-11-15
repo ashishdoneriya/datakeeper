@@ -16,7 +16,6 @@
 				</el-table>
 			</el-col>
 		</el-row>
-		<el-footer>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="8">
 				<el-pagination v-if="totalResults > 0"
@@ -29,7 +28,7 @@
 					:total="totalResults">
 				</el-pagination>
 			</el-col>
-		</el-row></el-footer>
+		</el-row>
 		<a class="float" @click="addRecord()">
 			<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
 		</a>
