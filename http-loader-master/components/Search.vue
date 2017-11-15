@@ -16,6 +16,7 @@
 				</el-table>
 			</el-col>
 		</el-row>
+		<el-footer>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="8">
 				<el-pagination v-if="totalResults > 0"
@@ -28,7 +29,7 @@
 					:total="totalResults">
 				</el-pagination>
 			</el-col>
-		</el-row>
+		</el-row></el-footer>
 		<a class="float" @click="addRecord()">
 			<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
 		</a>
@@ -62,7 +63,8 @@
 			searchQuery : function(newQuery) {
 				// clears the timer on a call so there is always x seconds in between calls
 				clearTimeout(this.timer);
-				// if the timer resets before it hits 150ms it will not run
+
+				// if the timer resets before it hits 400ms it will not run
 				this.timer = setTimeout(() => {
 				    this.getTotal()
 				}, 400);
