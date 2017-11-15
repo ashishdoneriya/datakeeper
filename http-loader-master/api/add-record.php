@@ -24,9 +24,12 @@ $fieldsString = join("," , $fieldsIdArr);
 $valuesString = join(",", $valuesArr);
 
 $query = "insert into $tableName ($fieldsString) values ($valuesString)";
-$db->query($query);
-
-echo 'success';
+$result = $db->query($query);
+if ($result == true) {
+	echo 'success';
+} else {
+	echo 'failed';
+}
 
 function toAddQuotes ($type) {
 	switch ($type) {

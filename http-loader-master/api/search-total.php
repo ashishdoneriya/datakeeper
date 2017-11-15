@@ -80,6 +80,7 @@ function getSearchQuery($query, $fields) {
 				array_push($searchArr, $field['id'] . " like '%". $query . "%'");
 				continue;
 			case 'Number' :
+			case 'Id' :
 				if (is_numeric($query) == true) {
 					array_push($searchArr, $field['id'] . "=". $query);
 				}

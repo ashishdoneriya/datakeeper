@@ -10,14 +10,26 @@ $data = json_decode(file_get_contents('php://input'), TRUE);
 $data = json_decode(json_encode($data));
 $displayedTableName = $data ->displayedTableName;
 $fields = $data->fields;
+$idsFound = 0;
 foreach($fields as $field) {
+	if ($field->type == 'Id') {
+		$idsFound++;
+	}
 	$field->id = str_replace(' ', '_', $field->name);
+}
+if ($idsFound != 1) {
+	echo "failed";
+	return;
 }
 $encodedFields = json_encode($fields);
 $userId = $_SESSION['userId'];
 $tableName = $userId . '_' . time();
 $query = "insert into users_tables (userId, tableName, displayedTableName, fields, publicRole ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', 'none')";
-$db->query($query);
+$rows = $db->query($query);
+if ($rows == false) {
+	echo "failed";
+	return;
+}
 
 // Creating table
 $tempFields = array();
@@ -26,7 +38,13 @@ foreach($fields as $field) {
 }
 
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
-$db->query($query);
+$rows = $db->query($query);
+
+if ($rows == false) {
+	echo "failed";
+} else {
+	echo "success";
+}
 
 function getRequired($required) {
 	if ($required == true) {
@@ -51,6 +69,8 @@ function getMysqlFieldType($type) {
 			return 'TIME';
 		case 'Date Time' :
 			return 'DATETIME';
+		case 'Id' :
+			return 'BIGINT primary key auto_increment';
 		default :
 			return 'TEXT';
 	}

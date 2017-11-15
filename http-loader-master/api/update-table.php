@@ -12,6 +12,17 @@ $data = json_decode(json_encode($data));
 $displayedTableName = $data->displayedTableName;
 $tableName = $data->tableName;
 $newFields = $data->fields;
+$idsFound = 0;
+foreach($newFields as $field) {
+	if ($field->type == 'Id') {
+		$idsFound++;
+	}
+	$field->id = str_replace(' ', '_', $field->name);
+}
+if ($idsFound != 1) {
+	echo "failed";
+	return;
+}
 $rows = $db->query("select fields from users_tables where tableName='$tableName' and userId=$userId");
 $row = $rows->fetch();
 $oldFields = json_decode($row['fields']);

@@ -7,6 +7,7 @@
 				</el-menu-item>
 				<el-menu-item index="2">
 					<el-select v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
+						<el-option key="" label="Select Table" value="" disabled="true"></el-option>
 						<el-option v-for="table in tablesList" :key="table" :label="table.displayedTableName" :value="table.tableName">
 						</el-option>
 					</el-select>
@@ -53,6 +54,9 @@
 		},
 		methods: {
 			openTable(tableName) {
+				if (this.selectedTable == '') {
+					return;
+				}
 				this.$router.push('/user/table/' + this.selectedTable);
 			},
 			getUserInfo() {

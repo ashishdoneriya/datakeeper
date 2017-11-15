@@ -18,16 +18,16 @@
 				<el-col :span="12" style="border-right:1px solid #ccc;overflow-y:auto;overflow-x:hidden;height:100%;padding-right:30px;">
 					<div class="grid-content bg-purple">
 						<h2 class="text-center">Form Builder</h2>
-						<el-card class="box-card" v-for="(field, i) of fields" :key="field.fieldName" style="margin-bottom:10px;">
-							<el-row>
+						<el-card class="box-card" v-for="(field, i) of fields" :key="field.fieldName" style="margin-bottom:10px;width:100%">
+							<el-row v-show="i != 0">
 								<el-col :span="24" class="right-align clearfix" style="margin-bottom:5px;">
 									<el-tooltip content="Remove Field" placement="top" open-delay="200">
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-delete" @click="deleteField(i)"></i>
 									</el-tooltip>
-									<el-tooltip content="Shift Field Up" placement="top" open-delay="200">
+									<el-tooltip v-show="i != 1" content="Shift Field Up" placement="top" open-delay="200">
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-up" @click="shiftUp(i)"></i>
 									</el-tooltip>
-									<el-tooltip content="Shift Field Down" placement="top" open-delay="200">
+									<el-tooltip v-show="i != (fields.length - 1)" content="Shift Field Down" placement="top" open-delay="200">
 										<i style="margin-right:10px;font-size:20px;" class="el-icon-arrow-down" @click="shiftDown(i)"></i>
 									</el-tooltip>
 								</el-col>
@@ -37,7 +37,8 @@
 									<el-input v-model="field.name"></el-input>
 								</el-form-item>
 								<el-form-item label="Field Type">
-									<el-select v-model="field.type" placeholder="Select">
+									<span v-if="field.type == 'Id'" >Id</span>
+									<el-select v-if="field.type != 'Id'" v-model="field.type" placeholder="Select">
 										<el-option v-for="type in fieldTypes" :key="type.value" :label="type.label" :value="type.value">
 										</el-option>
 									</el-select>
@@ -51,21 +52,24 @@
 									</el-col>
 									<el-button @click="addOption(field)" type="primary" size="small">Add Option</el-button>
 								</el-form-item>
-								<el-form-item label="Is Compulsory">
+								<el-form-item label="Is Compulsory" v-if="field.type != 'Id'">
 									<el-checkbox v-model="field.isCompulsory"></el-checkbox>
+								</el-form-item>
+								<el-form-item label="Auto Increment" v-if="field.type == 'Id'">
+									<el-checkbox v-model="field.autoIncrement"></el-checkbox>
 								</el-form-item>
 							</el-form>
 						</el-card>
 					</div>
 				</el-col>
-				<el-col :span="12">
+				<el-col :span="12" style="overflow-y:auto;overflow-x:hidden;height:100%;padding-right:30px;">
 					<div class="grid-content bg-purple-light" style="padding-left:30px;">
 						<h2 class="text-center">Preview</h2>
 						<table v-show="fields.length > 0">
-							<tr v-for="field in fields" :key="field">
+							<tr v-for="field in fields" :key="field" v-show="field.type != 'Id' || (field.type == 'Id' && field.autoIncrement==false)">
 								<td class="label">{{field.name}}</td>
 								<td>
-									<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number'" v-model="field.value" :ref="field.id"></el-input>
+									<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || field.type=='Id'" v-model="field.value" :ref="field.id"></el-input>
 									<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.id">
 										<el-option v-for="item in field.options" :key="item.value" :label="item.value" :value="item.value">
 										</el-option>
@@ -162,6 +166,15 @@
 							type: 'error'
 						});
 					});
+			} else {
+				this.fields.push({
+					name: 'Id',
+					type: 'Id',
+					isCompulsory: true,
+					value: '',
+					isVisible : false,
+					autoIncrement : true
+				});
 			}
 		},
 		methods: {
@@ -178,9 +191,10 @@
 					temp.push(field);
 				}
 				if (this.fields.length == 0) {
+					var word = this.tableName ? "saving" : "adding";
 					this.$message({
-						message: 'No adding table since some fields are not properly filled',
-						type: 'info'
+						message: `Not ${word} table since some fields are not properly filled`,
+						type: 'error'
 					});
 					return;
 				}
@@ -269,11 +283,14 @@
 			},
 
 			deleteField(i) {
+				if (this.fields[i].type == 'id') {
+					return;
+				}
 				this.fields.splice(i, 1);
 			},
 
 			shiftUp(i) {
-				if (i == 0) {
+				if (i == 0 || i == 1) {
 					return;
 				}
 				var temp = this.fields[i - 1];

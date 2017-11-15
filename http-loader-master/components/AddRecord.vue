@@ -7,7 +7,7 @@
 					<tr v-for="field in fields" :key="field">
 						<td class="label">{{field.name}}</td>
 						<td>
-							<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number'" v-model="field.value" :ref="field.id"></el-input>
+							<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || (field.type=='Id' && !field.autoIncrement)" v-model="field.value" :ref="field.id"></el-input>
 							<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.id">
 								<el-option v-for="item in field.options" :key="item.value" :label="item.value" :value="item.value">
 								</el-option>
@@ -55,7 +55,7 @@
 					this.fields = JSON.parse(JSON.stringify(this.fields));
 				}).catch(error => {
 					console.log(error);
-					this.$notify({
+					this.$message({
 						message: 'Unable to fetch table information',
 						type: 'error'
 					});
