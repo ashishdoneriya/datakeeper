@@ -1,5 +1,6 @@
 <template>
 	<el-main>
+		<el-button @click="goBack()"  icon="el-icon-back" type="primary" round>Go Back</el-button>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="18">
 				<table>
@@ -61,6 +62,9 @@
 				});
 		},
 		methods: {
+			goBack() {
+				this.$router.push(`/user/table/${this.tableName}`);
+			},
 			addRecord() {
 				axios.post('/api/add-record.php', {
 						tableName: this.tableName,

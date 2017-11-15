@@ -1,18 +1,32 @@
 <template>
 	<el-main>
+
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="12">
-				<el-input placeholder="Search.." v-model="query">
-					<el-button @click="search" slot="append" icon="el-icon-search">Search</el-button>
+				<el-input placeholder="Search.." v-model="searchQuery">
+					<el-button @click="getTotal()" slot="append" icon="el-icon-search">Search</el-button>
 				</el-input>
 			</el-col>
 		</el-row>
 		<el-row>
 			<el-col :span="24">
-				<el-table :data="tableData">
-					<el-table-column v-for="field in fields" :key="field" :prop="field.id" :label="field.name">
+				<el-table :data="tableData" @sort-change="sortChange">
+					<el-table-column v-for="field in fields" :key="field" :prop="field.id" :label="field.name" sortable="custom">
 					</el-table-column>
 				</el-table>
+			</el-col>
+		</el-row>
+		<el-row type="flex" class="row-bg" justify="center">
+			<el-col :span="8">
+				<el-pagination v-if="totalResults > 0"
+					@size-change="handlePageSizeChange"
+					@current-change="handleCurrentPageChange"
+					:current-page.sync="currentPage"
+					:page-sizes="[10, 20, 50, 100, 200, 500]"
+					:page-size="pageSize"
+					layout="total, sizes, prev, pager, next, jumper"
+					:total="totalResults">
+				</el-pagination>
 			</el-col>
 		</el-row>
 		<a class="float" @click="addRecord()">
@@ -33,17 +47,65 @@
 				tableData: [],
 				searchQuery: '',
 				displayedTableName : '',
+				sortBy : '',
+				order : 'asc',
+				totalResults : 0,
+				pageSize : 10,
+				currentPage : 1,
+				timer : 0
 			};
 		},
 		created() {
-			this.search();
+			this.getTableInfo();
+		},
+		watch : {
+			searchQuery : function(newQuery) {
+				// clears the timer on a call so there is always x seconds in between calls
+				clearTimeout(this.timer);
+				// if the timer resets before it hits 150ms it will not run
+				this.timer = setTimeout(() => {
+				    this.getTotal()
+				}, 400);
+			}
 		},
 		methods: {
-			search() {
-				var data = {
-					tableName: this.tableName
+			handlePageSizeChange(pageSize) {
+				this.pageSize = pageSize;
+				this.currentPage = 1;
+				this.getTotal();
+			},
+			handleCurrentPageChange(currentPage) {
+				this.currentPage = currentPage;
+				this.getTotal();
+			},
+			getTotal() {
+				axios.get(`/api/search-total.php?tableName=${this.tableName}&searchQuery=${this.searchQuery}`)
+					.then(result => {
+						console.log(result.data);
+						this.totalResults = result.data;
+						this.search();
+					}).catch(error => {
+						this.$message({
+							message: 'Unable to fetch records',
+							type: 'error'
+						});
+					});
+			},
+			sortChange(column) {
+				var fieldId = column.prop;
+				var order = column.order;
+				if (!fieldId || !order) {
+					return;
 				}
-				axios.get(`/api/search.php?tableName=${this.tableName}`)
+				if (order == 'ascending') {
+					order = 'asc';
+				} else {
+					order = 'desc';
+				}
+				this.search();
+			},
+			search() {
+				axios.get(`/api/search.php?tableName=${this.tableName}&pageNumber=${this.currentPage}&maximumResults=${this.pageSize}&sortBy=${this.sortBy}&order=${this.order}&searchQuery=${this.searchQuery}`)
 					.then(result => {
 						this.tableData = result.data;
 					}).catch(error => {
@@ -61,6 +123,7 @@
 						for (var field of this.fields) {
 							field['value'] = undefined;
 						}
+						this.getTotal();
 					}).catch(error => {
 						this.$message({
 							message: 'Unable to fetch table information',
@@ -73,20 +136,20 @@
 </script>
 
 <style scoped>
-	.float {
-		position: fixed;
-		width: 60px;
-		height: 60px;
-		bottom: 40px;
-		right: 40px;
-		background-color: #F44336;
-		color: #FFF;
-		border-radius: 50px;
-		text-align: center;
-		box-shadow: 2px 2px 3px #999;
-	}
+.float {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 40px;
+  right: 40px;
+  background-color: #f44336;
+  color: #fff;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+}
 
-	.my-float {
-		margin-top: 22px;
-	}
+.my-float {
+  margin-top: 22px;
+}
 </style>
