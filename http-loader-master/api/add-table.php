@@ -11,11 +11,13 @@ $data = json_decode(json_encode($data));
 $displayedTableName = $data ->displayedTableName;
 $fields = $data->fields;
 $idsFound = 0;
+$count = 0;
 foreach($fields as $field) {
 	if ($field->type == 'Id') {
 		$idsFound++;
 	}
-	$field->id = str_replace(' ', '_', $field->name);
+	$count++;
+	$field->id = str_replace(' ', '_', $field->name) . $count;
 }
 if ($idsFound != 1) {
 	echo "failed";
