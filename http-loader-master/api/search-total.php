@@ -13,8 +13,9 @@ $row = $rows->fetch();
 $role = $row['publicRole'];
 $finalFields = null;
 if ($userId == null) {
-	if ($role == 'none') {
-		echo '0';
+	if ($role == 'none' || $role == 'contributorW') {
+		header('HTTP/1.0 401 Unauthorized');
+		echo 'You are not authorized.';
 		return;
 	}
 
@@ -36,8 +37,9 @@ if ($userId == null) {
 	$row = $rows->fetch();
 	if (count($rows) == 0) {
 		// treat the other user as a public
-		if ($role == 'none') {
-			echo '0';
+		if ($role == 'none' || $role == 'contributorW') {
+			header('HTTP/1.0 401 Unauthorized');
+			echo 'You are not authorized.';
 			return;
 		}
 		$fields = json_decode($row['fields'], true);
