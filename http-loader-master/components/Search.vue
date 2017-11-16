@@ -82,7 +82,6 @@
 			getTotal() {
 				axios.get(`/api/search-total.php?tableName=${this.tableName}&searchQuery=${this.searchQuery}`)
 					.then(result => {
-						console.log(result.data);
 						this.totalResults = result.data;
 						this.search();
 					}).catch(error => {

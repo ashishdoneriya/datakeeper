@@ -25,10 +25,15 @@ foreach($fields as $field) {
 	$count++;
 	$field->id = str_replace(' ', '_', $field->name) . $count;
 }
-if ($idsFound != 1) {
-	echo "failed";
+if ($idsFound == 0) {
+	echo '{"status" : "failed", "message" : "No Id provided" }';
 	return;
 }
+if ($idsFound > 1) {
+	echo '{"status" : "failed", "message" : "Multiple Ids provided" }';
+	return;
+}
+
 $encodedFields = json_encode($fields);
 
 $tableName = $userId . '_' . time();
@@ -36,7 +41,7 @@ $roleJson = '{"read" : {"allow" : false, "approval" : true},"add" : {"allow" : f
 $query = "insert into users_tables (userId, tableName, displayedTableName, fields, publicRole ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', '$roleJson')";
 $rows = $db->query($query);
 if ($rows == false) {
-	echo "failed";
+	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 	return;
 }
 
@@ -47,13 +52,12 @@ foreach($fields as $field) {
 }
 
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
-$query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
 $rows = $db->query($query);
 
 if ($rows == false) {
-	echo "failed";
+	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 } else {
-	echo "success";
+	echo '{"status" : "success"}';
 }
 
 function getRequired($required) {

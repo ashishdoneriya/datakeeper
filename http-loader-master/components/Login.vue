@@ -60,13 +60,13 @@
 					'email': this.form.email,
 					'password': this.form.password
 				}).then(result => {
-					if (result.data == 'success') {
+					if (result.data.status == 'success') {
 						this.$router.push({
 							path: '/user/dashboard'
 						});
 					} else {
 						this.$message({
-							message: 'Invalid email or password',
+							message: result.data.message,
 							type: 'error'
 						});
 					}

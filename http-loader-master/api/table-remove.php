@@ -16,5 +16,5 @@ $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $db->query("drop table $tableName");
 $db->query("delete from users_tables where tableName='$tableName' and userId=$userId");
-echo 'success';
+echo '{status : "success"}';
 ?>

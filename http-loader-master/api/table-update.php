@@ -24,8 +24,12 @@ foreach($newFields as $field) {
 	}
 	$field->id = str_replace(' ', '_', $field->name);
 }
-if ($idsFound != 1) {
-	echo "failed";
+if ($idsFound == 0) {
+	echo '{"status" : "failed", "message" : "No Id provided" }';
+	return;
+}
+if ($idsFound > 1) {
+	echo '{"status" : "failed", "message" : "Multiple Ids provided" }';
 	return;
 }
 $rows = $db->query("select fields from users_tables where tableName='$tableName' and userId=$userId");
@@ -64,11 +68,13 @@ foreach($oldFields as $oldField) {
 $encodedFields = json_encode($newFields);
 $query = "update users_tables set displayedTableName='$displayedTableName',fields='$encodedFields' where userId=$userId and tableName='$tableName'";
 $rows = $db->query($query);
-if ($rows == true) {
-	echo 'success';
+
+if ($rows == false) {
+	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 } else {
-	echo 'error';
+	echo '{"status" : "success"}';
 }
+
 function getRequired($required) {
 	if ($required == true) {
 		return ' NOT NULL';

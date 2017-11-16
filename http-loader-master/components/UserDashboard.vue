@@ -49,13 +49,24 @@
 					axios.post('/api/table-remove.php', {
 						tableName: table.tableName
 					}).then((result => {
-						this.$message({
-							type: 'success',
-							message: `Table '${table.displayedTableName}' has been removed`
-						});
-						this.$store.commit('update');
+						if (result.data.status == 'success') {
+							this.$message({
+								type: 'success',
+								message: `Table '${table.displayedTableName}' has been removed`
+							});
+							this.$store.commit('update');
+						} else {
+							this.$message({
+								type: 'error',
+								message: result.data.message
+							});
+						}
+						
 					})).catch(error => {
-
+						this.$message({
+							type: 'info',
+							message: `Unable to remove table '${table.displayedTableName}'`
+						});
 					});
 
 				}).catch(() => {

@@ -217,14 +217,22 @@
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
 				}).then(response => {
-					this.$message({
-						message: 'Table added successfully',
-						type: 'success'
-					});
-					this.$store.commit('update');
-					setTimeout(() => {
-						this.$router.push('/user/dashboard');
-					}, 1000);
+					if (response.data.status == 'success') {
+						this.$message({
+							message: 'Table added successfully',
+							type: 'success'
+						});
+						this.$store.commit('update');
+						setTimeout(() => {
+							this.$router.push('/user/dashboard');
+						}, 1000);
+					} else {
+						this.$message({
+							message: response.data.message,
+							type: 'error'
+						});
+					}
+					
 				}).catch(error => {
 					this.showError('Unable to add table');
 				});
@@ -241,7 +249,7 @@
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
 				}).then(response => {
-					if (response.data == 'success') {
+					if (response.data.status == 'success') {
 						this.$message({
 							message: 'Table updated',
 							type: 'success'
@@ -249,12 +257,15 @@
 						this.$store.commit('update');
 						setTimeout(() => {
 							this.$router.push('/user/dashboard');
-						}, 2000);
+						}, 1000);
 					} else {
-						this.showError('Unable to update table');
+						this.$message({
+							message: response.data.message,
+							type: 'error'
+						});
 					}
 				}).catch(error => {
-
+					this.showError('Unable to update table');
 				});
 			},
 			isFieldEligible(type) {

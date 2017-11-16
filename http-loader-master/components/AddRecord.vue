@@ -71,7 +71,7 @@
 						fields: this.fields
 					})
 					.then(result => {
-						if (result.data == 'success') {
+						if (result.data.status == 'success') {
 							this.$message({
 								message: 'Record successfull added',
 								type: 'success'
@@ -82,7 +82,7 @@
 							this.fields = JSON.parse(JSON.stringify(this.fields));
 						} else {
 							this.$message({
-								message: 'Unable to add data',
+								message: result.data.message,
 								type: 'error'
 							});
 						}
