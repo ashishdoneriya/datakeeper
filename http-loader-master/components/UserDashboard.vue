@@ -46,7 +46,7 @@
 					cancelButtonText: 'Cancel',
 					type: 'warning'
 				}).then(() => {
-					axios.post('/api/remove-table.php', {
+					axios.post('/api/table-remove.php', {
 						tableName: table.tableName
 					}).then((result => {
 						this.$message({

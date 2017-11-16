@@ -213,7 +213,7 @@
 			},
 
 			addTable() {
-				axios.post('/api/add-table.php', {
+				axios.post('/api/table-add.php', {
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
 				}).then(response => {
@@ -236,7 +236,7 @@
 				});
 			},
 			updateTable() {
-				axios.post('/api/update-table.php', {
+				axios.post('/api/table-update.php', {
 					'tableName': this.tableName,
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields

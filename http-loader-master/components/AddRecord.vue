@@ -66,7 +66,7 @@
 				this.$router.push(`/user/table/${this.tableName}`);
 			},
 			addRecord() {
-				axios.post('/api/add-record.php', {
+				axios.post('/api/record-add.php', {
 						tableName: this.tableName,
 						fields: this.fields
 					})
