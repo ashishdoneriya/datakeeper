@@ -13,7 +13,7 @@ if ($userId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$tableName = $data['tableName'];
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
 $db->query("drop table $tableName");
 $db->query("delete from users_tables where tableName='$tableName' and userId=$userId");
 echo 'success';

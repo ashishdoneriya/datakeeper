@@ -13,7 +13,7 @@ if ($userId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$data = json_decode(json_encode($data));
+$data = json_decode(htmlspecialchars(strip_tags(json_encode($data))));
 $displayedTableName = $data ->displayedTableName;
 $fields = $data->fields;
 $idsFound = 0;

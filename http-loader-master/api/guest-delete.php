@@ -13,7 +13,10 @@ $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
-
+if  ($tableName == null || strlen($tableName) == 0) {
+    echo '{"status" : "error", "message" : "Table name not provided"}';
+    return;
+}
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 if ($row['userId'] != $loggedInUserId) {
@@ -26,6 +29,6 @@ if ($guestId == null || is_numeric($guestId) == false) {
     echo '{ "status" : "failed", "message" : "Guest Id not available"}';
 }
 $encodedJson = htmlspecialchars(strip_tags(json_encode($data['role'])));
-$rows = $db->query("update guest_permissions set role='$encodedJson' where userId=$guestId)");
+$rows = $db->query("delete from guest_permissions where userId=$guestId and tableName=$tableName)");
 echo '{ status : "success"}';
 ?>

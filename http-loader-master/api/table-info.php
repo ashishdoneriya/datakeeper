@@ -8,7 +8,7 @@ $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
 
-$tableName = $_GET['tableName'];
+$tableName = htmlspecialchars(strip_tags($_GET['tableName']));
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 $result = array();

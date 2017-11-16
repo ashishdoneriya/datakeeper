@@ -56,7 +56,7 @@
 					});
 					return;
 				}
-				axios.post('/api/login.php', {
+				axios.post('/api/signin.php', {
 					'email': this.form.email,
 					'password': this.form.password
 				}).then(result => {

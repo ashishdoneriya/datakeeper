@@ -13,7 +13,7 @@ if ($userId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$data = json_decode(json_encode($data));
+$data = json_decode(htmlspecialchars(strip_tags(json_encode($data))));
 $displayedTableName = $data->displayedTableName;
 $tableName = $data->tableName;
 $newFields = $data->fields;
@@ -29,7 +29,8 @@ if ($idsFound != 1) {
 	return;
 }
 $rows = $db->query("select fields from users_tables where tableName='$tableName' and userId=$userId");
-if (gettype($rows) == 'boolean' && $rows == false) {
+$row = $rows->fetch();
+if (gettype($row) == 'boolean' && $row == false) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;

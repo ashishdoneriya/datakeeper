@@ -7,7 +7,7 @@ session_start();
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$tableName = $data['tableName'];
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 $loggedInUserId = $_SESSION['userId'];
@@ -25,7 +25,8 @@ if ($loggedInUserId == null) {
 	}
 } else if ($row['userId'] != $loggedInUserId) {
 	$rows = $db->query("select role from guests_permissions where userId='$loggedInUserId' and tableName='$tableName'");
-	if (gettype($rows) == 'boolean' && $rows == false) {
+	$row = $rows->fetch();
+	if (gettype($row) == 'boolean' && $row == false) {
 		if ($publicRole['add']['allow'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
 			echo 'You are not authorized.';
@@ -34,7 +35,6 @@ if ($loggedInUserId == null) {
 			$approvalRequired = true;
 		}
 	} else {
-		$row = $rows->fetch();
 		$role = $row['role'];
 		if ($role['add']['allow'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
@@ -47,7 +47,7 @@ if ($loggedInUserId == null) {
 }
 if ($approvalRequired == true) {
 	$rows = null;
-	$encodedFields = json_encode($data['fields']);
+	$encodedFields = htmlspecialchars(strip_tags(json_encode($data['fields'])));
 	if ($loggedInUserId == null) {
 		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$encodedFields', 'add')");	
 	} else {

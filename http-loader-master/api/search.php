@@ -7,7 +7,7 @@ session_start();
 $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
-$tableName = $_GET['tableName'];
+$tableName = htmlspecialchars(strip_tags($_GET['tableName']));
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 $publicRole = json_decode($row['publicRole'], true);
@@ -66,11 +66,11 @@ foreach($finalFields as $field) {
 }
 
 $fieldsString = join(',', $fieldsArr);
-$searchQuery = $_GET['searchQuery'];
-$pageNumber = $_GET['pageNumber'];
-$maximumResults = $_GET['maximumResults'];
-$sortBy = $_GET['sortBy'];
-$order = $_GET['order'];
+$searchQuery = htmlspecialchars(strip_tags($_GET['searchQuery']));
+$pageNumber = htmlspecialchars(strip_tags($_GET['pageNumber']));
+$maximumResults = htmlspecialchars(strip_tags($_GET['maximumResults']));
+$sortBy = htmlspecialchars(strip_tags($_GET['sortBy']));
+$order = htmlspecialchars(strip_tags($_GET['order']));
 
 $whereAdded = false;
 

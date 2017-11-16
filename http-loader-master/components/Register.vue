@@ -54,7 +54,7 @@
 					this.showError('Password mismatch');
 					return;
 				}
-				axios.post('/api/register.php', {
+				axios.post('/api/signup.php', {
 					'name': this.name,
 					'email': this.email,
 					'password': this.password

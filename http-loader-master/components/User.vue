@@ -71,7 +71,7 @@
 					});
 			},
 			logout() {
-				axios.post("/api/logout.php");
+				axios.post("/api/signout.php");
 				this.$router.push({
 					path: "/"
 				});

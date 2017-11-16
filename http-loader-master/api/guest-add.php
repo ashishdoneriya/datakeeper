@@ -12,8 +12,11 @@ if ($loggedInUserId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$tableName = $data['tableName'];
-
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
+if  ($tableName == null || strlen($tableName) == 0) {
+    echo '{"status" : "error", "message" : "Table name not provided"}';
+    return;
+}
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 if ($row['userId'] != $loggedInUserId) {
@@ -21,15 +24,18 @@ if ($row['userId'] != $loggedInUserId) {
     echo 'You are not authorized.';
     return;
 }
-$guestEmail = $data['guestEmail'];
+$guestEmail = htmlspecialchars(strip_tags($data['guestEmail']));
 $rows = $db->query("select userId from users where email='$guestEmail'");
-if (gettype($rows) == 'boolean' && $rows == true) {
+$row = $rows->fetch();
+if (gettype($row) == 'boolean' && $row == true) {
     echo '{ status : "failed", message : "Email id is not registered"}';
     return;
 }
-$row = $rows->fetch();
 $guestId = $row['userId'];
-$encodedJson = json_encode($data['role']);
+if ($guestId == null || is_numeric($guestId) == false) {
+    echo '{ "status" : "failed", "message" : "Guest Id not available"}';
+}
+$encodedJson = htmlspecialchars(strip_tags(json_encode($data['role'])));
 $rows = $db->query("insert into guest_permissions (userId, tableName, role) values ($loggedInUserId, '$tableName', '$encodedJson')");
 echo '{ status : "success"}';
 ?>
