@@ -23,9 +23,14 @@ if (gettype($row) == 'boolean' && $row == false) {
 	return;
 }
 
-$db->query("drop table $tableName");
-$db->query("delete from users_tables where tableName='$tableName' and userId=$userId");
-$db->query("delete from guest_permissions where tableName='$tableName'");
-$db->query("delete from data_requests where tableName='$tableName'");
+$rows = $db->query("select count(*) from users_tables where tableName='$tableName' and userId=$userId");
+$row = $rows->fetch();
+if (((int)$row) > 1) {
+	$db->query("delete from users_tables where tableName='$tableName' and userId=$userId");	
+} else {
+	$db->query("drop table $tableName");
+	$db->query("delete from guest_permissions where tableName='$tableName'");
+	$db->query("delete from data_requests where tableName='$tableName'");	
+}
 echo '{status : "success"}';
 ?>
