@@ -29,7 +29,11 @@ if ($idsFound != 1) {
 	return;
 }
 $rows = $db->query("select fields from users_tables where tableName='$tableName' and userId=$userId");
-$row = $rows->fetch();
+if (gettype($rows) == 'boolean' && $rows == false) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
+}
 $oldFields = json_decode($row['fields']);
 foreach($newFields as $newField) {
 	if (!property_exists($newField, 'id')) {

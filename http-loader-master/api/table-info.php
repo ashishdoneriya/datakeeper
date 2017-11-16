@@ -13,10 +13,14 @@ $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 $result = array();
 $result['displayedTableName'] = $row['displayedTableName'];
-$role = $row['publicRole'];
+$publicRole = json_decode($row['publicRole'], true);
 if ($userId == null) {
-	if ($role == 'none') {
-		echo '';
+	if ($publicRole['read'] == false
+			&& $publicRole['add'] == false
+			&& $publicRole['update'] == false
+			&& $publicRole['delete'] == false) {
+		header('HTTP/1.0 401 Unauthorized');
+		echo 'You are not authorized.';
 		return;
 	}
 
@@ -38,10 +42,15 @@ if ($userId == null) {
 	$row = $rows->fetch();
 	if (count($rows) == 0) {
 		// treat the other user as a public
-		if ($role == 'none') {
-			echo '';
+		if ($publicRole['read'] == false
+				&& $publicRole['add'] == false
+				&& $publicRole['update'] == false
+				&& $publicRole['delete'] == false) {
+			header('HTTP/1.0 401 Unauthorized');
+			echo 'You are not authorized.';
 			return;
 		}
+
 		$fields = json_decode($row['fields'], true);
 		$publicFields = array();
 		foreach($fields as $field) {
@@ -50,6 +59,16 @@ if ($userId == null) {
 			}
 		}
 		$result['fields'] = $publicFields;
+	}
+	$row = $rows->fetch();
+	$individualRole = json_decode($row['role']);
+	if ($individualRole['read'] == false
+			&& $individualRole['add'] == false
+			&& $individualRole['update'] == false
+			&& $individualRole['delete'] == false) {
+		header('HTTP/1.0 401 Unauthorized');
+		echo 'You are not authorized.';
+		return;
 	} else {
 		$result['fields'] = json_decode($row['fields'], true);
 	}

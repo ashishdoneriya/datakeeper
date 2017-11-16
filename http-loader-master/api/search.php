@@ -10,10 +10,10 @@ $db = $database->getConnection();
 $tableName = $_GET['tableName'];
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
-$role = $row['publicRole'];
+$publicRole = json_decode($row['publicRole'], true);
 $finalFields = null;
 if ($userId == null) {
-	if ($role == 'none' || $role == 'contributorW') {
+	if ($publicRole['read'] == false) {
 		header('HTTP/1.0 401 Unauthorized');
 		echo 'You are not authorized.';
 		return;
@@ -37,7 +37,7 @@ if ($userId == null) {
 	$row = $rows->fetch();
 	if (count($rows) == 0) {
 		// treat the other user as a public
-		if ($role == 'none' || $role == 'contributorW') {
+		if ($publicRole['read'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
 			echo 'You are not authorized.';
 			return;
@@ -50,15 +50,21 @@ if ($userId == null) {
 			}
 		}
 		$finalFields = $publicFields;
+	} else if (json_decode($row['role'], true)['read'] == false) {
+		header('HTTP/1.0 401 Unauthorized');
+		echo 'You are not authorized.';
+		return;
 	} else {
 		$finalFields = json_decode($row['fields']);
 	}
 }
+
+
 $fieldsArr = array();
 foreach($finalFields as $field) {
 	array_push($fieldsArr, $field['id']);
 }
-echo json_decode($fieldsArr);
+
 $fieldsString = join(',', $fieldsArr);
 $searchQuery = $_GET['searchQuery'];
 $pageNumber = $_GET['pageNumber'];

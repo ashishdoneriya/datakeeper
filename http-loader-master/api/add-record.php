@@ -11,29 +11,54 @@ $tableName = $data['tableName'];
 $rows = $db->query("select * from users_tables where tableName='$tableName'");
 $row = $rows->fetch();
 $loggedInUserId = $_SESSION['userId'];
+$approvalRequired = false;
 if ($loggedInUserId == null) {
-	$publicRole = $row['publicRole'];
-	if ($publicRole == 'none' || $publicRole == 'contributorR') {
+	$publicRole = json_decode($row['publicRole'], true);
+	if ( $publicRole['add']['allow'] == false 
+			|| ($publicRole['add']['allow'] == true
+			&& $publicRole['add']['loginRequired'] == true)) {
 		header('HTTP/1.0 401 Unauthorized');
 		echo 'You are not authorized.';
 		return;
+	} else {
+		$approvalRequired = true;
 	}
-}
-
-if ($row['userId'] != $loggedInUserId) {
+} else if ($row['userId'] != $loggedInUserId) {
 	$rows = $db->query("select role from guests_permissions where userId='$loggedInUserId' and tableName='$tableName'");
 	if (gettype($rows) == 'boolean' && $rows == false) {
-		header('HTTP/1.0 401 Unauthorized');
-		echo 'You are not authorized.';
-		return;
+		if ($publicRole['add']['allow'] == false) {
+			header('HTTP/1.0 401 Unauthorized');
+			echo 'You are not authorized.';
+			return;
+		} else {
+			$approvalRequired = true;
+		}
+	} else {
+		$row = $rows->fetch();
+		$role = $row['role'];
+		if ($role['add']['allow'] == false) {
+			header('HTTP/1.0 401 Unauthorized');
+			echo 'You are not authorized.';
+			return;
+		} else if ($role['add']['loginRequired'] == true) {
+			$approvalRequired = true;
+		}
 	}
-	$row = $rows->fetch();
-	$role = $row['role'];
-	if ($role == 'contributorR') {
-		header('HTTP/1.0 401 Unauthorized');
-		echo 'You are not authorized.';
-		return;
+}
+if ($approvalRequired == true) {
+	$rows = null;
+	$encodedFields = json_encode($data['fields']);
+	if ($loggedInUserId == null) {
+		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$encodedFields', 'add')");	
+	} else {
+		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$encodedFields', 'add')");			
 	}
+	if ($rows == true) {
+		echo 'success';
+	} else {
+		echo 'failed';
+	}
+	return;
 }
 
 $fieldsIdArr = array();

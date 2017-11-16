@@ -32,7 +32,8 @@ if ($idsFound != 1) {
 $encodedFields = json_encode($fields);
 
 $tableName = $userId . '_' . time();
-$query = "insert into users_tables (userId, tableName, displayedTableName, fields, publicRole ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', 'none')";
+$roleJson = '{"read" : {"allow" : false, "approval" : true},"add" : {"allow" : false, "approval" : true, "loginRequired" : true},"update" : {"allow" : false, "approval" : true, "loginRequired" : true},"delete" : {"allow" : false, "approval" : true, "loginRequired" : true}}';
+$query = "insert into users_tables (userId, tableName, displayedTableName, fields, publicRole ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', '$roleJson')";
 $rows = $db->query($query);
 if ($rows == false) {
 	echo "failed";
@@ -45,6 +46,7 @@ foreach($fields as $field) {
 	array_push($tempFields, '' . $field->id . ' ' . getMysqlFieldType($field->type) . getRequired($field->isCompulsory));
 }
 
+$query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
 $rows = $db->query($query);
 
