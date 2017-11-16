@@ -14,9 +14,9 @@ $loggedInUserId = $_SESSION['userId'];
 $approvalRequired = false;
 if ($loggedInUserId == null) {
 	$publicRole = json_decode($row['publicRole'], true);
-	if ( $publicRole['add']['allow'] == false 
-			|| ($publicRole['add']['allow'] == true
-			&& $publicRole['add']['loginRequired'] == true)) {
+	if ( $publicRole['delete']['allow'] == false 
+			|| ($publicRole['delete']['allow'] == true
+			&& $publicRole['delete']['loginRequired'] == true)) {
 		header('HTTP/1.0 401 Unauthorized');
 		echo 'You are not authorized.';
 		return;
@@ -27,7 +27,7 @@ if ($loggedInUserId == null) {
 	$rows = $db->query("select role from guests_permissions where userId='$loggedInUserId' and tableName='$tableName'");
 	$row = $rows->fetch();
 	if (gettype($row) == 'boolean' && $row == false) {
-		if ($publicRole['add']['allow'] == false) {
+		if ($publicRole['delete']['allow'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
 			echo 'You are not authorized.';
 			return;
@@ -36,56 +36,38 @@ if ($loggedInUserId == null) {
 		}
 	} else {
 		$role = $row['role'];
-		if ($role['add']['allow'] == false) {
+		if ($role['delete']['allow'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
 			echo 'You are not authorized.';
 			return;
-		} else if ($role['add']['loginRequired'] == true) {
+		} else if ($role['delete']['loginRequired'] == true) {
 			$approvalRequired = true;
 		}
 	}
 }
+$id = htmlspecialchars(strip_tags($data['id']));
 if ($approvalRequired == true) {
 	$rows = null;
-	$encodedFields = htmlspecialchars(strip_tags(json_encode($data['fields'])));
 	if ($loggedInUserId == null) {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$encodedFields', 'add')");	
+		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$id', 'delete')");	
 	} else {
-		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$encodedFields', 'add')");			
+		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$id', 'delete')");
 	}
 	if ($rows == true) {
 		echo '{status : "success"}';
 	} else {
-		echo '{status : "failed", message : "Unable to create request to add data"}';
+		echo '{status : "failed", message : "Unable to create request to remove data"}';
 	}
 	return;
 }
-
-$fieldsIdArr = array();
-$valuesArr = array();
-$fields = $data['fields'];
-foreach($fields as $field) {
-	if ($field['type'] == 'id' && $field['autoIncrement'] == true) {
-		continue;
-	}
-	array_push($fieldsIdArr, $field['id']);
-	if (toAddQuotes($field['type'])) {
-		array_push($valuesArr, "'" . $field['value'] . "'");
-	} else {
-		array_push($valuesArr, $field['value']);
-	}
-}
-$fieldsString = join("," , $fieldsIdArr);
-$valuesString = join(",", $valuesArr);
 
 $query = "insert into $tableName ($fieldsString) values ($valuesString)";
 $result = $db->query($query);
 if ($rows == true) {
 	echo '{status : "success"}';
 } else {
-	echo '{status : "failed", message : "Unable to add data, internal server problem"}';
+	echo '{status : "failed", message : "Unable to remove data, internal server problem"}';
 }
-
 function toAddQuotes ($type) {
 	switch ($type) {
 		case 'Text' :

@@ -14,9 +14,9 @@ $loggedInUserId = $_SESSION['userId'];
 $approvalRequired = false;
 if ($loggedInUserId == null) {
 	$publicRole = json_decode($row['publicRole'], true);
-	if ( $publicRole['add']['allow'] == false 
-			|| ($publicRole['add']['allow'] == true
-			&& $publicRole['add']['loginRequired'] == true)) {
+	if ( $publicRole['update']['allow'] == false 
+			|| ($publicRole['update']['allow'] == true
+			&& $publicRole['update']['loginRequired'] == true)) {
 		header('HTTP/1.0 401 Unauthorized');
 		echo 'You are not authorized.';
 		return;
@@ -27,7 +27,7 @@ if ($loggedInUserId == null) {
 	$rows = $db->query("select role from guests_permissions where userId='$loggedInUserId' and tableName='$tableName'");
 	$row = $rows->fetch();
 	if (gettype($row) == 'boolean' && $row == false) {
-		if ($publicRole['add']['allow'] == false) {
+		if ($publicRole['update']['allow'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
 			echo 'You are not authorized.';
 			return;
@@ -36,22 +36,23 @@ if ($loggedInUserId == null) {
 		}
 	} else {
 		$role = $row['role'];
-		if ($role['add']['allow'] == false) {
+		if ($role['update']['allow'] == false) {
 			header('HTTP/1.0 401 Unauthorized');
 			echo 'You are not authorized.';
 			return;
-		} else if ($role['add']['loginRequired'] == true) {
+		} else if ($role['update']['loginRequired'] == true) {
 			$approvalRequired = true;
 		}
 	}
 }
+$oldId=$data['oldId'];
 if ($approvalRequired == true) {
 	$rows = null;
 	$encodedFields = htmlspecialchars(strip_tags(json_encode($data['fields'])));
 	if ($loggedInUserId == null) {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$encodedFields', 'add')");	
+		$rows = $db->query("insert into data_requests (tableName, fields, requestType, oldId) values ('$tableName', '$encodedFields', 'update', $oldId)");	
 	} else {
-		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$encodedFields', 'add')");			
+		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType, oldId) values ($loggedInUserId, '$tableName', '$encodedFields', 'update', $oldId)");			
 	}
 	if ($rows == true) {
 		echo '{status : "success"}';
@@ -62,23 +63,22 @@ if ($approvalRequired == true) {
 }
 
 $fieldsIdArr = array();
-$valuesArr = array();
 $fields = $data['fields'];
 foreach($fields as $field) {
 	if ($field['type'] == 'id' && $field['autoIncrement'] == true) {
 		continue;
-	}
-	array_push($fieldsIdArr, $field['id']);
+    }
+    $temp = $field['id'];
+	array_push($fieldsIdArr, $field['id'] . "=");
 	if (toAddQuotes($field['type'])) {
-		array_push($valuesArr, "'" . $field['value'] . "'");
+		$temp = $temp . "'" . $field['value'] . "'";
 	} else {
-		array_push($valuesArr, $field['value']);
+		$temp = $temp . $field['value'];
 	}
 }
-$fieldsString = join("," , $fieldsIdArr);
-$valuesString = join(",", $valuesArr);
+$fieldsString = join(", " , $fieldsIdArr);
 
-$query = "insert into $tableName ($fieldsString) values ($valuesString)";
+$query = "update $tableName set ($fieldsString) where id=$oldId";
 $result = $db->query($query);
 if ($rows == true) {
 	echo '{status : "success"}';

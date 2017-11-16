@@ -30,7 +30,7 @@ $db->query($query);
 
 // Creating table 'data_requests'
 // requestType = add / update /delete
-$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(30) not null, fields text not null, requestType varchar(6) not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
+$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(30) not null, fields text not null, oldId int, requestType varchar(6) not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
 $db->query($query);
 
 echo "success";
