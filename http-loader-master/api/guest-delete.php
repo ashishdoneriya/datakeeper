@@ -2,33 +2,34 @@
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
+include_once './utils.php';
 session_start();
 $loggedInUserId = $_SESSION['userId'];
-if ($loggedInUserId == null) {
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You are not authorized.';
-    return;
-}
 $database = new Database();
 $db = $database->getConnection();
-$data = json_decode(file_get_contents('php://input'), TRUE);
-$tableName = htmlspecialchars(strip_tags($data['tableName']));
-if  ($tableName == null || strlen($tableName) == 0) {
-    echo '{"status" : "error", "message" : "Table name not provided"}';
-    return;
+$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
+$tableName = $data['tableName'];
+$guestId = $data['guestId'];
+
+// Checking if logged in user is admin
+if (!isAdmin($db, $userId, $tableName)) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
 }
-$rows = $db->query("select * from users_tables where tableName='$tableName'");
-$row = $rows->fetch();
-if ($row['userId'] != $loggedInUserId) {
-    header('HTTP/1.0 401 Unauthorized');
-    echo 'You are not authorized.';
-    return;
-}
-$guestId = htmlspecialchars(strip_tags($data['guestId']));
-if ($guestId == null || is_numeric($guestId) == false) {
-    echo '{ "status" : "failed", "message" : "Guest Id not available"}';
-}
-$encodedJson = htmlspecialchars(strip_tags(json_encode($data['role'])));
+
+// removing user from guest
 $rows = $db->query("delete from guest_permissions where userId=$guestId and tableName=$tableName)");
+if ($rows == false) {
+	echo '{ status : "failed", message : "Unable to revoke permissions from user"}';
+	return;
+}
+// removing data requests created by user
+$rows = $db->query("delete from data_requests where userId=$guestId and tableName=$tableName)");
+if ($rows == false) {
+	echo '{ status : "failed", message : "Unable to remove table requests created by user"}';
+	return;
+}
 echo '{ status : "success"}';
+
 ?>

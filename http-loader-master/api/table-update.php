@@ -3,6 +3,8 @@
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
+include_once './utils.php';
+
 session_start();
 $userId = $_SESSION['userId'];
 if ($userId == null) {
@@ -17,6 +19,14 @@ $data = json_decode(htmlspecialchars(strip_tags(json_encode($data))));
 $displayedTableName = $data->displayedTableName;
 $tableName = $data->tableName;
 $newFields = $data->fields;
+
+if (!isAdmin($db, $userId, $tableName)) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
+}
+
+
 $idsFound = 0;
 foreach($newFields as $field) {
 	if ($field->type == 'Id') {
@@ -32,14 +42,13 @@ if ($idsFound > 1) {
 	echo '{"status" : "failed", "message" : "Multiple Ids provided" }';
 	return;
 }
-$rows = $db->query("select fields from users_tables where tableName='$tableName' and userId=$userId");
-$row = $rows->fetch();
-if (gettype($row) == 'boolean' && $row == false) {
+
+$oldFields = getFields($db, $userId, $tableName);
+if ($oldFields == null) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
 }
-$oldFields = json_decode($row['fields']);
 foreach($newFields as $newField) {
 	if (!property_exists($newField, 'id')) {
 		$newField->id = str_replace(' ', '_', $newField->name);
@@ -66,7 +75,7 @@ foreach($oldFields as $oldField) {
 
 // updating users_tables
 $encodedFields = json_encode($newFields);
-$query = "update users_tables set displayedTableName='$displayedTableName',fields='$encodedFields' where userId=$userId and tableName='$tableName'";
+$query = "update users_tables set displayedTableName='$displayedTableName',fields='$encodedFields' where tableName='$tableName'";
 $rows = $db->query($query);
 
 if ($rows == false) {

@@ -38,7 +38,13 @@ $encodedFields = json_encode($fields);
 
 $tableName = $userId . '_' . time();
 $roleJson = '{"read" : {"allow" : false, "approval" : true},"add" : {"allow" : false, "approval" : true, "loginRequired" : true},"update" : {"allow" : false, "approval" : true, "loginRequired" : true},"delete" : {"allow" : false, "approval" : true, "loginRequired" : true}}';
-$query = "insert into users_tables (userId, tableName, displayedTableName, fields, publicRole ) values ($userId, '$tableName', '$displayedTableName', '$encodedFields', '$roleJson')";
+$query = "insert into users_tables (tableName, displayedTableName, fields, publicRole ) values ('$tableName', '$displayedTableName', '$encodedFields', '$roleJson')";
+$rows = $db->query($query);
+if ($rows == false) {
+	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
+	return;
+}
+$query = "insert into table_admins (userId, tableName) values ($userId, '$tableName')";
 $rows = $db->query($query);
 if ($rows == false) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';

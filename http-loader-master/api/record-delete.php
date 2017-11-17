@@ -3,53 +3,27 @@
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
+include_once './utils.php';
 session_start();
 $database = new Database();
 $db = $database->getConnection();
-$data = json_decode(file_get_contents('php://input'), TRUE);
-$tableName = htmlspecialchars(strip_tags($data['tableName']));
-$rows = $db->query("select * from users_tables where tableName='$tableName'");
-$row = $rows->fetch();
+$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
+$tableName = $data['tableName'];
 $loggedInUserId = $_SESSION['userId'];
-$approvalRequired = false;
-if ($loggedInUserId == null) {
-	$publicRole = json_decode($row['publicRole'], true);
-	if ( $publicRole['delete']['allow'] == false 
-			|| ($publicRole['delete']['allow'] == true
-			&& $publicRole['delete']['loginRequired'] == true)) {
-		header('HTTP/1.0 401 Unauthorized');
-		echo 'You are not authorized.';
-		return;
-	} else {
-		$approvalRequired = true;
-	}
-} else if ($row['userId'] != $loggedInUserId) {
-	$rows = $db->query("select role from guests_permissions where userId='$loggedInUserId' and tableName='$tableName'");
-	$row = $rows->fetch();
-	if (gettype($row) == 'boolean' && $row == false) {
-		if ($publicRole['delete']['allow'] == false) {
-			header('HTTP/1.0 401 Unauthorized');
-			echo 'You are not authorized.';
-			return;
-		} else {
-			$approvalRequired = true;
-		}
-	} else {
-		$role = $row['role'];
-		if ($role['delete']['allow'] == false) {
-			header('HTTP/1.0 401 Unauthorized');
-			echo 'You are not authorized.';
-			return;
-		} else if ($role['delete']['loginRequired'] == true) {
-			$approvalRequired = true;
-		}
-	}
+
+$access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'delete');
+
+if (!$access['allowed']) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
 }
+
 $id = htmlspecialchars(strip_tags($data['id']));
-if ($approvalRequired == true) {
+if ($access['approval']) {
 	$rows = null;
 	if ($loggedInUserId == null) {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$id', 'delete')");	
+		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$id', 'delete')");
 	} else {
 		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$id', 'delete')");
 	}

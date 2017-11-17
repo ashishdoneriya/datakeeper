@@ -20,17 +20,21 @@ roles json format = {
 }
 */
 
-// Creating table 'users_tables'
-$query = "create table if not exists users_tables ( userId int not null, tableName varchar(30) not null, displayedTableName varchar(100) not null, fields text not null, publicRole text not null, foreign key (userId) references users(userId))";
+// Creating table 'tables_info'
+$query = "create table if not exists tables_info ( tableName varchar(100) not null, displayedTableName varchar(100) not null, fields text not null, publicRole text not null";
+$db->query($query);
+
+// Creating table 'table_admins'
+$query = "create table admins (userId int not null, tableName varchar(100) not null, foreign key (userId) references users(userId)), foreign key tables_info(tableName) references users(userId))";
 $db->query($query);
 
 // Creating table 'guests_permissions'
-$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(30) not null, role text not null, foreign key (userId) references users(userId))";
+$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(100) not null, role text not null, foreign key (userId) references users(userId))";
 $db->query($query);
 
 // Creating table 'data_requests'
 // requestType = add / update /delete
-$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(30) not null, fields text not null, oldId int, requestType varchar(6) not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
+$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(100) not null, fields text not null, oldId int, requestType varchar(6) not null, foreign key (userId) references users(userId), foreign key (refreeId) references users(userId))";
 $db->query($query);
 
 echo "success";

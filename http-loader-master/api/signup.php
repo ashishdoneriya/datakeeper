@@ -8,11 +8,11 @@ $database = new Database();
 $db = $database->getConnection();
 $user = new User($db);
 
-$data = json_decode(file_get_contents('php://input'), TRUE);
+$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
 
-$name = htmlspecialchars(strip_tags($data['name']));
-$email = htmlspecialchars(strip_tags($data['email']));
-$password = htmlspecialchars(strip_tags($data['password']));
+$name = $data['name'];
+$email = $data['email'];
+$password =$data['password'];
 
 $rows = $db->query("select count(*) from users where email='$email'");
 $result = array();
