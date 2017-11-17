@@ -73,9 +73,9 @@ foreach($oldFields as $oldField) {
 	}
 }
 
-// updating users_tables
+// updating tables_info
 $encodedFields = json_encode($newFields);
-$query = "update users_tables set displayedTableName='$displayedTableName',fields='$encodedFields' where tableName='$tableName'";
+$query = "update tables_info set displayedTableName='$displayedTableName',fields='$encodedFields' where tableName='$tableName'";
 $rows = $db->query($query);
 
 if ($rows == false) {

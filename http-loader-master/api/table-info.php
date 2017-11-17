@@ -10,7 +10,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
-$rows = $db->query("select displayedTableName from users_tables where tableName='$tableName'");
+$rows = $db->query("select displayedTableName from tables_info where tableName='$tableName'");
 $row = $rows->fetch();
 $result = array();
 $result['displayedTableName'] = $row['displayedTableName'];

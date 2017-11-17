@@ -16,7 +16,7 @@ if (!isAdmin($db, $userId, $tableName)) {
 	return;
 }
 
-$db->query("delete from users_tables where tableName='$tableName' and userId=$userId");
+$db->query("delete from tables_info where tableName='$tableName' and userId=$userId");
 $db->query("drop table $tableName");
 $db->query("delete from guest_permissions where tableName='$tableName'");
 $db->query("delete from data_requests where tableName='$tableName'");
