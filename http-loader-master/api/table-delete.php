@@ -1,8 +1,9 @@
 <?php
+include_once './config/database.php';
+include_once './utils.php';
 
 header("Access-Control-Allow-Methods: POST");
 
-include_once './config/database.php';
 session_start();
 $userId = $_SESSION['userId'];
 $database = new Database();
@@ -10,7 +11,7 @@ $db = $database->getConnection();
 $data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
 $tableName = $data['tableName'];
 
-if (!isAdmin($db, $userId, $tableName)) {
+if (!isSuperAdmin($db, $userId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;

@@ -25,7 +25,7 @@ if ($userIdToAdd  == null) {
 	return;
 }
 // adding user as admin
-$rows = $db->query("insert table_admin (userId, tableName) values ('$tableName', '$userIdToAdd')");
+$rows = $db->query("insert table_admins (userId, tableName, isSuperAdmin) values ('$tableName', '$userIdToAdd', 0)");
 if ($rows == false) {
 	echo "{'status' : 'failed', message : 'unable to add $email as admin, server error '}";
 } else {

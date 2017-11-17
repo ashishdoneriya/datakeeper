@@ -1,4 +1,17 @@
 <?php
+
+function isSuperAdmin($db, $userId, $tableName) {
+	if ($userId == null || $tableName == null) {
+		return false;
+	}
+	$rows = $db->query("select isSuperAdmin from table_admins where userId=$userId and tableName='$tableName'");
+	$row = $rows->fetch();
+	if (gettype($row) == 'boolean') {
+		return false;
+	}
+	return $row['isSuperAdmin'] == 1 ? true : false;
+}
+
 function isAdmin($db, $userId, $tableName) {
 	if ($userId == null || $tableName == null) {
 		return false;

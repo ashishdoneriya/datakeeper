@@ -20,7 +20,7 @@ $displayedTableName = $data->displayedTableName;
 $tableName = $data->tableName;
 $newFields = $data->fields;
 
-if (!isAdmin($db, $userId, $tableName)) {
+if (!isSuperAdmin($db, $userId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;

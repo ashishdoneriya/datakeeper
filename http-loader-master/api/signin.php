@@ -6,7 +6,7 @@ include_once './config/database.php';
 
 $database = new Database();
 $db = $database->getConnection();
-$user = new User($db);
+
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $email = htmlspecialchars(strip_tags($data['email']));
 $password = htmlspecialchars(strip_tags($data['password']));

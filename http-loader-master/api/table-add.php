@@ -44,7 +44,7 @@ if ($rows == false) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 	return;
 }
-$query = "insert into table_admins (userId, tableName) values ($userId, '$tableName')";
+$query = "insert into table_admins (userId, tableName, isSuperAdmin) values ($userId, '$tableName', 1)";
 $rows = $db->query($query);
 if ($rows == false) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';

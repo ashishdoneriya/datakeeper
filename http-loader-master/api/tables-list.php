@@ -40,7 +40,7 @@ while($row = $rows->fetch()) {
 	array_push($ddArray, $arr);
 }
 
-$result['personalTables'] = $ddArray;
+$result['otherTables'] = $ddArray;
 
 echo json_encode($result);
 ?>
