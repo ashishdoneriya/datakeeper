@@ -24,7 +24,7 @@ $query = "create table if not exists tables_info ( tableName varchar(100) primar
 $db->query($query);
 
 // Creating table 'table_admins'
-$query = "create table if not exists admins (userId int not null, tableName varchar(100) not null, isSuperAdmin int(1) not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
+$query = "create table if not exists table_admins (userId int not null, tableName varchar(100) not null, isSuperAdmin int(1) not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
 $db->query($query);
 
 // Creating table 'guests_permissions'

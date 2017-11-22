@@ -18,7 +18,7 @@ function isAdmin($db, $userId, $tableName) {
 	}
 	$rows = $db->query("select count(*) from table_admins where userId=$userId and tableName='$tableName'");
 	$row = $rows->fetch();
-	return (int) $row[0] > 1;
+	return (int) $row[0] == 1;
 }
 
 // add /update / delete / read
@@ -44,11 +44,11 @@ function isAllowedToAccessTable($db, $userId, $tableName, $accessType) {
 			return $result;
 		}
 	}
-	$rows = $db->query("select role from tables_info where tableName='$tableName'");
+	$rows = $db->query("select publicRole from tables_info where tableName='$tableName'");
 	$row = $rows->fetch();
 	$row = json_decode($row['publicRole'], true);
 	$row = $row[$accessType];
-	if ($row['loginRequired'] && $userId == null) {
+	if ($row['loginRequired'] == true && $userId == null) {
 		$result['allowed'] = false;
 	} else {
 		$result['allowed'] = $row['allowed'];
@@ -63,6 +63,12 @@ function getFields($db, $userId, $tableName) {
 		return null;
 	}
 
+	if (isAdmin($db, $userId, $tableName)) {
+		$rows = $db->query("select fields from tables_info where tableName='$tableName'");
+		$row = $rows->fetch();
+		return json_decode($row['fields'], true);
+	}
+
 	$access = isAllowedToAccessTable($db, $userId, $tableName, 'read');
 
 	if (!$access['allowed']) {
@@ -75,7 +81,6 @@ function getFields($db, $userId, $tableName) {
 			}
 		}
 	}
-
 	$rows = $db->query("select fields from tables_info where tableName='$tableName'");
 	$row = $rows->fetch();
 	$fields = json_decode($row['fields'], true);

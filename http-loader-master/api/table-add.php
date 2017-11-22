@@ -37,7 +37,7 @@ if ($idsFound > 1) {
 $encodedFields = json_encode($fields);
 
 $tableName = $userId . '_' . time();
-$roleJson = '{"read" : {"allow" : false, "approval" : true},"add" : {"allow" : false, "approval" : true, "loginRequired" : true},"update" : {"allow" : false, "approval" : true, "loginRequired" : true},"delete" : {"allow" : false, "approval" : true, "loginRequired" : true}}';
+$roleJson = '{"read" : {"allowed" : false, "approval" : true, "loginRequired" : false},"add" : {"allowed" : false, "approval" : true, "loginRequired" : true},"update" : {"allowed" : false, "approval" : true, "loginRequired" : true},"delete" : {"allowed" : false, "approval" : true, "loginRequired" : true}}';
 $query = "insert into tables_info (tableName, displayedTableName, fields, publicRole ) values ('$tableName', '$displayedTableName', '$encodedFields', '$roleJson')";
 $rows = $db->query($query);
 if ($rows == false) {
@@ -58,6 +58,7 @@ foreach($fields as $field) {
 }
 
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
+
 $rows = $db->query($query);
 
 if ($rows == false) {

@@ -28,9 +28,9 @@ if ($access['approval']) {
 		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType, oldId) values ($loggedInUserId, '$tableName', '$encodedFields', 'update', $oldId)");
 	}
 	if ($rows == true) {
-		echo '{status : "success"}';
+		echo '{"status" : "success"}';
 	} else {
-		echo '{status : "failed", message : "Unable to create request to add data"}';
+		echo '{"status" : "failed", "message" : "Unable to create request to add data"}';
 	}
 	return;
 }
@@ -54,9 +54,9 @@ $fieldsString = join(", " , $fieldsIdArr);
 $query = "update $tableName set ($fieldsString) where id=$oldId";
 $result = $db->query($query);
 if ($rows == true) {
-	echo '{status : "success"}';
+	echo '{"status" : "success"}';
 } else {
-	echo '{status : "failed", message : "Unable to add data, internal server problem"}';
+	echo '{"status" : "failed", "message" : "Unable to add data, internal server problem"}';
 }
 
 function toAddQuotes ($type) {

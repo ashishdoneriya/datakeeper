@@ -17,30 +17,34 @@ $query = "select ut.tableName as tableName, ut.displayedTableName as displayedTa
 $rows = $db->query($query);
 $result = array();
 $ddArray = array();
-while($row = $rows->fetch()) {
-	$arr = array();
-	$arr['tableName'] = $row['tableName'];
-	$arr['displayedTableName'] = $row['displayedTableName'];
-	array_push($ddArray, $arr);
+if (gettype($rows) != 'boolean') {
+	while($row = $rows->fetch()) {
+		$arr = array();
+		$arr['tableName'] = $row['tableName'];
+		$arr['displayedTableName'] = $row['displayedTableName'];
+		array_push($ddArray, $arr);
+	}
 }
-$result['personalTables'] = $ddArray;
+$result['personalTables'] = array('label' => 'Personal Tables', 'list'=> $ddArray);
 
 $query = "select tables_info.tableName as tableName, tables_info.displayedTableName as displayedTableName, guest_permissions.role as role from tables_info, guest_permissions where tables_info.tableName=guest_permissions.tableName and tables_info.userId=$userId";
 
 $rows = $db->query($query);
 $ddArray = array();
-while($row = $rows->fetch()) {
-	if (gettype($row) == 'boolean') {
-		break;
+if (gettype($rows) != 'boolean') {
+	while($row = $rows->fetch()) {
+		if (gettype($row) == 'boolean') {
+			break;
+		}
+		$arr = array();
+		$arr['tableName'] = $row['tableName'];
+		$arr['displayedTableName'] = $row['displayedTableName'];
+		$arr['role'] = $row['role'];
+		array_push($ddArray, $arr);
 	}
-	$arr = array();
-	$arr['tableName'] = $row['tableName'];
-	$arr['displayedTableName'] = $row['displayedTableName'];
-	$arr['role'] = $row['role'];
-	array_push($ddArray, $arr);
 }
 
-$result['otherTables'] = $ddArray;
+$result['otherTables'] = array('label' => 'Other Tables', 'list'=> $ddArray);
 
 echo json_encode($result);
 ?>

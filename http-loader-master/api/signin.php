@@ -14,7 +14,7 @@ $query = "select userId, name from users where email='$email'";
 $rows = $db->query($query);
 $row = $rows->fetch();
 if(gettype($row) == 'boolean') {
-	echo "{status : 'failed', message : 'Email not registered'}";
+	echo '{"status" : "failed", "message" : "Email not registered"}';
 	return;
 }
 session_start();
@@ -23,5 +23,5 @@ $_SESSION["userId"] = $row["userId"];
 $_SESSION["name"] = $row["name"];
 $_SESSION["email"] = $email;
 
-echo "{status : 'success'}";
+echo '{"status" : "success"}';
 ?>

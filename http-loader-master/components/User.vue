@@ -2,14 +2,30 @@
 	<el-container>
 		<el-header>
 			<el-menu :default-active="'1'" class="el-menu-demo" mode="horizontal" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
-				<el-menu-item index="1">
-					<router-link to="/user/dashboard">Home</router-link>
+				<el-menu-item @click="goToHome()" index="1">
+					<a>Home</a>
 				</el-menu-item>
 				<el-menu-item index="2">
 					<el-select v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
 						<el-option key="" label="Select Table" value="" disabled="true"></el-option>
-						<el-option v-for="table in tablesList" :key="table" :label="table.displayedTableName" :value="table.tableName">
-						</el-option>
+						<el-option v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length == 0"
+							v-for="table in tablesList.personalTables.list"
+							:key="table"
+							:label="table.displayedTableName"
+							:value="table.tableName"
+						></el-option>
+						<el-option v-if="tablesList.personalTables.list.length == 0 && tablesList.otherTables.list.length > 0"
+							v-for="table in tablesList.otherTables.list"
+							:key="table"
+							:label="table.displayedTableName"
+							:value="table.tableName"
+						></el-option>
+						<el-option-group
+							v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length > 0"
+							v-for="(value, key) in tablesList" :key="key" :label="value.label" v-if="value.list.length > 0">
+							<el-option v-for="table in value.list" :key="table" :label="table.displayedTableName" :value="table.tableName">
+							</el-option>
+						</el-option-group>
 					</el-select>
 				</el-menu-item>
 				<el-submenu index="3" style="float:right;min-width:75px;text-align:right">
@@ -28,7 +44,7 @@
 		data() {
 			return {
 				user: {},
-				selectedTable: ''
+				selectedTable: ""
 			};
 		},
 		computed: {
@@ -39,34 +55,40 @@
 				return this.$store.state.list;
 			}
 		},
-		watch : {
+		watch: {
 			storeCurrentTable(newTable, oldTable) {
 				this.selectedTable = newTable;
 			}
 		},
 		created: function() {
 			this.getUserInfo();
-			this.$store.commit('update');
+			this.$store.commit("update");
 			var tableName = this.$route.params.tableName;
 			if (tableName) {
 				this.selectedTable = tableName;
 			}
 		},
 		methods: {
+			goToHome() {
+				this.selectedTable = "";
+				this.$router.push("/user/dashboard");
+			},
 			openTable(tableName) {
-				if (this.selectedTable == '') {
+				if (this.selectedTable == "") {
 					return;
 				}
-				this.$router.push('/user/table/' + this.selectedTable);
+				this.$router.push("/user/table/" + this.selectedTable);
 			},
 			getUserInfo() {
-				axios.get('/api/user/info.php')
+				axios
+					.get("/api/user/info.php")
 					.then(result => {
 						this.user = result.data;
-					}).catch(error => {
+					})
+					.catch(error => {
 						this.$notify({
-							message: 'Unable to fetch your details',
-							type: 'error'
+							message: "Unable to fetch your details",
+							type: "error"
 						});
 					});
 			},

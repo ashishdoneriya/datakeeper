@@ -7,7 +7,7 @@
 						<span>Tables</span>
 						<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addTable()">Add</el-button>
 					</div>
-					<div v-for="table in tablesList.personalTables" :key="table" class="text item">
+					<div v-for="table in tablesList.personalTables.list" :key="table" class="text item">
 						<a @click="openTable(table.tableName)"> {{table.displayedTableName }}</a>
 						<el-button @click="removeTable(table)" style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
 						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
@@ -46,7 +46,7 @@
 					cancelButtonText: 'Cancel',
 					type: 'warning'
 				}).then(() => {
-					axios.post('/api/table-remove.php', {
+					axios.post('/api/table-delete.php', {
 						tableName: table.tableName
 					}).then((result => {
 						if (result.data.status == 'success') {

@@ -1,6 +1,6 @@
 <template>
 	<el-row type="flex" class="row-bg" justify="center" style="margin-top:100px">
-		<el-col :span="6">
+		<el-col :xs="24" :sm="16" :md="12" :lg="8">
 			<el-card class="box-card">
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Login</span>
@@ -60,6 +60,7 @@
 					'email': this.form.email,
 					'password': this.form.password
 				}).then(result => {
+					console.log(result);
 					if (result.data.status == 'success') {
 						this.$router.push({
 							path: '/user/dashboard'

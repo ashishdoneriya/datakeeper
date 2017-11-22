@@ -1,6 +1,6 @@
 <template>
 	<el-row type="flex" class="row-bg" justify="center" style="margin-top:100px">
-		<el-col :span="8">
+		<el-col :xs="24" :sm="16" :md="12" :lg="8">
 			<el-card class="box-card">
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Registration Form</span>

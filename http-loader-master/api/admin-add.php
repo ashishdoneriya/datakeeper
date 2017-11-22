@@ -21,14 +21,14 @@ if (!isAdmin($db, $userId, $tableName)) {
 // fetching userId of email that is to be added
 $userIdToAdd = getUserId($db, $email);
 if ($userIdToAdd  == null) {
-	echo "{status : 'failed', message : 'Email not registered'}";
+	echo '{"status" : "failed", "message" : "Email not registered"}';
 	return;
 }
 // adding user as admin
 $rows = $db->query("insert table_admins (userId, tableName, isSuperAdmin) values ('$tableName', '$userIdToAdd', 0)");
 if ($rows == false) {
-	echo "{'status' : 'failed', message : 'unable to add $email as admin, server error '}";
+	echo '{"status" : "failed", "message" : "unable to add ' + $email + ' as admin, server error"}';
 } else {
-	echo "{status : 'success'}";
+	echo '{"status" : "success"}';
 }
 ?>
