@@ -7,9 +7,9 @@ include_once './utils.php';
 session_start();
 $database = new Database();
 $db = $database->getConnection();
-$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
-$tableName = $data['tableName'];
-$loggedInUserId = $_SESSION['userId'];
+$data = json_decode(file_get_contents('php://input'), TRUE);
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
+$loggedInUserId = htmlspecialchars(strip_tags($_SESSION['userId']));
 
 $access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'add');
 

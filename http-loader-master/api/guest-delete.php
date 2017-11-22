@@ -7,9 +7,9 @@ session_start();
 $loggedInUserId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
-$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
-$tableName = $data['tableName'];
-$guestId = $data['guestId'];
+$data = json_decode(file_get_contents('php://input'), TRUE);
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
+$guestId = htmlspecialchars(strip_tags($data['guestId']));
 
 // Checking if logged in user is admin
 if (!isAdmin($db, $userId, $tableName)) {

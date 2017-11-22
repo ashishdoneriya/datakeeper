@@ -7,8 +7,8 @@ include_once './utils.php';
 session_start();
 $database = new Database();
 $db = $database->getConnection();
-$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), TRUE);
-$tableName = $data['tableName'];
+$data = json_decode(file_get_contents('php://input'), TRUE);
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = $_SESSION['userId'];
 
 $access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'update');
@@ -18,7 +18,7 @@ if (!$access['allowed']) {
 	echo 'You are not authorized.';
 	return;
 }
-$oldId=$data['oldId'];
+$oldId=htmlspecialchars(strip_tags($data['oldId']));
 if ($access['approval']) {
 	$rows = null;
 	$encodedFields = htmlspecialchars(strip_tags(json_encode($data['fields'])));

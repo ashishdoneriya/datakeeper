@@ -8,9 +8,9 @@ session_start();
 $database = new Database();
 $db = $database->getConnection();
 $userId = $_SESSION['userId'];
-$data = json_decode(htmlspecialchars(strip_tags(file_get_contents('php://input'))), true);
-$tableName = $data['tableName'];
-$email = $data['email'];
+$data = json_decode(file_get_contents('php://input'), true);
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
+$email = htmlspecialchars(strip_tags($data['email']));
 
 // Checking if logged in user is admin
 if (!isAdmin($db, $userId, $tableName)) {
