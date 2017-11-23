@@ -12,6 +12,7 @@
 						<el-button @click="removeTable(table)" style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
 						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
 						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text"> Change Permissions</el-button>
+						<el-button @click="addRecord(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-circle-plus">Add Record</el-button>
 					</div>
 				</el-card>
 			</el-col>
@@ -30,6 +31,9 @@
 			this.$store.commit('setCurrentTable', '');
 		},
 		methods: {
+			addRecord(table) {
+				this.$router.push(`/user/table/${table.tableName}/add-record`);
+			},
 			openTable(tableName) {
 				this.$store.commit('setCurrentTable', tableName);
 				this.$router.push(`/user/table/${tableName}`);

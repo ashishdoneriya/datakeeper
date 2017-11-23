@@ -52,7 +52,7 @@ $result = array();
 while($row = $rows->fetch()) {
 	$temp = array();
 	foreach ($finalFields as $field) {
-		$temp[$field['name']] = $row[$field['id']];
+		$temp[$field['id']] = $row[$field['id']];
 	}
 	array_push($result, $temp);
 }

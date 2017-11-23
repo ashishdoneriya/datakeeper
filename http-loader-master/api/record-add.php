@@ -38,8 +38,9 @@ if ($access['approval']) {
 $fieldsIdArr = array();
 $valuesArr = array();
 $fields = $data['fields'];
+
 foreach($fields as $field) {
-	if ($field['type'] == 'id' && $field['autoIncrement'] == true) {
+	if ($field['type'] == 'Id' && $field['autoIncrement'] == true) {
 		continue;
 	}
 	array_push($fieldsIdArr, $field['id']);
@@ -53,7 +54,8 @@ $fieldsString = join("," , $fieldsIdArr);
 $valuesString = join(",", $valuesArr);
 
 $query = "insert into $tableName ($fieldsString) values ($valuesString)";
-$result = $db->query($query);
+
+$rows = $db->query($query);
 if ($rows == true) {
 	echo '{"status" : "success"}';
 } else {

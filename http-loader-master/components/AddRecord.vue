@@ -4,7 +4,7 @@
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="18">
 				<table>
-					<tr v-for="field in fields" :key="field">
+					<tr v-for="field in fields" :key="field" v-if="field.type != 'Id' || (field.type == 'Id' && !field.autoIncrement)">
 						<td class="label">{{field.name}}</td>
 						<td>
 							<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || (field.type=='Id' && !field.autoIncrement)" v-model="field.value" :ref="field.id"></el-input>
@@ -63,7 +63,7 @@
 		},
 		methods: {
 			goBack() {
-				this.$router.push(`/user/table/${this.tableName}`);
+				this.$router.go(-1);
 			},
 			addRecord() {
 				axios.post('/api/record-add.php', {

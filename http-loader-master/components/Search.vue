@@ -8,7 +8,7 @@
 				</el-input>
 			</el-col>
 		</el-row>
-		<el-row>
+		<el-row style="margin-top:30px">
 			<el-col :span="24">
 				<el-table :data="tableData" @sort-change="sortChange">
 					<el-table-column v-for="field in fields" :key="field" :prop="field.id" :label="field.name" sortable="custom">
@@ -29,12 +29,12 @@
 				</el-pagination>
 			</el-col>
 		</el-row>
-		<a class="float" @click="addRecord()">
-			<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
-		</a>
-		<router-link :to="'/user/table/' + tableName + '/add-record'" class="float">
-			<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
-		</router-link>
+		<el-tooltip class="item" effect="dark" content="Add Record" placement="top">
+			<router-link :to="'/user/table/' + tableName + '/add-record'" class="float">
+				<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
+			</router-link>
+		</el-tooltip>
+
 	</el-main>
 </template>
 
