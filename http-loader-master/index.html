@@ -56,7 +56,16 @@
 				el: '#vapp',
 				store: new Vuex.Store({
 					state: {
-						list: {},
+						list: {
+							personalTables : {
+								label : 'Personal Tables',
+								list : []
+							},
+							otherTables : {
+								label : 'Other Tables',
+								list : []
+							}
+						},
 						currentTable : ''
 					},
 					mutations: {

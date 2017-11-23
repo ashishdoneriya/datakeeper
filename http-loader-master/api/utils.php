@@ -58,6 +58,7 @@ function isAllowedToAccessTable($db, $userId, $tableName, $accessType) {
 	return $result;
 }
 
+//TODO in case of a unique person is allowed to read table
 function getFields($db, $userId, $tableName) {
 	if ($tableName == null) {
 		return null;

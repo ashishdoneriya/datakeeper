@@ -19,7 +19,6 @@ if ($finalFields == null){
 }
 
 $query = "select count(*) from " . $tableName . getSearchQuery($searchQuery, $finalFields);
-echo $query;
 $rows = $db->query($query);
 $row = $rows->fetch();
 echo $row[0];

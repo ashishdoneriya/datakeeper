@@ -46,6 +46,7 @@ if ($pageNumber != null && $maximumResults != null) {
 	$firstRow = ((int) $pageNumber - 1)  * $max;
 	$query = $query . " limit " . $firstRow . "," . $max;
 }
+
 $rows = $db->query($query);
 $result = array();
 while($row = $rows->fetch()) {

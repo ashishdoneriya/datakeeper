@@ -20,10 +20,12 @@ $idsFound = 0;
 $count = 0;
 foreach($fields as $field) {
 	if ($field->type == 'Id') {
+		$field->id = str_replace(' ', '_', $field->name);
 		$idsFound++;
+	} else {
+		$count++;
+		$field->id = str_replace(' ', '_', $field->name) . $count;
 	}
-	$count++;
-	$field->id = str_replace(' ', '_', $field->name) . $count;
 }
 if ($idsFound == 0) {
 	echo '{"status" : "failed", "message" : "No Id provided" }';

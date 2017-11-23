@@ -5,23 +5,27 @@
 				<el-menu-item @click="goToHome()" index="1">
 					<a>Home</a>
 				</el-menu-item>
-				<el-menu-item index="2">
-					<el-select v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
+				<el-menu-item index="2" v-if="tablesList.personalTables.list.length > 0 || tablesList.otherTables.list.length > 0">
+					<el-select v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length == 0" v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
 						<el-option key="" label="Select Table" value="" disabled="true"></el-option>
-						<el-option v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length == 0"
+						<el-option
 							v-for="table in tablesList.personalTables.list"
 							:key="table"
 							:label="table.displayedTableName"
 							:value="table.tableName"
 						></el-option>
-						<el-option v-if="tablesList.personalTables.list.length == 0 && tablesList.otherTables.list.length > 0"
+					</el-select>
+					<el-select v-if="tablesList.personalTables.list.length == 0 && tablesList.otherTables.list.length > 0" v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
+						<el-option key="" label="Select Table" value="" disabled="true"></el-option>
+						<el-option
 							v-for="table in tablesList.otherTables.list"
 							:key="table"
 							:label="table.displayedTableName"
 							:value="table.tableName"
 						></el-option>
+					</el-select>
+					<el-select v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length > 0" v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
 						<el-option-group
-							v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length > 0"
 							v-for="(value, key) in tablesList" :key="key" :label="value.label" v-if="value.list.length > 0">
 							<el-option v-for="table in value.list" :key="table" :label="table.displayedTableName" :value="table.tableName">
 							</el-option>
@@ -29,8 +33,7 @@
 					</el-select>
 				</el-menu-item>
 				<el-submenu index="3" style="float:right;min-width:75px;text-align:right">
-					<template slot="title">Hi {{user.name}}
-</template>
+					<template slot="title"><span>Hi {{user.name}}</span></template>
 					<el-menu-item index="3-1" @click="logout()" style="max-width:75px;min-width:75px;">Logout</el-menu-item>
 				</el-submenu>
 			</el-menu>
