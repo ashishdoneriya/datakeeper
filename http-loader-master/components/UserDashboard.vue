@@ -11,7 +11,7 @@
 						<a @click="openTable(table.tableName)"> {{table.displayedTableName }}</a>
 						<el-button @click="removeTable(table)" style="float: right; padding: 3px 5px;" type="text" icon="el-icon-delete">Remove</el-button>
 						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-edit">Modify</el-button>
-						<el-button @click="modifyTable(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text"><i class="material-icons" style="margin-right: 5px;font-size: 17px;position: relative;top: -2px;">account_circle</i><span style="margin-top: 0px;padding-top: 0px;position: relative;top: -5px;">Change Permissions</span></el-button>
+						<el-button @click="changePermissions(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text"><i class="material-icons" style="margin-right: 5px;font-size: 17px;position: relative;top: -2px;">account_circle</i><span style="margin-top: 0px;padding-top: 0px;position: relative;top: -5px;">Change Permissions</span></el-button>
 						<el-button @click="addRecord(table)" style="float: right; padding: 3px 5px;margin-right:10px;" type="text" icon="el-icon-circle-plus">Add Record</el-button>
 					</div>
 				</el-card>
@@ -37,6 +37,9 @@
 			openTable(tableName) {
 				this.$store.commit('setCurrentTable', tableName);
 				this.$router.push(`/user/table/${tableName}`);
+			},
+			changePermissions(table) {
+				this.$router.push(`/user/table/${table.tableName}/permissions`);
 			},
 			addTable() {
 				this.$router.push('/user/form-builder');
