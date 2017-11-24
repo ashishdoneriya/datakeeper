@@ -6,7 +6,7 @@
 			</el-col>
 		</el-row>
 		<el-row>
-			<h3>Global Permissions</h3>
+			<h3>Public</h3>
 			<el-form label-position="top">
 				<el-form-item label="Allow all peoples to view records of this Table">
 					<el-radio-group v-model="publicRoles.read.allowed">
@@ -41,11 +41,11 @@
 			</el-form>
 		</el-row>
 		<el-row>
-			<h3>Individual User Permissions</h3>
+			<h3>Guests<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="guestAddDialog = true">Add Guest</el-button></h3>
 			<el-card class="box-card" v-for="(guest, index) in guestPermissions" :key="guest.userId">
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Name : {{guest.name}} | Email : {{guest.email}}</span>
-					<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-delete" @click="removeGuest(guest.userId, index)">Remove User</el-button>
+					<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-delete" @click="removeGuest(guest.userId, index)">Remove Guest</el-button>
 				</div>
 				<el-form label-position="top">
 					<el-form-item label="Allow this person to view records of this Table">
@@ -95,42 +95,44 @@
 			</el-card>
 		</el-row>
 		<el-dialog title="Add individual user permission" :visible.sync="guestAddDialog">
-			<el-form label-position="top">
-				<el-form-item label="Email">
-					<el-input v-model="newGuestEmail"></el-input>
-				</el-form-item>
-				<el-form-item label="Allow this person to view records of this Table">
-					<el-radio-group v-model="guestRoleTemp.read.allowed">
-						<el-radio :label="true">Yes</el-radio>
-						<el-radio :label="false">No</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="Allow this person to ADD record to this table">
-					<el-radio-group v-model="guestRoleTemp.add.allowed" style="margin-right:30px">
-						<el-radio :label="true">Yes</el-radio>
-						<el-radio :label="false">No</el-radio>
-					</el-radio-group>
-					<el-checkbox v-model="guestRoleTemp.add.approval" :disabled="!guestRoleTemp.add.allowed">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
-				</el-form-item>
-				<el-form-item label="Allow this person to MODIFY records of this table">
-					<el-radio-group v-model="guestRoleTemp.update.allowed" style="margin-right:30px">>
-						<el-radio :label="true">Yes</el-radio>
-						<el-radio :label="false">No</el-radio>
-					</el-radio-group>
-					<el-checkbox v-model="guestRoleTemp.update.approval" :disabled="!guestRoleTemp.update.allowed">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
-				</el-form-item>
-				<el-form-item label="Allow this person to REMOVE records from this table">
-					<el-radio-group v-model="guestRoleTemp.delete.allowed" style="margin-right:30px">>
-						<el-radio :label="true">Yes</el-radio>
-						<el-radio :label="false">No</el-radio>
-					</el-radio-group>
-					<el-checkbox v-model="guestRoleTemp.delete.approval" :disabled="!guestRoleTemp.delete.allowed">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
-				</el-form-item>
-				 <el-form-item>
-					<el-button type="primary" @click="addGuest()">Add</el-button>
-					<el-button @click="guestAddDialog = false">Cancel</el-button>
-				</el-form-item>
-			</el-form>
+			<el-row style="height:300px;overflow-y:auto">
+				<el-form label-position="top">
+					<el-form-item label="Email">
+						<el-input v-model="newGuestEmail"></el-input>
+					</el-form-item>
+					<el-form-item label="Allow this person to view records of this Table">
+						<el-radio-group v-model="guestRoleTemp.read.allowed">
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="Allow this person to ADD record to this table">
+						<el-radio-group v-model="guestRoleTemp.add.allowed" style="margin-right:30px">
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+						<el-checkbox v-model="guestRoleTemp.add.approval" :disabled="!guestRoleTemp.add.allowed">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
+					</el-form-item>
+					<el-form-item label="Allow this person to MODIFY records of this table">
+						<el-radio-group v-model="guestRoleTemp.update.allowed" style="margin-right:30px">>
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+						<el-checkbox v-model="guestRoleTemp.update.approval" :disabled="!guestRoleTemp.update.allowed">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
+					</el-form-item>
+					<el-form-item label="Allow this person to REMOVE records from this table">
+						<el-radio-group v-model="guestRoleTemp.delete.allowed" style="margin-right:30px">>
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+						<el-checkbox v-model="guestRoleTemp.delete.approval" :disabled="!guestRoleTemp.delete.allowed">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
+					</el-form-item>
+					<el-form-item>
+						<el-button type="primary" @click="addGuest()">Add</el-button>
+						<el-button @click="guestAddDialog = false">Cancel</el-button>
+					</el-form-item>
+				</el-form>
+			</el-row>
 		</el-dialog>
 
 	</el-main>
@@ -144,15 +146,15 @@
 				displayedTableName: '',
 				publicRoles: {
 					"read": {
-						"allow": false
+						"allowed": false
 					},
 					"add": {
-						"allow": false,
+						"allowed": false,
 						"approval": true,
 						"loginRequired": true
 					},
 					"update": {
-						"allow": false,
+						"allowed": false,
 						"approval": true,
 						"loginRequired": true
 					},
@@ -169,20 +171,20 @@
 				newGuestEmail : '',
 				guestRoleTemp: {
 					"read": {
-						"allow": false
+						"allowed": false
 					},
 					"add": {
-						"allow": false,
+						"allowed": false,
 						"approval": true,
 						"loginRequired": true
 					},
 					"update": {
-						"allow": false,
+						"allowed": false,
 						"approval": true,
 						"loginRequired": true
 					},
 					"delete": {
-						"allow": false,
+						"allowed": false,
 						"approval": true,
 						"loginRequired": true
 					}
@@ -194,7 +196,7 @@
 		},
 		methods: {
 			removeGuest(userId, index) {
-				axios.post(`/api/guest-delete.php`, {
+				axios.post(`/api/guest-remove.php`, {
 						tableName: this.tableName,
 						userId : userId
 					}).then(result => {
@@ -219,15 +221,17 @@
 			},
 			addGuest() {
 				axios.post(`/api/guest-add.php`, {
-						email: newGuestEmail,
+						email: this.newGuestEmail,
 						tableName: this.tableName,
-						role: guestRoleTemp
+						role: this.guestRoleTemp
 					}).then(result => {
 						if (result.data.status == 'success') {
 							this.$message({
 								message: 'Added',
 								type: 'success'
 							});
+							this.newGuestEmail = ''
+							this.guestAddDialog = false;
 							axios.get(`/api/table-permissions.php?tableName=${this.tableName}`)
 								.then(result => {
 									this.guestPermissions = result.data.guestPermissions;
@@ -245,7 +249,7 @@
 						}
 					}).catch(error => {
 						this.$message({
-							message: `Problem while adding ${row.email} to individual users list`,
+							message: `Problem while adding ${this.newGuestEmail} to Guests`,
 							type: 'error'
 						});
 					});
@@ -257,8 +261,10 @@
 					inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
 					inputErrorMessage: 'Invalid Email'
 				}).then(value => {
-					axios.post(`/api/admin-remove.php`, {
-						email: value
+					value = value.value;
+					axios.post(`/api/admin-add.php`, {
+						email: value,
+						tableName : tableName
 					}).then(result => {
 						if (result.data.status == 'success') {
 							this.$message({
@@ -286,6 +292,7 @@
 							type: 'error'
 						});
 					});
+				}).catch(error => {
 				});
 			},
 			removeAdmin(index, row) {
@@ -331,7 +338,6 @@
 						this.displayedTableName = result.data.displayedTableName;
 						this.fields = result.data.fields;
 						this.publicRoles = result.data.publicRoles;
-						console.log(this.publicRoles);
 						this.guestPermissions = result.data.guestPermissions;
 						this.admins = result.data.admins;
 					}).catch(error => {

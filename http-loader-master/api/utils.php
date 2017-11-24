@@ -97,7 +97,7 @@ function getFields($db, $userId, $tableName) {
 }
 
 function getUserId($db, $email) {
-	$rows = $db->query("select userId from users where email=$email");
+	$rows = $db->query("select userId from users where email='$email'");
 	$row = $rows->fetch();
 	if (gettype($row) == 'boolean') {
 		return null;
