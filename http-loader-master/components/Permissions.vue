@@ -94,7 +94,7 @@
 				</el-table>
 			</el-card>
 		</el-row>
-		<el-dialog title="Add individual user permission" :visible.sync="guestAddDialog">
+		<el-dialog title="Add Guest" :visible.sync="guestAddDialog">
 			<el-row style="height:300px;overflow-y:auto">
 				<el-form label-position="top">
 					<el-form-item label="Email">
@@ -214,7 +214,7 @@
 						}
 					}).catch(error => {
 						this.$message({
-							message: `Problem while removing ${row.email} from individual users list`,
+							message: `Problem while removing ${row.email} from guests list`,
 							type: 'error'
 						});
 					});
