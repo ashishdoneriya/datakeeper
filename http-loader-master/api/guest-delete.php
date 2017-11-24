@@ -9,7 +9,7 @@ $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
-$guestId = htmlspecialchars(strip_tags($data['guestId']));
+$guestId = htmlspecialchars(strip_tags($data['userId']));
 
 // Checking if logged in user is admin
 if (!isAdmin($db, $userId, $tableName)) {
