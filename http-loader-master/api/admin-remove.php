@@ -22,8 +22,8 @@ if (!isAdmin($db, $userId, $tableName)) {
 // removing user from admin
 $rows = $db->query("delete from table_admins where userId=$userIdToRemove and tableName='$tableName'");
 if ($rows == false) {
-	echo "{'status' : 'failed', message : 'unable to remove $email from admins, server error '}";
+	echo '{"status" : "failed", "message" : "unable to remove $email from admins, server error"}';
 } else {
-	echo "{status : 'success'}";
+	echo '{"status" : "success"}';
 }
 ?>

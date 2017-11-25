@@ -21,15 +21,15 @@ if (!isAdmin($db, $userId, $tableName)) {
 // removing user from guest
 $rows = $db->query("delete from guest_permissions where userId=$guestId and tableName=$tableName)");
 if ($rows == false) {
-	echo '{ status : "failed", message : "Unable to revoke permissions from user"}';
+	echo '{ "status" : "failed", "message" : "Unable to revoke permissions from user"}';
 	return;
 }
 // removing data requests created by user
 $rows = $db->query("delete from data_requests where userId=$guestId and tableName=$tableName)");
 if ($rows == false) {
-	echo '{ status : "failed", message : "Unable to remove table requests created by user"}';
+	echo '{ "status" : "failed", "message" : "Unable to remove table requests created by user"}';
 	return;
 }
-echo '{ status : "success"}';
+echo '{ "status" : "success"}';
 
 ?>

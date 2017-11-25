@@ -6,16 +6,16 @@ include_once './config/database.php';
 include_once './utils.php';
 
 session_start();
-$userId = $_SESSION['userId'];
+$loggedInUserId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
-if (!isAdmin($db, $userId, $tableName)) {
+$data = json_decode(file_get_contents('php://input'), TRUE);
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
+if (!isAdmin($db, $loggedInUserId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
 }
-$data = json_decode(file_get_contents('php://input'), TRUE);
-$tableName = htmlspecialchars(strip_tags($data['tableName']));
 $role = json_encode($data['role']);
 $userId = $data['userId'];
 $rows = null;

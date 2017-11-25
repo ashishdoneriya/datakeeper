@@ -63,7 +63,7 @@ foreach($newFields as $newField) {
 foreach($oldFields as $oldField) {
 	$isExists = false;
 	foreach ($newFields as $newField) {
-		if ($oldField->id == $newField->id) {
+		if ($oldField['id'] == $newField->id) {
 			$isExists = true;
 		}
 	}

@@ -15,8 +15,8 @@
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item label="Select fields which will be displayed to the public">
-					<el-select v-model="allowedFields" multiple collapse-tags :disabled="!publicRoles.read.allowed" @change="updateGlobalFields()" placeholder="Select">
+				<el-form-item v-show="publicRoles.read.allowed" label="Select fields which will be displayed to the public">
+					<el-select v-model="allowedFields" multiple collapse-tags  @change="updateGlobalFields()" placeholder="Select">
 						<el-option v-for="field in fields" :key="field.id" :label="field.name" :value="field.id">
 						</el-option>
 					</el-select>
@@ -54,7 +54,7 @@
 			<el-card class="box-card" v-for="(guest, index) in guestPermissions" :key="guest.userId">
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Name : {{guest.name}} | Email : {{guest.email}}</span>
-					<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-delete" @click="removeGuest(guest.userId, index)">Remove Guest</el-button>
+					<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-delete" @click="removeGuest(guest, index)">Remove Guest</el-button>
 				</div>
 				<el-form label-position="top">
 					<el-form-item label="Allow this person to view records of this Table">
@@ -89,10 +89,10 @@
 		</el-row>
 		<el-row>
 			<h3>Manage Administrators
-				<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addAdmin()">Add an Admin</el-button>
+				<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addAdmin()">Add Admin</el-button>
 			</h3>
-			<el-card class="box-card">
-				<div v-for="(admin, index) in admins" :key="admin.email" class="text item">
+			<el-card class="box-card" v-show="admins.length > 0">
+				<div v-for="(admin, index) in admins" :key="admin" class="text item">
 					<span>Name : {{admin.name}} | Email : {{admin.email}}</span>
 					<el-button size="mini" @click="removeAdmin(index, admin)" icon="el-icon-delete" style="float: right; padding: 3px 5px;">Remove</el-button>
 				</div>
@@ -233,7 +233,7 @@
 					}).catch(error => {
 						this.showError('Unable to update information');
 					});
-				}, 1500);
+				}, 1000);
 			},
 			updateGlobalRoles() {
 				clearTimeout(this.publicRolesTimeout);
@@ -257,7 +257,7 @@
 								type: "error"
 							});
 						});
-				}, 1500);
+				}, 1000);
 			},
 			updateRoles(guest) {
 				axios
@@ -281,11 +281,11 @@
 						});
 					});
 			},
-			removeGuest(userId, index) {
+			removeGuest(guest, index) {
 				axios
 					.post(`/api/guest-remove.php`, {
 						tableName: this.tableName,
-						userId: userId
+						userId: guest.userId
 					})
 					.then(result => {
 						if (result.data.status == "success") {
@@ -302,8 +302,9 @@
 						}
 					})
 					.catch(error => {
+						console.log(error);
 						this.$message({
-							message: `Problem while removing ${row.email} from guests list`,
+							message: `Problem while removing ${guest.email} from guests list`,
 							type: "error"
 						});
 					});
@@ -351,16 +352,15 @@
 			addAdmin() {
 				this.$prompt("Please input e-mail", "Add Administrator", {
 						confirmButtonText: "OK",
-						cancelButtonText: "Cancel",
-						inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-						inputErrorMessage: "Invalid Email"
+						cancelButtonText: "Cancel"
 					})
-					.then(value => {
-						value = value.value;
+					.then((value) => {
+
+						var email = value.value;
 						axios
 							.post(`/api/admin-add.php`, {
-								email: value,
-								tableName: tableName
+								email: email,
+								tableName: this.tableName
 							})
 							.then(result => {
 								if (result.data.status == "success") {
@@ -388,16 +388,18 @@
 							})
 							.catch(error => {
 								this.$message({
-									message: `Problem while adding ${value} to admins list`,
+									message: `Problem while adding ${email} to admins list`,
 									type: "error"
 								});
 							});
 					})
-					.catch(error => {});
+					.catch(error => {
+						console.log(error);
+					});
 			},
-			removeAdmin(index, row) {
+			removeAdmin(index, admin) {
 				this.$confirm(
-						`Are you sure want to remove '${row.email} from admin list' ?`,
+						`Are you sure want to remove ${admin.email} from admin list' ?`,
 						"Warning", {
 							confirmButtonText: "OK",
 							cancelButtonText: "Cancel",
@@ -407,7 +409,7 @@
 					.then(() => {
 						axios
 							.post(`/api/admin-remove.php`, {
-								userId: row.userId,
+								userId: admin.userId,
 								tableName: this.tableName
 							})
 							.then(result => {
@@ -425,8 +427,9 @@
 								}
 							})
 							.catch(error => {
+								console.log(error);
 								this.$message({
-									message: `Problem while removing ${row.email} from admins list`,
+									message: `Problem while removing ${admin.email} from admins list`,
 									type: "error"
 								});
 							});
@@ -448,7 +451,7 @@
 						this.guestPermissions = result.data.guestPermissions;
 						this.admins = result.data.admins;
 						this.publicRoles = result.data.publicRoles;
-						if (this.publicRoles.read.allow) {
+						if (this.publicRoles.read.allowed) {
 							for (var field of this.fields) {
 								if (field.isVisible) {
 									this.allowedFields.push(field.id);

@@ -21,5 +21,5 @@ if (!isAdmin($db, $userId, $tableName)) {
 // updating guest permissions
 $encodedJson = json_encode($data['role']);
 $rows = $db->query("update guest_permissions set role='$encodedJson' where userId=$guestId)");
-echo '{ status : "success"}';
+echo '{ "status" : "success"}';
 ?>
