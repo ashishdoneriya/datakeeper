@@ -15,6 +15,12 @@
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
 				</el-form-item>
+				<el-form-item label="Select fields which will be displayed to the public">
+					<el-select v-model="allowedFields" multiple collapse-tags :disabled="!publicRoles.read.allowed" @change="updateGlobalFields()" placeholder="Select">
+						<el-option v-for="field in fields" :key="field.id" :label="field.name" :value="field.id">
+						</el-option>
+					</el-select>
+				</el-form-item>
 				<el-form-item label="Allow all peoples to ADD record to this table">
 					<el-radio-group v-model="publicRoles.add.allowed" @change="updateGlobalRoles()" style="margin-right:30px">
 						<el-radio :label="true">Yes</el-radio>
@@ -22,12 +28,6 @@
 					</el-radio-group>
 					<el-checkbox v-model="publicRoles.add.approval" :disabled="!publicRoles.add.allowed" @change="updateGlobalRoles()">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
 					<el-checkbox v-model="publicRoles.add.loginRequired" :disabled="!publicRoles.add.allowed" @change="updateGlobalRoles()"><u>Login required</u> for a person to add record</el-checkbox>
-				</el-form-item>
-				<el-form-item label="Select fields which will be displayed to the public">
-					<el-select v-model="allowedFields" multiple collapse-tags :disabled="!publicRoles.add.allowed" @change="updateGlobalFields()" placeholder="Select">
-						<el-option v-for="field in fields" :key="field.id" :label="field.name" :value="field.id">
-						</el-option>
-					</el-select>
 				</el-form-item>
 				<el-form-item label="Allow all peoples to MODIFY records of this table">
 					<el-radio-group v-model="publicRoles.update.allowed" @change="updateGlobalRoles()" style="margin-right:30px">>
@@ -92,7 +92,7 @@
 				<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addAdmin()">Add an Admin</el-button>
 			</h3>
 			<el-card class="box-card">
-				<div v-for="(admin, index) in admins" :key="table" class="text item">
+				<div v-for="(admin, index) in admins" :key="admin.email" class="text item">
 					<span>Name : {{admin.name}} | Email : {{admin.email}}</span>
 					<el-button size="mini" @click="removeAdmin(index, admin)" icon="el-icon-delete" style="float: right; padding: 3px 5px;">Remove</el-button>
 				</div>
@@ -168,10 +168,10 @@
 						loginRequired: true
 					}
 				},
-				publicRolesTimer: 0,
+				publicRolesTimeout: 0,
 				fields: [],
 				allowedFields: [],
-				allowedFieldsTimer: 0,
+				allowedFieldsTimeout: 0,
 				guestPermissions: [],
 				admins: [],
 				guestAddDialog: false,
@@ -206,8 +206,8 @@
 				this.$router.go(-1);
 			},
 			updateGlobalFields() {
-				clearTimer(this.allowedFieldsTimer);
-				this.allowedFieldsTimer = setTimeout(() => {
+				clearTimeout(this.allowedFieldsTimeout);
+				this.allowedFieldsTimeout = setTimeout(() => {
 					for (var field of this.fields) {
 						field.isVisible = false;
 					}
@@ -234,10 +234,10 @@
 						this.showError('Unable to update information');
 					});
 				}, 1500);
-			}
+			},
 			updateGlobalRoles() {
-				clearTimer(this.publicRolesTimer);
-				this.publicRolesTimer = setTimeout(() => {
+				clearTimeout(this.publicRolesTimeout);
+				this.publicRolesTimeout = setTimeout(() => {
 					axios
 						.post("/api/table-update-roles.php", {
 							tableName: this.tableName,
