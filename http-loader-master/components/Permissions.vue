@@ -1,5 +1,6 @@
 <template>
 	<el-main>
+		<el-button @click="goBack()"  icon="el-icon-back" type="primary" round>Go Back</el-button>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col class="text-center">
 				<h2><u>{{displayedTableName}}</u> Permissions</h2>
@@ -23,8 +24,8 @@
 					<el-checkbox v-model="publicRoles.add.loginRequired" :disabled="!publicRoles.add.allowed" @change="updateGlobalRoles()"><u>Login required</u> for a person to add record</el-checkbox>
 				</el-form-item>
 				<el-form-item label="Select fields which will be displayed to the public">
-					<el-select v-model="value11" multiple collapse-tags style="margin-left: 20px;" placeholder="Select">
-						<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+					<el-select v-model="allowedFields" multiple collapse-tags :disabled="!publicRoles.add.allowed" @change="updateGlobalFields()" placeholder="Select">
+						<el-option v-for="field in fields" :key="field.id" :label="field.name" :value="field.id">
 						</el-option>
 					</el-select>
 				</el-form-item>
@@ -96,7 +97,7 @@
 					<el-table-column prop="email" label="Email" sortable></el-table-column>
 					<el-table-column label="Operations">
 						<template slot-scope="scope">
-									 	<el-button size="mini" @click="removeAdmin(scope.$index, scope.row)"  icon="el-icon-delete">Remove</el-button>
+									<el-button size="mini" @click="removeAdmin(scope.$index, scope.row)"  icon="el-icon-delete">Remove</el-button>
 </template>
 					</el-table-column>
 				</el-table>
@@ -172,7 +173,10 @@
 						loginRequired: true
 					}
 				},
+				publicRolesTimer: 0,
 				fields: [],
+				allowedFields: [],
+				allowedFieldsTimer: 0,
 				guestPermissions: [],
 				admins: [],
 				guestAddDialog: false,
@@ -203,26 +207,62 @@
 			this.fetchPermissions();
 		},
 		methods: {
-			updateGlobalRoles() {
-				axios
-					.post("/api/table-update-roles.php", {
-						tableName: this.tableName,
-						role: this.publicRoles
-					})
-					.then(result => {
-						if (result.data.status != "success") {
+			goBack() {
+				this.$router.go(-1);
+			},
+			updateGlobalFields() {
+				clearTimer(this.allowedFieldsTimer);
+				this.allowedFieldsTimer = setTimeout(() => {
+					for (var field of this.fields) {
+						field.isVisible = false;
+					}
+					for (var allowed of this.allowedFields) {
+						for (var field of this.fields) {
+							if (field.id == allowed) {
+								field.isVisible = true;
+							}
+						}
+					}
+					axios.post('/api/table-update-fields.php', {
+						'tableName': this.tableName,
+						'displayedTableName': this.displayedTableName,
+						'fields': this.fields
+					}).then(response => {
+						if (response.data.status != 'success') {
 							this.$message({
-								message: result.data.message,
+								message: 'Unable to update information',
+								type: 'error'
+							});
+							console.error(response.data.message);
+						}
+					}).catch(error => {
+						this.showError('Unable to update information');
+					});
+				}, 1500);
+			}
+			updateGlobalRoles() {
+				clearTimer(this.publicRolesTimer);
+				this.publicRolesTimer = setTimeout(() => {
+					axios
+						.post("/api/table-update-roles.php", {
+							tableName: this.tableName,
+							role: this.publicRoles
+						})
+						.then(result => {
+							if (result.data.status != "success") {
+								this.$message({
+									message: result.data.message,
+									type: "error"
+								});
+							}
+						})
+						.catch(error => {
+							this.$message({
+								message: `Problem while updating permissions`,
 								type: "error"
 							});
-						}
-					})
-					.catch(error => {
-						this.$message({
-							message: `Problem while updating permissions`,
-							type: "error"
 						});
-					});
+				}, 1500);
 			},
 			updateRoles(guest) {
 				axios
@@ -411,8 +451,15 @@
 						this.displayedTableName = result.data.displayedTableName;
 						this.fields = result.data.fields;
 						this.publicRoles = result.data.publicRoles;
-						this.guestPermissions = result.data.guestPermissions;
 						this.admins = result.data.admins;
+						this.guestPermissions = result.data.guestPermissions;
+						if (this.guestPermissions.read.allow) {
+							for (var field of this.fields) {
+								if (field.isVisible) {
+									this.allowedFields.push(field.id);
+								}
+							}
+						}
 					})
 					.catch(error => {
 						this.$message({
