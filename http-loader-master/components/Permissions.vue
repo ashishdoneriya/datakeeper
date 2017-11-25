@@ -1,6 +1,6 @@
 <template>
 	<el-main>
-		<el-button @click="goBack()"  icon="el-icon-back" type="primary" round>Go Back</el-button>
+		<el-button @click="goBack()" icon="el-icon-back" type="primary" round>Go Back</el-button>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col class="text-center">
 				<h2><u>{{displayedTableName}}</u> Permissions</h2>
@@ -91,16 +91,11 @@
 			<h3>Manage Administrators
 				<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-circle-plus" @click="addAdmin()">Add an Admin</el-button>
 			</h3>
-			<el-card class="box-card" style="width:100%">
-				<el-table :data="admins">
-					<el-table-column prop="name" label="Name" sortable></el-table-column>
-					<el-table-column prop="email" label="Email" sortable></el-table-column>
-					<el-table-column label="Operations">
-						<template slot-scope="scope">
-									<el-button size="mini" @click="removeAdmin(scope.$index, scope.row)"  icon="el-icon-delete">Remove</el-button>
-</template>
-					</el-table-column>
-				</el-table>
+			<el-card class="box-card">
+				<div v-for="(admin, index) in admins" :key="table" class="text item">
+					<span>Name : {{admin.name}} | Email : {{admin.email}}</span>
+					<el-button size="mini" @click="removeAdmin(index, admin)" icon="el-icon-delete" style="float: right; padding: 3px 5px;">Remove</el-button>
+				</div>
 			</el-card>
 		</el-row>
 		<el-dialog title="Add Guest" :visible.sync="guestAddDialog">
