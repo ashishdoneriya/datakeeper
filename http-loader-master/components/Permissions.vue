@@ -445,10 +445,10 @@
 					.then(result => {
 						this.displayedTableName = result.data.displayedTableName;
 						this.fields = result.data.fields;
-						this.publicRoles = result.data.publicRoles;
-						this.admins = result.data.admins;
 						this.guestPermissions = result.data.guestPermissions;
-						if (this.guestPermissions.read.allow) {
+						this.admins = result.data.admins;
+						this.publicRoles = result.data.publicRoles;
+						if (this.publicRoles.read.allow) {
 							for (var field of this.fields) {
 								if (field.isVisible) {
 									this.allowedFields.push(field.id);
@@ -457,6 +457,7 @@
 						}
 					})
 					.catch(error => {
+						console.log(error);
 						this.$message({
 							message: "Unable to fetch table information",
 							type: "error"
