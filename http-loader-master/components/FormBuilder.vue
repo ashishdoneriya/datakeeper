@@ -232,7 +232,7 @@
 							type: 'error'
 						});
 					}
-					
+
 				}).catch(error => {
 					this.showError('Unable to add table');
 				});
@@ -244,7 +244,7 @@
 				});
 			},
 			updateTable() {
-				axios.post('/api/table-update.php', {
+				axios.post('/api/table-update-fields.php', {
 					'tableName': this.tableName,
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
