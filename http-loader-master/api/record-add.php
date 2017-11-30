@@ -40,10 +40,10 @@ $valuesArr = array();
 $fields = $data['fields'];
 
 foreach($fields as $field) {
-	if ($field['type'] == 'Id' && $field['autoIncrement'] == true) {
+	if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
 		continue;
 	}
-	array_push($fieldsIdArr, $field['id']);
+	array_push($fieldsIdArr, $field['fieldId']);
 	if (toAddQuotes($field['type'])) {
 		array_push($valuesArr, "'" . $field['value'] . "'");
 	} else {
@@ -74,7 +74,7 @@ function toAddQuotes ($type) {
 			return true;
 		case 'Number' :
 		case 'Decimal Number' :
-		case 'Id';
+		case 'primaryKey';
 			return false;
 		default :
 			return true;

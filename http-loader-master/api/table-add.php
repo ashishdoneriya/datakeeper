@@ -13,20 +13,24 @@ if ($userId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$data = json_decode(json_encode($data));
-$displayedTableName = htmlspecialchars(strip_tags($data ->displayedTableName));
-$fields = $data->fields;
+$displayedTableName = htmlspecialchars(strip_tags($data['displayedTableName']));
+$fields = $data['fields'];
+$length = count($fields);
+
 $idsFound = 0;
 $count = 0;
-foreach($fields as $field) {
-	if ($field->type == 'Id') {
-		$field->id = str_replace(' ', '_', $field->name);
+for ($x = 0; $x < $length; $x++) {
+	$field = (object) $fields[$x];
+	if ($field->type == 'primaryKey') {
+		$field->fieldId = "primaryKey";
 		$idsFound++;
 	} else {
 		$count++;
-		$field->id = str_replace(' ', '_', $field->name) . $count;
+		$field->fieldId = str_replace(' ', '_', $field->name) . $count;
 	}
+	$fields[$x] = (array) $field;
 }
+
 if ($idsFound == 0) {
 	echo '{"status" : "failed", "message" : "No Id provided" }';
 	return;
@@ -39,8 +43,8 @@ if ($idsFound > 1) {
 $encodedFields = json_encode($fields);
 
 $tableName = $userId . '_' . time();
-$roleJson = '{"read" : {"allowed" : false, "approval" : true, "loginRequired" : false},"add" : {"allowed" : false, "approval" : true, "loginRequired" : true},"update" : {"allowed" : false, "approval" : true, "loginRequired" : true},"delete" : {"allowed" : false, "approval" : true, "loginRequired" : true}}';
-$query = "insert into tables_info (tableName, displayedTableName, fields, publicRole ) values ('$tableName', '$displayedTableName', '$encodedFields', '$roleJson')";
+$permissionsJson = '{"read" : {"allowed" : false, "approval" : true, "loginRequired" : false},"add" : {"allowed" : false, "approval" : true, "loginRequired" : true},"update" : {"allowed" : false, "approval" : true, "loginRequired" : true},"delete" : {"allowed" : false, "approval" : true, "loginRequired" : true}}';
+$query = "insert into tables_info (tableName, displayedTableName, fields, publicPermissions ) values ('$tableName', '$displayedTableName', '$encodedFields', '$permissionsJson')";
 $rows = $db->query($query);
 if ($rows == false) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
@@ -56,7 +60,7 @@ if ($rows == false) {
 // Creating table
 $tempFields = array();
 foreach($fields as $field) {
-	array_push($tempFields, '' . $field->id . ' ' . getMysqlFieldType($field->type) . getRequired($field->isCompulsory));
+	array_push($tempFields, '' . $field['fieldId'] . ' ' . getMysqlFieldType($field['type']) . getRequired($field['required']));
 }
 
 $query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
@@ -92,7 +96,7 @@ function getMysqlFieldType($type) {
 			return 'TIME';
 		case 'Date Time' :
 			return 'DATETIME';
-		case 'Id' :
+		case 'primaryKey' :
 			return 'BIGINT primary key auto_increment';
 		default :
 			return 'TEXT';

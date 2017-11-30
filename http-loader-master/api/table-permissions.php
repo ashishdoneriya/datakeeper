@@ -20,21 +20,21 @@ if (!isAdmin($db, $userId, $tableName)) {
 
 $result = array();
 
-// Fetching public roles
-$rows = $db->query("select displayedTableName, fields, publicRole from tables_info where tableName='$tableName'");
+// Fetching public permissions
+$rows = $db->query("select displayedTableName, fields, publicPermissions from tables_info where tableName='$tableName'");
 $row = $rows->fetch();
 $result['displayedTableName'] = $row['displayedTableName'];
 $result['fields'] = json_decode($row['fields'], true);
-$result['publicRoles'] = json_decode($row['publicRole'], true);
+$result['publicPermissions'] = json_decode($row['publicPermissions'], true);
 
-// Fetching individual roles
-$rows = $db->query("select guest_permissions.userId as userId, users.name as name, users.email as email, guest_permissions.role as role from guest_permissions, users where users.userId=guest_permissions.userId and guest_permissions.tableName='$tableName'");
+// Fetching individual permissions
+$rows = $db->query("select guest_permissions.userId as userId, users.name as name, users.email as email, guest_permissions.permissions as permissions from guest_permissions, users where users.userId=guest_permissions.userId and guest_permissions.tableName='$tableName'");
 $guestPermissions = array();
 while($row = $rows->fetch()) {
 	if (gettype($row) == 'boolean') {
 		break;
 	}
-	array_push($guestPermissions, array('userId'=> $row['userId'], 'name'=> $row['name'], 'email'=> $row['email'], 'role'=> json_decode($row['role'], true)));
+	array_push($guestPermissions, array('userId'=> $row['userId'], 'name'=> $row['name'], 'email'=> $row['email'], 'permissions'=> json_decode($row['permissions'], true)));
 }
 $result['guestPermissions'] = $guestPermissions;
 

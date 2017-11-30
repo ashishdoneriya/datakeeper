@@ -27,7 +27,7 @@ if (gettype($rows) != 'boolean') {
 }
 $result['personalTables'] = array('label' => 'Personal Tables', 'list'=> $ddArray);
 
-$query = "select tables_info.tableName as tableName, tables_info.displayedTableName as displayedTableName, guest_permissions.role as role from tables_info, guest_permissions where tables_info.tableName=guest_permissions.tableName and tables_info.userId=$userId";
+$query = "select tables_info.tableName as tableName, tables_info.displayedTableName as displayedTableName, guest_permissions.permissions as permissions from tables_info, guest_permissions where tables_info.tableName=guest_permissions.tableName and tables_info.userId=$userId";
 
 $rows = $db->query($query);
 $ddArray = array();
@@ -39,7 +39,7 @@ if (gettype($rows) != 'boolean') {
 		$arr = array();
 		$arr['tableName'] = $row['tableName'];
 		$arr['displayedTableName'] = $row['displayedTableName'];
-		$arr['role'] = $row['role'];
+		$arr['permissions'] = $row['permissions'];
 		array_push($ddArray, $arr);
 	}
 }

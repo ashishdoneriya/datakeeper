@@ -37,8 +37,8 @@
 									<el-input v-model="field.name"></el-input>
 								</el-form-item>
 								<el-form-item label="Field Type">
-									<span v-if="field.type == 'Id'" >Id</span>
-									<el-select v-if="field.type != 'Id'" v-model="field.type" placeholder="Select">
+									<span v-if="field.type == 'primaryKey'" >Id</span>
+									<el-select v-if="field.type != 'primaryKey'" v-model="field.type" placeholder="Select">
 										<el-option v-for="type in fieldTypes" :key="type.value" :label="type.label" :value="type.value">
 										</el-option>
 									</el-select>
@@ -52,10 +52,10 @@
 									</el-col>
 									<el-button @click="addOption(field)" type="primary" size="small">Add Option</el-button>
 								</el-form-item>
-								<el-form-item label="Is Compulsory" v-if="field.type != 'Id'">
-									<el-checkbox v-model="field.isCompulsory"></el-checkbox>
+								<el-form-item label="Is Compulsory" v-if="field.type != 'primaryKey'">
+									<el-checkbox v-model="field.required"></el-checkbox>
 								</el-form-item>
-								<el-form-item label="Auto Increment" v-if="field.type == 'Id'">
+								<el-form-item label="Auto Increment" v-if="field.type == 'primaryKey'">
 									<el-checkbox v-model="field.autoIncrement"></el-checkbox>
 								</el-form-item>
 							</el-form>
@@ -66,28 +66,28 @@
 					<div class="grid-content bg-purple-light" style="padding-left:30px;">
 						<h2 class="text-center">Preview</h2>
 						<table v-show="fields.length > 0">
-							<tr v-for="field in fields" :key="field" v-show="field.type != 'Id' || (field.type == 'Id' && field.autoIncrement==false)">
-								<td class="label">{{field.name}}</td>
+							<tr v-for="field in fields" :key="field" v-show="field.type && (field.type != 'primaryKey' || (field.type == 'primaryKey' && field.autoIncrement==false))">
+								<td class="label"><span v-show="field.required" style="color:#F44336">*</span>{{field.name}}</td>
 								<td>
-									<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || field.type=='Id'" v-model="field.value" :ref="field.id"></el-input>
-									<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.id">
+									<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || field.type=='primaryKey'" v-model="field.value" :ref="field.fieldId"></el-input>
+									<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.fieldId">
 										<el-option v-for="item in field.options" :key="item.value" :label="item.value" :value="item.value">
 										</el-option>
 									</el-select>
-									<el-checkbox-group v-if="field.type=='Checkbox'" v-model="field.value" :ref="field.id">
+									<el-checkbox-group v-if="field.type=='Checkbox'" v-model="field.value" :ref="field.fieldId">
 										<el-checkbox v-for="option in field.options" :key="option.value" :label="option.value"></el-checkbox>
 									</el-checkbox-group>
-									<el-radio-group :ref="field.id" v-if="field.type=='Radio Button' && field.options.length > 0" v-model="field.value">
+									<el-radio-group :ref="field.fieldId" v-if="field.type=='Radio Button' && field.options.length > 0" v-model="field.value">
 										<el-radio v-for="(option, j) in field.options" :key="option.value" :label="option.value">{{option.value}}</el-radio>
 									</el-radio-group>
-									<el-date-picker :ref="field.id" v-if="field.type=='Date'" v-model="field.value" type="date" placeholder="Pick a day" value-format="yyyy-MM-dd">
+									<el-date-picker :ref="field.fieldId" v-if="field.type=='Date'" v-model="field.value" type="date" placeholder="Pick a day" value-format="yyyy-MM-dd">
 									</el-date-picker>
-									<el-time-select :ref="field.id" v-if="field.type=='Time'" v-model="field.value" value-format="HH:mm:ss" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
+									<el-time-select :ref="field.fieldId" v-if="field.type=='Time'" v-model="field.value" value-format="HH:mm:ss" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
 									</el-time-select>
-									<el-date-picker :ref="field.id" v-if="field.type=='Date Time'" v-model="field.value" type="datetime" placeholder="Select date and time" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+									<el-date-picker :ref="field.fieldId" v-if="field.type=='Date Time'" v-model="field.value" type="datetime" placeholder="Select date and time" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
 								</td>
 							</tr>
-							<tr>
+							<tr v-show="fields.length > 1">
 								<td></td>
 								<td>
 									<el-button>Save</el-button>
@@ -169,8 +169,8 @@
 			} else {
 				this.fields.push({
 					name: 'Id',
-					type: 'Id',
-					isCompulsory: true,
+					type: 'primaryKey',
+					required: true,
 					value: '',
 					isVisible : false,
 					autoIncrement : true
@@ -286,7 +286,7 @@
 				this.fields.push({
 					name: '',
 					type: '',
-					isCompulsory: false,
+					required: false,
 					options: [],
 					value: undefined,
 					isVisible : false
@@ -294,7 +294,7 @@
 			},
 
 			deleteField(i) {
-				if (this.fields[i].type == 'id') {
+				if (this.fields[i].type == 'primaryKey') {
 					return;
 				}
 				this.fields.splice(i, 1);

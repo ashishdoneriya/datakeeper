@@ -77,10 +77,6 @@
 					});
 
 				}).catch(() => {
-					this.$message({
-						type: 'info',
-						message: `Unable to remove table '${table.displayedTableName}'`
-					});
 				});
 			}
 		}

@@ -54,7 +54,7 @@ function toAddQuotes ($type) {
 			return true;
 		case 'Number' :
 		case 'Decimal Number' :
-		case 'Id';
+		case 'primaryKey';
 			return false;
 		default :
 			return true;

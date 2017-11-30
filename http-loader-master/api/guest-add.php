@@ -25,7 +25,7 @@ if ($guestId == null) {
     return;
 }
 // Adding guest
-$encodedJson = json_encode($data['role']);
-$rows = $db->query("insert into guest_permissions (userId, tableName, role) values ($loggedInUserId, '$tableName', '$encodedJson')");
+$encodedJson = $data['permissions'];
+$rows = $db->query("insert into guest_permissions (userId, tableName, permissions) values ($loggedInUserId, '$tableName', '$encodedJson')");
 echo '{ "status" : "success"}';
 ?>

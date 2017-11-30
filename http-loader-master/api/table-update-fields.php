@@ -15,10 +15,9 @@ if ($userId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$data = json_decode(json_encode($data));
-$displayedTableName = htmlspecialchars(strip_tags($data->displayedTableName));
-$tableName = htmlspecialchars(strip_tags($data->tableName));
-$newFields = $data->fields;
+$displayedTableName = htmlspecialchars(strip_tags($data['displayedTableName']));
+$tableName = htmlspecialchars(strip_tags($data['tableName']));
+$newFields = $data['fields'];
 
 if (!isSuperAdmin($db, $userId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');
@@ -26,14 +25,15 @@ if (!isSuperAdmin($db, $userId, $tableName)) {
 	return;
 }
 
-
 $idsFound = 0;
-foreach($newFields as $field) {
-	if ($field->type == 'Id') {
+$length = count($newFields);
+for ($x = 0; $x < $length; $x++) {
+	$field = (object) $newFields[$x];
+	if ($field->type == 'primaryKey') {
 		$idsFound++;
 	}
-	$field->id = str_replace(' ', '_', $field->name);
 }
+
 if ($idsFound == 0) {
 	echo '{"status" : "failed", "message" : "No Id provided" }';
 	return;
@@ -49,27 +49,30 @@ if ($oldFields == null) {
 	echo 'You are not authorized.';
 	return;
 }
-foreach($newFields as $newField) {
-	if (!property_exists($newField, 'id')) {
-		$newField->id = str_replace(' ', '_', $newField->name);
+$length = count($newFields);
+for ($x = 0; $x < $length; $x++) {
+	$newField = (object) $newFields[$x];
+	if (!property_exists($newField, 'fieldId')) {
+		$newField->fieldId = str_replace(' ', '_', $newField->name);
 		// Adding column
-		$db->query("alter table " . $tableName . " add " . $newField->id . " " . getMysqlFieldType($newField->type) . getRequired($newField->isCompulsory));
+		$db->query("alter table " . $tableName . " add " . $newField->fieldId . " " . getMysqlFieldType($newField->type) . getRequired($newField->required));
 	} else {
 		// Modifying column
-		$db->query("alter table " . $tableName . " modify column " . $newField->id . " " . getMysqlFieldType($newField->type) . getRequired($newField->isCompulsory));
+		$db->query("alter table " . $tableName . " modify column " . $newField->fieldId . " " . getMysqlFieldType($newField->type) . getRequired($newField->required));
 	}
+	$newFields[$x] = (array) $newField;
 }
 
 foreach($oldFields as $oldField) {
 	$isExists = false;
 	foreach ($newFields as $newField) {
-		if ($oldField['id'] == $newField->id) {
+		if ($oldField['fieldId'] == $newField['fieldId']) {
 			$isExists = true;
 		}
 	}
 	if ($isExists == false) {
 		// Removing fields
-		$db->query("alter table " . $tableName . " drop column " . $oldField->id);
+		$db->query("alter table " . $tableName . " drop column " . $oldField['fieldId']);
 	}
 }
 

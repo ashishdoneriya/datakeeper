@@ -38,11 +38,11 @@ if ($access['approval']) {
 $fieldsIdArr = array();
 $fields = $data['fields'];
 foreach($fields as $field) {
-	if ($field['type'] == 'id' && $field['autoIncrement'] == true) {
+	if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
 		continue;
     }
-    $temp = $field['id'];
-	array_push($fieldsIdArr, $field['id'] . "=");
+    $temp = $field['fieldId'];
+	array_push($fieldsIdArr, $field['fieldId'] . "=");
 	if (toAddQuotes($field['type'])) {
 		$temp = $temp . "'" . $field['value'] . "'";
 	} else {
@@ -71,7 +71,7 @@ function toAddQuotes ($type) {
 			return true;
 		case 'Number' :
 		case 'Decimal Number' :
-		case 'Id';
+		case 'primaryKey';
 			return false;
 		default :
 			return true;

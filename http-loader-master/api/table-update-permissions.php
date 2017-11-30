@@ -16,13 +16,13 @@ if (!isAdmin($db, $loggedInUserId, $tableName)) {
 	echo 'You are not authorized.';
 	return;
 }
-$role = json_encode($data['role']);
+$permissions = json_encode($data['permissions']);
 $userId = $data['userId'];
 $rows = null;
 if ($userId == null) {
-	$rows = $db->query("update tables_info set publicRole='$role' where tableName='$tableName'");
+	$rows = $db->query("update tables_info set publicPermissions='$permissions' where tableName='$tableName'");
 } else {
-	$rows = $db->query("update guest_permissions set role='$role' where userId=$userId and tableName='$tableName'");
+	$rows = $db->query("update guest_permissions set permissions='$permissions' where userId=$userId and tableName='$tableName'");
 }
 if ($rows) {
 	echo '{"status" : "success"}';

@@ -21,7 +21,7 @@ if ($finalFields == null){
 
 $fieldsArr = array();
 foreach($finalFields as $field) {
-	array_push($fieldsArr, $field['id']);
+	array_push($fieldsArr, $field['fieldId']);
 }
 
 $fieldsString = join(',', $fieldsArr);
@@ -34,7 +34,7 @@ $order = htmlspecialchars(strip_tags($_GET['order']));
 $whereAdded = false;
 
 if ($sortBy == null) {
-	$sortBy = $finalFields[0]['id'];
+	$sortBy = $finalFields[0]['fieldId'];
 }
 if ($order == null) {
 	$order = 'asc';
@@ -47,12 +47,13 @@ if ($pageNumber != null && $maximumResults != null) {
 	$query = $query . " limit " . $firstRow . "," . $max;
 }
 
+
 $rows = $db->query($query);
 $result = array();
 while($row = $rows->fetch()) {
 	$temp = array();
 	foreach ($finalFields as $field) {
-		$temp[$field['id']] = $row[$field['id']];
+		$temp[$field['fieldId']] = $row[$field['fieldId']];
 	}
 	array_push($result, $temp);
 }
@@ -76,23 +77,23 @@ function getSearchQuery($query, $fields) {
 			case 'Select' :
 			case 'Checkbox' :
 			case 'Radio Button' :
-				array_push($searchArr, $field['id'] . " like '%". $query . "%'");
+				array_push($searchArr, $field['fieldId'] . " like '%". $query . "%'");
 				continue;
 			case 'Number' :
-			case 'Id' :
+			case 'primaryKey' :
 				if (is_numeric($query) == true) {
-					array_push($searchArr, $field['id'] . "=". $query);
+					array_push($searchArr, $field['fieldId'] . "=". $query);
 				}
 				continue;
 			case 'Decimal Number' :
 				if (is_float($query) == true || is_numeric($query) == true) {
-					array_push($searchArr, $field['id'] . "=". $query);
+					array_push($searchArr, $field['fieldId'] . "=". $query);
 				}
 				continue;
 			case 'Date' :
 			case 'Time' :
 			case 'Date Time' :
-				array_push($searchArr, $field['id'] . "='". $query . "'");
+				array_push($searchArr, $field['fieldId'] . "='". $query . "'");
 		}
 	}
 	return " where " . join(" or ", $searchArr) . " ";

@@ -33,10 +33,10 @@ function isAllowedToAccessTable($db, $userId, $tableName, $accessType) {
 	}
 	if ($userId != null) {
 		$result['admin'] = false;
-		$rows = $db->query("select role from guest_permissions where userId=$userId and tableName='$tableName'");
+		$rows = $db->query("select permissions from guest_permissions where userId=$userId and tableName='$tableName'");
 		$row = $rows->fetch();
 		if (gettype($row) != 'boolean') {
-			$row = json_decode($row['role'], true);
+			$row = json_decode($row['permissions'], true);
 			$row = $row[$accessType];
 			$result['allowed'] = $row['allowed'];
 			$result['approval'] = $row['approval'];
@@ -44,9 +44,9 @@ function isAllowedToAccessTable($db, $userId, $tableName, $accessType) {
 			return $result;
 		}
 	}
-	$rows = $db->query("select publicRole from tables_info where tableName='$tableName'");
+	$rows = $db->query("select publicPermissions from tables_info where tableName='$tableName'");
 	$row = $rows->fetch();
-	$row = json_decode($row['publicRole'], true);
+	$row = json_decode($row['publicPermissions'], true);
 	$row = $row[$accessType];
 	if ($row['loginRequired'] == true && $userId == null) {
 		$result['allowed'] = false;
@@ -93,7 +93,7 @@ function getFields($db, $userId, $tableName) {
 		}
 		array_push($finalFields, $field);
 	}
-	$finalFields;
+	return $finalFields;
 }
 
 function getUserId($db, $email) {
@@ -105,31 +105,31 @@ function getUserId($db, $email) {
 	return $row['userId'];
 }
 
-function getRolesJson($db, $userId, $tableName) {
+function getPermissionsJson($db, $userId, $tableName) {
 
 	if (isAdmin($db, $userId, $tableName)) {
-		$roles = array('add', 'update', 'delete', 'read');
+		$permissions = array('add', 'update', 'delete', 'read');
 		$result = array();
 		$result['allowed'] = true;
 		$result['approval'] = false;
 		$result['loginRequired'] = true;
 		$result['admin'] = true;
 		$ddArr = array();
-		foreach ($roles as $role) {
-			$ddArr[$role] = $result;
+		foreach ($permissions as $permission) {
+			$ddArr[$permission] = $result;
 		}
 		return $ddArr;
 	}
 	if ($userId != null) {
-		$rows = $db->query("select role from guest_permissions where userId=$userId and tableName='$tableName'");
+		$rows = $db->query("select permissions from guest_permissions where userId=$userId and tableName='$tableName'");
 		$row = $rows->fetch();
 		if (gettype($row) != 'boolean') {
-			return json_decode($row['role'], true);
+			return json_decode($row['permissions'], true);
 		}
 	}
-	$rows = $db->query("select role from tables_info where tableName='$tableName'");
+	$rows = $db->query("select publicPermissions from tables_info where tableName='$tableName'");
 	$row = $rows->fetch();
-	return json_decode($row['publicRole'], true);
+	return json_decode($row['publicPermissions'], true);
 }
 
 ?>

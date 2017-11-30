@@ -11,7 +11,7 @@
 		<el-row style="margin-top:30px">
 			<el-col :span="24">
 				<el-table :data="tableData" @sort-change="sortChange">
-					<el-table-column v-for="field in fields" :key="field" :prop="field.id" :label="field.name" sortable="custom">
+					<el-table-column v-for="field in fields" :key="field" :prop="field.fieldId" :label="field.name" sortable="custom">
 					</el-table-column>
 				</el-table>
 			</el-col>
@@ -83,7 +83,11 @@
 				axios.get(`/api/search-total.php?tableName=${this.tableName}&searchQuery=${this.searchQuery}`)
 					.then(result => {
 						this.totalResults = result.data;
-						this.search();
+						if (this.totalResults != 0) {
+							this.search();
+						} else {
+							this.tableData = [];
+						}
 					}).catch(error => {
 						this.$message({
 							message: 'Unable to fetch records',
@@ -95,13 +99,18 @@
 				var fieldId = column.prop;
 				var order = column.order;
 				if (!fieldId || !order) {
+					this.sortBy = this.fields[0].fieldId;
+					this.order = 'asc';
+					this.search();
 					return;
 				}
+				this.sortBy = fieldId;
 				if (order == 'ascending') {
 					order = 'asc';
 				} else {
 					order = 'desc';
 				}
+				this.order = order;
 				this.search();
 			},
 			search() {

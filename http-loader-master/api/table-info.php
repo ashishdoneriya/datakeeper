@@ -21,6 +21,6 @@ if ($finalFields == null){
 	return;
 }
 $result['fields'] = $finalFields;
-$result['role'] = getRolesJson($db, $userId, $tableName);
+$result['permissions'] = getPermissionsJson($db, $userId, $tableName);
 echo json_encode($result);
 ?>

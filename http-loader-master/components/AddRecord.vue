@@ -4,25 +4,25 @@
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="18">
 				<table>
-					<tr v-for="field in fields" :key="field" v-if="field.type != 'Id' || (field.type == 'Id' && !field.autoIncrement)">
+					<tr v-for="field in fields" :key="field" v-if="field.type != 'primaryKey' || (field.type == 'primaryKey' && !field.autoIncrement)">
 						<td class="label">{{field.name}}</td>
 						<td>
-							<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || (field.type=='Id' && !field.autoIncrement)" v-model="field.value" :ref="field.id"></el-input>
-							<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.id">
+							<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || (field.type=='primaryKey' && !field.autoIncrement)" v-model="field.value" :ref="field.fieldId"></el-input>
+							<el-select v-if="field.type=='Select'" placeholder="Select" v-model="field.value" :ref="field.fieldId">
 								<el-option v-for="item in field.options" :key="item.value" :label="item.value" :value="item.value">
 								</el-option>
 							</el-select>
-							<el-checkbox-group v-if="field.type=='Checkbox'" v-model="field.value" :ref="field.id">
+							<el-checkbox-group v-if="field.type=='Checkbox'" v-model="field.value" :ref="field.fieldId">
 								<el-checkbox v-for="option in field.options" :key="option.value" :label="option.value"></el-checkbox>
 							</el-checkbox-group>
-							<el-radio-group :ref="field.id" v-if="field.type=='Radio Button' && field.options.length > 0" v-model="field.value">
+							<el-radio-group :ref="field.fieldId" v-if="field.type=='Radio Button' && field.options.length > 0" v-model="field.value">
 								<el-radio v-for="(option, j) in field.options" :key="option.value" :label="option.value">{{option.value}}</el-radio>
 							</el-radio-group>
-							<el-date-picker :ref="field.id" v-if="field.type=='Date'" v-model="field.value" type="date" placeholder="Pick a day" value-format="yyyy-MM-dd">
+							<el-date-picker :ref="field.fieldId" v-if="field.type=='Date'" v-model="field.value" type="date" placeholder="Pick a day" value-format="yyyy-MM-dd">
 							</el-date-picker>
-							<el-time-select :ref="field.id" v-if="field.type=='Time'" v-model="field.value" value-format="HH:mm:ss" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
+							<el-time-select :ref="field.fieldId" v-if="field.type=='Time'" v-model="field.value" value-format="HH:mm:ss" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
 							</el-time-select>
-							<el-date-picker :ref="field.id" v-if="field.type=='Date Time'" v-model="field.value" type="datetime" placeholder="Select date and time" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+							<el-date-picker :ref="field.fieldId" v-if="field.type=='Date Time'" v-model="field.value" type="datetime" placeholder="Select date and time" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
 						</td>
 					</tr>
 					<tr>

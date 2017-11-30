@@ -10,40 +10,40 @@
 			<h3>Public</h3>
 			<el-form label-position="top">
 				<el-form-item label="Allow all peoples to view records of this Table">
-					<el-radio-group v-model="publicRoles.read.allowed" @change="updateGlobalRoles()">
+					<el-radio-group v-model="publicPermissions.read.allowed" @change="updateGlobalPermissions()">
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item v-show="publicRoles.read.allowed" label="Select fields which will be displayed to the public">
+				<el-form-item v-show="publicPermissions.read.allowed" label="Select fields which will be displayed to the public">
 					<el-select v-model="allowedFields" multiple collapse-tags  @change="updateGlobalFields()" placeholder="Select">
-						<el-option v-for="field in fields" :key="field.id" :label="field.name" :value="field.id">
+						<el-option v-for="field in fields" :key="field.fieldId" :label="field.name" :value="field.fieldId">
 						</el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item label="Allow all peoples to ADD record to this table">
-					<el-radio-group v-model="publicRoles.add.allowed" @change="updateGlobalRoles()" style="margin-right:30px">
+					<el-radio-group v-model="publicPermissions.add.allowed" @change="updateGlobalPermissions()" style="margin-right:30px">
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
-					<el-checkbox v-model="publicRoles.add.approval" :disabled="!publicRoles.add.allowed" @change="updateGlobalRoles()">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
-					<el-checkbox v-model="publicRoles.add.loginRequired" :disabled="!publicRoles.add.allowed" @change="updateGlobalRoles()"><u>Login required</u> for a person to add record</el-checkbox>
+					<el-checkbox v-model="publicPermissions.add.approval" :disabled="!publicPermissions.add.allowed" @change="updateGlobalPermissions()">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
+					<el-checkbox v-model="publicPermissions.add.loginRequired" :disabled="!publicPermissions.add.allowed" @change="updateGlobalPermissions()"><u>Login required</u> for a person to add record</el-checkbox>
 				</el-form-item>
 				<el-form-item label="Allow all peoples to MODIFY records of this table">
-					<el-radio-group v-model="publicRoles.update.allowed" @change="updateGlobalRoles()" style="margin-right:30px">>
+					<el-radio-group v-model="publicPermissions.update.allowed" @change="updateGlobalPermissions()" style="margin-right:30px">>
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
-					<el-checkbox v-model="publicRoles.update.approval" :disabled="!publicRoles.update.allowed" @change="updateGlobalRoles()">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
-					<el-checkbox v-model="publicRoles.update.loginRequired" :disabled="!publicRoles.update.allowed" @change="updateGlobalRoles()"><u>Login required</u> for a person to modify records</el-checkbox>
+					<el-checkbox v-model="publicPermissions.update.approval" :disabled="!publicPermissions.update.allowed" @change="updateGlobalPermissions()">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
+					<el-checkbox v-model="publicPermissions.update.loginRequired" :disabled="!publicPermissions.update.allowed" @change="updateGlobalPermissions()"><u>Login required</u> for a person to modify records</el-checkbox>
 				</el-form-item>
 				<el-form-item label="Allow all peoples to REMOVE records from this table">
-					<el-radio-group v-model="publicRoles.delete.allowed" @change="updateGlobalRoles()" style="margin-right:30px">>
+					<el-radio-group v-model="publicPermissions.delete.allowed" @change="updateGlobalPermissions()" style="margin-right:30px">>
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
-					<el-checkbox v-model="publicRoles.delete.approval" :disabled="!publicRoles.delete.allowed" @change="updateGlobalRoles()">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
-					<el-checkbox v-model="publicRoles.delete.loginRequired" :disabled="!publicRoles.delete.allowed" @change="updateGlobalRoles()"><u>Login required</u> for a person to delete records</el-checkbox>
+					<el-checkbox v-model="publicPermissions.delete.approval" :disabled="!publicPermissions.delete.allowed" @change="updateGlobalPermissions()">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
+					<el-checkbox v-model="publicPermissions.delete.loginRequired" :disabled="!publicPermissions.delete.allowed" @change="updateGlobalPermissions()"><u>Login required</u> for a person to delete records</el-checkbox>
 				</el-form-item>
 			</el-form>
 		</el-row>
@@ -58,31 +58,31 @@
 				</div>
 				<el-form label-position="top">
 					<el-form-item label="Allow this person to view records of this Table">
-						<el-radio-group v-model="guest.role.read.allowed" @change="updateRoles(guest)">
+						<el-radio-group v-model="guest.permission.read.allowed" @change="updatePermissions(guest)">
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
 					</el-form-item>
 					<el-form-item label="Allow this person to ADD record to this table">
-						<el-radio-group v-model="guest.role.add.allowed" @change="updateRoles(guest)" style="margin-right:30px">
+						<el-radio-group v-model="guest.permission.add.allowed" @change="updatePermissions(guest)" style="margin-right:30px">
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guest.role.add.approval" :disabled="!guest.role.add.allowed" @change="updateRoles(guest)">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
+						<el-checkbox v-model="guest.permission.add.approval" :disabled="!guest.permission.add.allowed" @change="updatePermissions(guest)">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to MODIFY records of this table">
-						<el-radio-group v-model="guest.role.update.allowed" @change="updateRoles(guest)" style="margin-right:30px">>
+						<el-radio-group v-model="guest.permission.update.allowed" @change="updatePermissions(guest)" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guest.role.update.approval" :disabled="!guest.role.update.allowed" @change="updateRoles(guest)">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
+						<el-checkbox v-model="guest.permission.update.approval" :disabled="!guest.permission.update.allowed" @change="updatePermissions(guest)">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to REMOVE records from this table">
-						<el-radio-group v-model="guest.role.delete.allowed" @change="updateRoles(guest)" style="margin-right:30px">>
+						<el-radio-group v-model="guest.permission.delete.allowed" @change="updatePermissions(guest)" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guest.role.delete.approval" :disabled="!guest.role.delete.allowed" @change="updateRoles(guest)">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
+						<el-checkbox v-model="guest.permission.delete.approval" :disabled="!guest.permission.delete.allowed" @change="updatePermissions(guest)">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
 					</el-form-item>
 				</el-form>
 			</el-card>
@@ -105,31 +105,31 @@
 						<el-input v-model="newGuestEmail"></el-input>
 					</el-form-item>
 					<el-form-item label="Allow this person to view records of this Table">
-						<el-radio-group v-model="guestRoleTemp.read.allowed">
+						<el-radio-group v-model="guestPermissionTemp.read.allowed">
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
 					</el-form-item>
 					<el-form-item label="Allow this person to ADD record to this table">
-						<el-radio-group v-model="guestRoleTemp.add.allowed" style="margin-right:30px">
+						<el-radio-group v-model="guestPermissionTemp.add.allowed" style="margin-right:30px">
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guestRoleTemp.add.approval" :disabled="!guestRoleTemp.add.allowed">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
+						<el-checkbox v-model="guestPermissionTemp.add.approval" :disabled="!guestPermissionTemp.add.allowed">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to MODIFY records of this table">
-						<el-radio-group v-model="guestRoleTemp.update.allowed" style="margin-right:30px">>
+						<el-radio-group v-model="guestPermissionTemp.update.allowed" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guestRoleTemp.update.approval" :disabled="!guestRoleTemp.update.allowed">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
+						<el-checkbox v-model="guestPermissionTemp.update.approval" :disabled="!guestPermissionTemp.update.allowed">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to REMOVE records from this table">
-						<el-radio-group v-model="guestRoleTemp.delete.allowed" style="margin-right:30px">>
+						<el-radio-group v-model="guestPermissionTemp.delete.allowed" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guestRoleTemp.delete.approval" :disabled="!guestRoleTemp.delete.allowed">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
+						<el-checkbox v-model="guestPermissionTemp.delete.approval" :disabled="!guestPermissionTemp.delete.allowed">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
 					</el-form-item>
 					<el-form-item>
 						<el-button type="primary" @click="addGuest()">Add</el-button>
@@ -148,7 +148,7 @@
 			return {
 				tableName: "",
 				displayedTableName: "",
-				publicRoles: {
+				publicPermissions: {
 					read: {
 						allowed: false
 					},
@@ -168,7 +168,7 @@
 						loginRequired: true
 					}
 				},
-				publicRolesTimeout: 0,
+				publicPermissionsTimeout: 0,
 				fields: [],
 				allowedFields: [],
 				allowedFieldsTimeout: 0,
@@ -176,7 +176,7 @@
 				admins: [],
 				guestAddDialog: false,
 				newGuestEmail: "",
-				guestRoleTemp: {
+				guestPermissionTemp: {
 					read: {
 						allowed: false
 					},
@@ -213,7 +213,7 @@
 					}
 					for (var allowed of this.allowedFields) {
 						for (var field of this.fields) {
-							if (field.id == allowed) {
+							if (field.fieldId == allowed) {
 								field.isVisible = true;
 							}
 						}
@@ -235,13 +235,13 @@
 					});
 				}, 1000);
 			},
-			updateGlobalRoles() {
-				clearTimeout(this.publicRolesTimeout);
-				this.publicRolesTimeout = setTimeout(() => {
+			updateGlobalPermissions() {
+				clearTimeout(this.publicPermissionsTimeout);
+				this.publicPermissionsTimeout = setTimeout(() => {
 					axios
-						.post("/api/table-update-roles.php", {
+						.post("/api/table-update-permissions.php", {
 							tableName: this.tableName,
-							role: this.publicRoles
+							permissions: this.publicPermissions
 						})
 						.then(result => {
 							if (result.data.status != "success") {
@@ -259,11 +259,11 @@
 						});
 				}, 1000);
 			},
-			updateRoles(guest) {
+			updatePermissions(guest) {
 				axios
-					.post("/api/table-update-roles.php", {
+					.post("/api/table-update-permissions.php", {
 						tableName: this.tableName,
-						role: guest.role,
+						permissions: guest.permission,
 						userId: guest.userId
 					})
 					.then(result => {
@@ -314,7 +314,7 @@
 					.post(`/api/guest-add.php`, {
 						email: this.newGuestEmail,
 						tableName: this.tableName,
-						role: this.guestRoleTemp
+						permissions: this.guestPermissionTemp
 					})
 					.then(result => {
 						if (result.data.status == "success") {
@@ -450,8 +450,8 @@
 						this.fields = result.data.fields;
 						this.guestPermissions = result.data.guestPermissions;
 						this.admins = result.data.admins;
-						this.publicRoles = result.data.publicRoles;
-						if (this.publicRoles.read.allowed) {
+						this.publicPermissions = result.data.publicPermissions;
+						if (this.publicPermissions.read.allowed) {
 							for (var field of this.fields) {
 								if (field.isVisible) {
 									this.allowedFields.push(field.id);

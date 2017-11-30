@@ -11,7 +11,7 @@ $query = "create table if not exists users ( userId int primary key not null aut
 $db->query($query);
 
 /*
-roles json format = {
+permissions json format = {
     "read" : {"allow" : false, "approval" : true},
     "add" : {"allow" : false, "approval" : true, "loginRequired" : true},
     "update" : {"allow" : false, "approval" : true, "loginRequired" : true},
@@ -20,7 +20,7 @@ roles json format = {
 */
 
 // Creating table 'tables_info'
-$query = "create table if not exists tables_info ( tableName varchar(100) primary key not null, displayedTableName varchar(100) not null, fields text not null, publicRole text not null)";
+$query = "create table if not exists tables_info ( tableName varchar(100) primary key not null, displayedTableName varchar(100) not null, fields text not null, publicPermissions text not null)";
 $db->query($query);
 
 // Creating table 'table_admins'
@@ -28,7 +28,7 @@ $query = "create table if not exists table_admins (userId int not null, tableNam
 $db->query($query);
 
 // Creating table 'guests_permissions'
-$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(100) not null, role text not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
+$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(100) not null, permissions text not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
 $db->query($query);
 
 // Creating table 'data_requests'
