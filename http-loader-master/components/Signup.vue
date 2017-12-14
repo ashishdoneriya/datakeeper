@@ -24,7 +24,7 @@
 				</el-form>
 			</el-card>
 			<el-row style="margin-top:30px;text-align:center">
-				<router-link to="/login">Go Back</router-link>
+				<router-link to="/signin">Go Back</router-link>
 			</el-row>
 		</el-col>
 	</el-row>
@@ -65,7 +65,7 @@
 							type: 'success'
 						});
 						setTimeout(() => {
-							this.$router.push('/login');
+							this.$router.push('/signin');
 						}, 2000);
 					} else {
 						this.$message({

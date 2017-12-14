@@ -34,7 +34,7 @@
 				</el-menu-item>
 				<el-submenu index="3" style="float:right;min-width:75px;text-align:right">
 					<template slot="title"><span>Hi {{user.name}}</span></template>
-					<el-menu-item index="3-1" @click="logout()" style="max-width:75px;min-width:75px;">Logout</el-menu-item>
+					<el-menu-item index="3-1" @click="signout()" style="max-width:75px;min-width:75px;">Logout</el-menu-item>
 				</el-submenu>
 			</el-menu>
 		</el-header>
@@ -101,7 +101,7 @@
 						});
 					});
 			},
-			logout() {
+			signout() {
 				axios.post("/api/signout.php");
 				this.$router.push({
 					path: "/"

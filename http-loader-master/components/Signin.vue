@@ -21,7 +21,7 @@
 				</el-form>
 			</el-card>
 			<el-row style="margin-top:30px;text-align:center">
-				<router-link to="/register">Register here</router-link>
+				<router-link to="/signup">Register here</router-link>
 			</el-row>
 		</el-col>
 	</el-row>
