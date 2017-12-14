@@ -70,7 +70,7 @@
 				return;
 			}
 			this.isLoggedIn = true;
-			this.getUserInfo();
+			this.fetchUserInfo();
 			this.$store.commit("update");
 			var tableName = this.$route.params.tableName;
 			if (tableName) {
@@ -88,7 +88,7 @@
 				}
 				this.$router.push("/user/table/" + this.selectedTable);
 			},
-			getUserInfo() {
+			fetchUserInfo() {
 				axios
 					.get("/api/user/info.php")
 					.then(result => {
@@ -103,6 +103,7 @@
 			},
 			signout() {
 				axios.post("/api/signout.php");
+				Cookies.expire("username");
 				this.$router.push({
 					path: "/"
 				});
