@@ -199,6 +199,9 @@
 			};
 		},
 		created() {
+			if (!Cookies.get("email")) {
+				this.$router.push("/");
+			}
 			this.fetchPermissions();
 		},
 		methods: {

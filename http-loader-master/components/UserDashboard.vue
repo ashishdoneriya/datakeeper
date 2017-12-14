@@ -28,6 +28,9 @@
 			}
 		},
 		created() {
+			if (!Cookies.get("email")) {
+				this.$router.push("/");
+			}
 			this.$store.commit('setCurrentTable', '');
 		},
 		methods: {

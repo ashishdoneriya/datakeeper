@@ -151,6 +151,9 @@
 			};
 		},
 		created: function() {
+			if (!Cookies.get("email")) {
+				this.$router.push("/login");
+			}
 			this.tableName = this.$route.params.tableName;
 			if (this.tableName) {
 				axios.get(`/api/table-info.php?tableName=${this.tableName}`)

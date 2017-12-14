@@ -13,6 +13,9 @@
 						<el-input v-model="form.password" type="password"></el-input>
 					</el-form-item>
 					<el-form-item>
+						<el-checkbox v-model="stayLoggedIn">Stay Logged in</el-checkbox>
+					</el-form-item>
+					<el-form-item>
 						<el-button type="primary" @click="login">Login</el-button>
 					</el-form-item>
 				</el-form>
@@ -31,7 +34,8 @@
 			return {
 				form: {
 					email: '',
-					password: ''
+					password: '',
+					stayLoggedIn : false
 				}
 			}
 		},
@@ -62,6 +66,11 @@
 				}).then(result => {
 					console.log(result);
 					if (result.data.status == 'success') {
+						if (this,stayLoggedIn) {
+							Cookies.set('email', result.data.email, { expires: Infinity });
+						} else {
+							Cookies.set('email', result.data.email, { expires: 86400 }); // 1 day
+						}
 						this.$router.push({
 							path: '/user/dashboard'
 						});

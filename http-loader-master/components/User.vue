@@ -1,6 +1,6 @@
 <template>
 	<el-container>
-		<el-header>
+		<el-header v-show="isLoggedIn">
 			<el-menu :default-active="'1'" class="el-menu-demo" mode="horizontal" background-color="#002B36" text-color="#fff" active-text-color="#ffd04b">
 				<el-menu-item @click="goToHome()" index="1">
 					<a>Home</a>
@@ -47,7 +47,8 @@
 		data() {
 			return {
 				user: {},
-				selectedTable: ""
+				selectedTable: "",
+				isLoggedIn : false
 			};
 		},
 		computed: {
@@ -64,6 +65,11 @@
 			}
 		},
 		created: function() {
+			var email = Cookies.get("email");
+			if (!email) {
+				return;
+			}
+			this.isLoggedIn = true;
 			this.getUserInfo();
 			this.$store.commit("update");
 			var tableName = this.$route.params.tableName;
