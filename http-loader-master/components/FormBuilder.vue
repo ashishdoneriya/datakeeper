@@ -150,8 +150,13 @@
 				]
 			};
 		},
+		computed : {
+			isLoggedIn() {
+				return this.$store.state.isLoggedIn;
+			}
+		},
 		created: function() {
-			if (!Cookies.get("email")) {
+			if (!this.isLoggedIn) {
 				this.$router.push("/login");
 			}
 			this.tableName = this.$route.params.tableName;

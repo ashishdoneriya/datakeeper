@@ -66,16 +66,12 @@
 				}).then(result => {
 					console.log(result);
 					if (result.data.status == 'success') {
-						if (Cookies.enabled) {
-							if (this,stayLoggedIn) {
+						if (this,stayLoggedIn) {
 							Cookies.set('email', result.data.email, { expires: 1296000 }); // 15 days
-							} else {
-								Cookies.set('email', result.data.email, { expires: 86400 }); // 1 day
-							}
 						} else {
-							localStorage.setItem("email", result.data.email);
+							Cookies.set('email', result.data.email, { expires: 86400 }); // 1 day
 						}
-
+						this.$store.commit('setLoggedIn', true);
 						this.$router.push({
 							path: '/user/dashboard'
 						});

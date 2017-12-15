@@ -67,7 +67,8 @@
 								list : []
 							}
 						},
-						currentTable : ''
+						currentTable : '',
+						isLoggedIn : Cookies.get("email") ? true : false
 					},
 					mutations: {
 						update() {
@@ -80,6 +81,9 @@
 						},
 						setCurrentTable(state, table) {
 							state.currentTable = table;
+						},
+						setLoggedIn(state, loggedIn) {
+							state.isLoggedIn = loggedIn;
 						}
 					}
 				}),

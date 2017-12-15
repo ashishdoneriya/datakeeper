@@ -57,6 +57,9 @@
 			},
 			tablesList() {
 				return this.$store.state.list;
+			},
+			isLoggedIn() {
+				return this.$store.state.isLoggedIn;
 			}
 		},
 		watch: {
@@ -65,8 +68,7 @@
 			}
 		},
 		created: function() {
-			var email = Cookies.get("email");
-			if (!email) {
+			if (!this.isLoggedIn) {
 				return;
 			}
 			this.isLoggedIn = true;
@@ -102,8 +104,13 @@
 					});
 			},
 			signout() {
+				// Signout from server
 				axios.post("/api/signout.php");
-				Cookies.expire("username");
+				// Remove browser cookies
+				Cookies.expire("email");
+				// change global variable value
+				this.$store.commit('setLoggedIn', false);
+				// return back to home
 				this.$router.push({
 					path: "/"
 				});

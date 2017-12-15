@@ -25,10 +25,13 @@
 		computed: {
 			tablesList() {
 				return this.$store.state.list;
+			},
+			isLoggedIn() {
+				return this.$store.state.isLoggedIn;
 			}
 		},
 		created() {
-			if (!Cookies.get("email")) {
+			if (!this.isLoggedIn) {
 				this.$router.push("/");
 			}
 			this.$store.commit('setCurrentTable', '');
