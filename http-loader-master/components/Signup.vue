@@ -62,7 +62,8 @@
 					if (response.data.status == 'success') {
 						this.$message({
 							message: response.data.message,
-							type: 'success'
+							type: 'success',
+							center : true
 						});
 						setTimeout(() => {
 							this.$router.push('/signin');
@@ -70,7 +71,8 @@
 					} else {
 						this.$message({
 							message: response.data.message,
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					}
 				}).catch(error => {
@@ -80,7 +82,8 @@
 			showError(msg) {
 				this.$message({
 					message: msg,
-					type: 'error'
+					type: 'error',
+					center : true
 				});
 			},
 			isEmpty: function(field) {

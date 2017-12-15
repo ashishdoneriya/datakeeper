@@ -171,7 +171,8 @@
 					}).catch(error => {
 						this.$message({
 							message: 'Unable to fetch table information',
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					});
 			} else {
@@ -202,14 +203,16 @@
 					var word = this.tableName ? "saving" : "adding";
 					this.$message({
 						message: `Not ${word} table since some fields are not properly filled`,
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 					return;
 				}
 				if (this.displayedTableName.trim().length == 0) {
 					this.$message({
 						message: 'Please specify table name',
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 					return;
 				}
@@ -228,7 +231,8 @@
 					if (response.data.status == 'success') {
 						this.$message({
 							message: 'Table added successfully',
-							type: 'success'
+							type: 'success',
+							center : true
 						});
 						this.$store.commit('update');
 						setTimeout(() => {
@@ -237,7 +241,8 @@
 					} else {
 						this.$message({
 							message: response.data.message,
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					}
 
@@ -248,7 +253,8 @@
 			showError(msg) {
 				this.$message({
 					message: msg,
-					type: 'error'
+					type: 'error',
+					center : true
 				});
 			},
 			updateTable() {
@@ -260,7 +266,8 @@
 					if (response.data.status == 'success') {
 						this.$message({
 							message: 'Table updated',
-							type: 'success'
+							type: 'success',
+							center : true
 						});
 						this.$store.commit('update');
 						setTimeout(() => {
@@ -269,7 +276,8 @@
 					} else {
 						this.$message({
 							message: response.data.message,
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					}
 				}).catch(error => {

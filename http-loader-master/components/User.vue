@@ -97,9 +97,10 @@
 						this.user = result.data;
 					})
 					.catch(error => {
-						this.$notify({
+						this.$message({
 							message: "Unable to fetch your details",
-							type: "error"
+							type: "error",
+							center : true
 						});
 					});
 			},

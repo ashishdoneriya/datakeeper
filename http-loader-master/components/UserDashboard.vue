@@ -65,20 +65,23 @@
 						if (result.data.status == 'success') {
 							this.$message({
 								type: 'success',
-								message: `Table '${table.displayedTableName}' has been removed`
+								message: `Table '${table.displayedTableName}' has been removed`,
+								center : true
 							});
 							this.$store.commit('update');
 						} else {
 							this.$message({
 								type: 'error',
-								message: result.data.message
+								message: result.data.message,
+								center : true
 							});
 						}
 
 					})).catch(error => {
 						this.$message({
 							type: 'info',
-							message: `Unable to remove table '${table.displayedTableName}'`
+							message: `Unable to remove table '${table.displayedTableName}'`,
+							center : true
 						});
 					});
 

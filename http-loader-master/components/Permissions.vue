@@ -234,7 +234,8 @@
 						if (response.data.status != 'success') {
 							this.$message({
 								message: 'Unable to update information',
-								type: 'error'
+								type: 'error',
+								center : true
 							});
 							console.error(response.data.message);
 						}
@@ -255,14 +256,16 @@
 							if (result.data.status != "success") {
 								this.$message({
 									message: result.data.message,
-									type: "error"
+									type: "error",
+									center : true
 								});
 							}
 						})
 						.catch(error => {
 							this.$message({
 								message: `Problem while updating permissions`,
-								type: "error"
+								type: "error",
+								center : true
 							});
 						});
 				}, 1000);
@@ -278,14 +281,16 @@
 						if (result.data.status != "success") {
 							this.$message({
 								message: result.data.message,
-								type: "error"
+								type: "error",
+								center : true
 							});
 						}
 					})
 					.catch(error => {
 						this.$message({
 							message: `Problem while updating permissions`,
-							type: "error"
+							type: "error",
+							center : true
 						});
 					});
 			},
@@ -299,13 +304,15 @@
 						if (result.data.status == "success") {
 							this.$message({
 								message: "Removed",
-								type: "success"
+								type: "success",
+								center : true
 							});
 							this.guestPermissions.splice(index, 1);
 						} else {
 							this.$message({
 								message: result.data.message,
-								type: "error"
+								type: "error",
+								center : true
 							});
 						}
 					})
@@ -313,7 +320,8 @@
 						console.log(error);
 						this.$message({
 							message: `Problem while removing ${guest.email} from guests list`,
-							type: "error"
+							type: "error",
+							center : true
 						});
 					});
 			},
@@ -328,7 +336,8 @@
 						if (result.data.status == "success") {
 							this.$message({
 								message: "Added",
-								type: "success"
+								type: "success",
+								center : true
 							});
 							this.newGuestEmail = "";
 							this.guestAddDialog = false;
@@ -340,20 +349,23 @@
 								.catch(error => {
 									this.$message({
 										message: "Unable to update table information",
-										type: "error"
+										type: "error",
+										center : true
 									});
 								});
 						} else {
 							this.$message({
 								message: result.data.message,
-								type: "error"
+								type: "error",
+								center : true
 							});
 						}
 					})
 					.catch(error => {
 						this.$message({
 							message: `Problem while adding ${this.newGuestEmail} to Guests`,
-							type: "error"
+							type: "error",
+							center : true
 						});
 					});
 			},
@@ -374,7 +386,8 @@
 								if (result.data.status == "success") {
 									this.$message({
 										message: "Added",
-										type: "success"
+										type: "success",
+										center : true
 									});
 									axios
 										.get(`/api/table-permissions.php?tableName=${this.tableName}`)
@@ -384,20 +397,23 @@
 										.catch(error => {
 											this.$message({
 												message: "Unable to update table information",
-												type: "error"
+												type: "error",
+												center : true
 											});
 										});
 								} else {
 									this.$message({
 										message: result.data.message,
-										type: "error"
+										type: "error",
+										center : true
 									});
 								}
 							})
 							.catch(error => {
 								this.$message({
 									message: `Problem while adding ${email} to admins list`,
-									type: "error"
+									type: "error",
+									center : true
 								});
 							});
 					})
@@ -424,13 +440,15 @@
 								if (result.data.status == "success") {
 									this.$message({
 										message: "Removed",
-										type: "success"
+										type: "success",
+										center : true
 									});
 									this.admins.splice(index, 1);
 								} else {
 									this.$message({
 										message: result.data.message,
-										type: "error"
+										type: "error",
+										center : true
 									});
 								}
 							})
@@ -438,14 +456,16 @@
 								console.log(error);
 								this.$message({
 									message: `Problem while removing ${admin.email} from admins list`,
-									type: "error"
+									type: "error",
+									center : true
 								});
 							});
 					})
 					.catch(() => {
 						this.$message({
 							message: `Problem while removing ${row.email} from admins list`,
-							type: "error"
+							type: "error",
+							center : true
 						});
 					});
 			},
@@ -471,7 +491,8 @@
 						console.log(error);
 						this.$message({
 							message: "Unable to fetch table information",
-							type: "error"
+							type: "error",
+							center : true
 						});
 					});
 			}

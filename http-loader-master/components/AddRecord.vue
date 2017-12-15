@@ -57,7 +57,8 @@
 					console.log(error);
 					this.$message({
 						message: 'Unable to fetch table information',
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 				});
 		},
@@ -74,7 +75,8 @@
 						if (result.data.status == 'success') {
 							this.$message({
 								message: 'Record successfull added',
-								type: 'success'
+								type: 'success',
+								center : true
 							});
 							for (var field of this.fields) {
 								field['value'] = undefined;
@@ -83,14 +85,16 @@
 						} else {
 							this.$message({
 								message: result.data.message,
-								type: 'error'
+								type: 'error',
+								center : true
 							});
 						}
 					}).catch(error => {
 						console.log(error);
 						this.$message({
 							message: 'Unable to add data',
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					});
 			}

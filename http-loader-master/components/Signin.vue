@@ -44,19 +44,22 @@
 				if (!this.form.email && !this.form.password) {
 					this.$message({
 						message: 'Please fill your email id and password',
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 					return;
 				} else if (!this.form.email) {
 					this.$message({
 						message: 'Please fill your email id',
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 					return;
 				} else if (!this.form.password) {
 					this.$message({
 						message: 'Please fill your password',
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 					return;
 				}
@@ -78,13 +81,15 @@
 					} else {
 						this.$message({
 							message: result.data.message,
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					}
 				}).catch(error => {
 					this.$message({
 						message: 'Error while checking login details',
-						type: 'error'
+						type: 'error',
+						center : true
 					});
 				});
 			}

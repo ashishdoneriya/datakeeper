@@ -91,7 +91,8 @@
 					}).catch(error => {
 						this.$message({
 							message: 'Unable to fetch records',
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					});
 			},
@@ -120,7 +121,8 @@
 					}).catch(error => {
 						this.$message({
 							message: 'Unable to fetch records',
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					});
 			},
@@ -136,7 +138,8 @@
 					}).catch(error => {
 						this.$message({
 							message: 'Unable to fetch table information',
-							type: 'error'
+							type: 'error',
+							center : true
 						});
 					});
 			}
