@@ -13,7 +13,7 @@
 						<el-input v-model="form.password" type="password"></el-input>
 					</el-form-item>
 					<el-form-item>
-						<el-checkbox v-model="stayLoggedIn">Stay Logged in</el-checkbox>
+						<el-checkbox v-model="form.stayLoggedIn">Stay Logged in</el-checkbox>
 					</el-form-item>
 					<el-form-item>
 						<el-button type="primary" @click="login">Login</el-button>
@@ -69,7 +69,7 @@
 				}).then(result => {
 					console.log(result);
 					if (result.data.status == 'success') {
-						if (this,stayLoggedIn) {
+						if (this.form.stayLoggedIn) {
 							Cookies.set('email', result.data.email, { expires: 1296000 }); // 15 days
 						} else {
 							Cookies.set('email', result.data.email, { expires: 86400 }); // 1 day

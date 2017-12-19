@@ -23,5 +23,5 @@ $_SESSION["userId"] = $row["userId"];
 $_SESSION["name"] = $row["name"];
 $_SESSION["email"] = $email;
 
-echo '{"status" : "success", "email" : "' . $email . '"';
+echo '{"status" : "success", "email" : "' . $email . '"}';
 ?>
