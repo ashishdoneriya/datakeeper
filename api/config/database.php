@@ -4,7 +4,7 @@ class Database {
 	private $port = "80";
 	private $username = "root";
 	private $password = "root";
-	private $database = "vuejsui";
+	private $database = "datakeeper";
 
 	public function getConnection() {
 		$conn = null;
