@@ -3,7 +3,8 @@
 		<el-button @click="goBack()" icon="el-icon-back" type="primary" round>Go Back</el-button>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col class="text-center">
-				<h2><u>{{displayedTableName}}</u> Permissions</h2>
+				<h2>
+					<u>{{displayedTableName}}</u> Permissions</h2>
 			</el-col>
 		</el-row>
 		<el-row>
@@ -16,7 +17,7 @@
 					</el-radio-group>
 				</el-form-item>
 				<el-form-item v-show="publicPermissions.read.allowed" label="Select fields which will be displayed to the public">
-					<el-select v-model="allowedFields" multiple collapse-tags  @change="updateGlobalFields()" placeholder="Select">
+					<el-select v-model="allowedFields" multiple collapse-tags @change="updateGlobalFields()" placeholder="Select">
 						<el-option v-for="field in fields" :key="field.fieldId" :label="field.name" :value="field.fieldId">
 						</el-option>
 					</el-select>
@@ -26,24 +27,30 @@
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
-					<el-checkbox v-model="publicPermissions.add.approval" :disabled="!publicPermissions.add.allowed" @change="updateGlobalPermissions()">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
-					<el-checkbox v-model="publicPermissions.add.loginRequired" :disabled="!publicPermissions.add.allowed" @change="updateGlobalPermissions()"><u>Login required</u> for a person to add record</el-checkbox>
+					<el-checkbox v-model="publicPermissions.add.approval" :disabled="!publicPermissions.add.allowed" @change="updateGlobalPermissions()">You have to
+						<u>approve</u> first, after that the record will be added</el-checkbox>
+					<el-checkbox v-model="publicPermissions.add.loginRequired" :disabled="!publicPermissions.add.allowed" @change="updateGlobalPermissions()">
+						<u>Login required</u> for a person to add record</el-checkbox>
 				</el-form-item>
 				<el-form-item label="Allow all peoples to MODIFY records of this table">
 					<el-radio-group v-model="publicPermissions.update.allowed" @change="updateGlobalPermissions()" style="margin-right:30px">>
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
-					<el-checkbox v-model="publicPermissions.update.approval" :disabled="!publicPermissions.update.allowed" @change="updateGlobalPermissions()">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
-					<el-checkbox v-model="publicPermissions.update.loginRequired" :disabled="!publicPermissions.update.allowed" @change="updateGlobalPermissions()"><u>Login required</u> for a person to modify records</el-checkbox>
+					<el-checkbox v-model="publicPermissions.update.approval" :disabled="!publicPermissions.update.allowed" @change="updateGlobalPermissions()">You have to
+						<u>approve</u> first, after that the record will be modified</el-checkbox>
+					<el-checkbox v-model="publicPermissions.update.loginRequired" :disabled="!publicPermissions.update.allowed" @change="updateGlobalPermissions()">
+						<u>Login required</u> for a person to modify records</el-checkbox>
 				</el-form-item>
 				<el-form-item label="Allow all peoples to REMOVE records from this table">
 					<el-radio-group v-model="publicPermissions.delete.allowed" @change="updateGlobalPermissions()" style="margin-right:30px">>
 						<el-radio :label="true">Yes</el-radio>
 						<el-radio :label="false">No</el-radio>
 					</el-radio-group>
-					<el-checkbox v-model="publicPermissions.delete.approval" :disabled="!publicPermissions.delete.allowed" @change="updateGlobalPermissions()">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
-					<el-checkbox v-model="publicPermissions.delete.loginRequired" :disabled="!publicPermissions.delete.allowed" @change="updateGlobalPermissions()"><u>Login required</u> for a person to delete records</el-checkbox>
+					<el-checkbox v-model="publicPermissions.delete.approval" :disabled="!publicPermissions.delete.allowed" @change="updateGlobalPermissions()">You have to
+						<u>approve</u> first, after that the record will be deleted</el-checkbox>
+					<el-checkbox v-model="publicPermissions.delete.loginRequired" :disabled="!publicPermissions.delete.allowed" @change="updateGlobalPermissions()">
+						<u>Login required</u> for a person to delete records</el-checkbox>
 				</el-form-item>
 			</el-form>
 		</el-row>
@@ -68,21 +75,24 @@
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guest.permission.add.approval" :disabled="!guest.permission.add.allowed" @change="updatePermissions(guest)">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
+						<el-checkbox v-model="guest.permission.add.approval" :disabled="!guest.permission.add.allowed" @change="updatePermissions(guest)">You have to
+							<u>approve</u> first, after that the record will be added</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to MODIFY records of this table">
 						<el-radio-group v-model="guest.permission.update.allowed" @change="updatePermissions(guest)" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guest.permission.update.approval" :disabled="!guest.permission.update.allowed" @change="updatePermissions(guest)">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
+						<el-checkbox v-model="guest.permission.update.approval" :disabled="!guest.permission.update.allowed" @change="updatePermissions(guest)">You have to
+							<u>approve</u> first, after that the record will be modified</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to REMOVE records from this table">
 						<el-radio-group v-model="guest.permission.delete.allowed" @change="updatePermissions(guest)" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guest.permission.delete.approval" :disabled="!guest.permission.delete.allowed" @change="updatePermissions(guest)">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
+						<el-checkbox v-model="guest.permission.delete.approval" :disabled="!guest.permission.delete.allowed" @change="updatePermissions(guest)">You have to
+							<u>approve</u> first, after that the record will be deleted</el-checkbox>
 					</el-form-item>
 				</el-form>
 			</el-card>
@@ -115,21 +125,24 @@
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guestPermissionTemp.add.approval" :disabled="!guestPermissionTemp.add.allowed">You have to <u>approve</u> first, after that the record will be added</el-checkbox>
+						<el-checkbox v-model="guestPermissionTemp.add.approval" :disabled="!guestPermissionTemp.add.allowed">You have to
+							<u>approve</u> first, after that the record will be added</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to MODIFY records of this table">
 						<el-radio-group v-model="guestPermissionTemp.update.allowed" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guestPermissionTemp.update.approval" :disabled="!guestPermissionTemp.update.allowed">You have to <u>approve</u> first, after that the record will be modified</el-checkbox>
+						<el-checkbox v-model="guestPermissionTemp.update.approval" :disabled="!guestPermissionTemp.update.allowed">You have to
+							<u>approve</u> first, after that the record will be modified</el-checkbox>
 					</el-form-item>
 					<el-form-item label="Allow this person to REMOVE records from this table">
 						<el-radio-group v-model="guestPermissionTemp.delete.allowed" style="margin-right:30px">>
 							<el-radio :label="true">Yes</el-radio>
 							<el-radio :label="false">No</el-radio>
 						</el-radio-group>
-						<el-checkbox v-model="guestPermissionTemp.delete.approval" :disabled="!guestPermissionTemp.delete.allowed">You have to <u>approve</u> first, after that the record will be deleted</el-checkbox>
+						<el-checkbox v-model="guestPermissionTemp.delete.approval" :disabled="!guestPermissionTemp.delete.allowed">You have to
+							<u>approve</u> first, after that the record will be deleted</el-checkbox>
 					</el-form-item>
 					<el-form-item>
 						<el-button type="primary" @click="addGuest()">Add</el-button>
@@ -144,7 +157,7 @@
 
 <script>
 	module.exports = {
-		data: function() {
+		data: function () {
 			return {
 				tableName: "",
 				displayedTableName: "",
@@ -198,7 +211,7 @@
 				}
 			};
 		},
-		computed : {
+		computed: {
 			isLoggedIn() {
 				return this.$store.state.isLoggedIn;
 			}
@@ -235,7 +248,7 @@
 							this.$message({
 								message: 'Unable to update information',
 								type: 'error',
-								center : true
+								center: true
 							});
 							console.error(response.data.message);
 						}
@@ -257,7 +270,7 @@
 								this.$message({
 									message: result.data.message,
 									type: "error",
-									center : true
+									center: true
 								});
 							}
 						})
@@ -265,7 +278,7 @@
 							this.$message({
 								message: `Problem while updating permissions`,
 								type: "error",
-								center : true
+								center: true
 							});
 						});
 				}, 1000);
@@ -282,7 +295,7 @@
 							this.$message({
 								message: result.data.message,
 								type: "error",
-								center : true
+								center: true
 							});
 						}
 					})
@@ -290,7 +303,7 @@
 						this.$message({
 							message: `Problem while updating permissions`,
 							type: "error",
-							center : true
+							center: true
 						});
 					});
 			},
@@ -305,14 +318,14 @@
 							this.$message({
 								message: "Removed",
 								type: "success",
-								center : true
+								center: true
 							});
 							this.guestPermissions.splice(index, 1);
 						} else {
 							this.$message({
 								message: result.data.message,
 								type: "error",
-								center : true
+								center: true
 							});
 						}
 					})
@@ -321,7 +334,7 @@
 						this.$message({
 							message: `Problem while removing ${guest.email} from guests list`,
 							type: "error",
-							center : true
+							center: true
 						});
 					});
 			},
@@ -337,7 +350,7 @@
 							this.$message({
 								message: "Added",
 								type: "success",
-								center : true
+								center: true
 							});
 							this.newGuestEmail = "";
 							this.guestAddDialog = false;
@@ -350,14 +363,14 @@
 									this.$message({
 										message: "Unable to update table information",
 										type: "error",
-										center : true
+										center: true
 									});
 								});
 						} else {
 							this.$message({
 								message: result.data.message,
 								type: "error",
-								center : true
+								center: true
 							});
 						}
 					})
@@ -365,15 +378,15 @@
 						this.$message({
 							message: `Problem while adding ${this.newGuestEmail} to Guests`,
 							type: "error",
-							center : true
+							center: true
 						});
 					});
 			},
 			addAdmin() {
 				this.$prompt("Please input e-mail", "Add Administrator", {
-						confirmButtonText: "OK",
-						cancelButtonText: "Cancel"
-					})
+					confirmButtonText: "OK",
+					cancelButtonText: "Cancel"
+				})
 					.then((value) => {
 
 						var email = value.value;
@@ -387,7 +400,7 @@
 									this.$message({
 										message: "Added",
 										type: "success",
-										center : true
+										center: true
 									});
 									axios
 										.get(`/api/table-permissions.php?tableName=${this.tableName}`)
@@ -398,14 +411,14 @@
 											this.$message({
 												message: "Unable to update table information",
 												type: "error",
-												center : true
+												center: true
 											});
 										});
 								} else {
 									this.$message({
 										message: result.data.message,
 										type: "error",
-										center : true
+										center: true
 									});
 								}
 							})
@@ -413,7 +426,7 @@
 								this.$message({
 									message: `Problem while adding ${email} to admins list`,
 									type: "error",
-									center : true
+									center: true
 								});
 							});
 					})
@@ -423,13 +436,13 @@
 			},
 			removeAdmin(index, admin) {
 				this.$confirm(
-						`Are you sure want to remove ${admin.email} from admin list' ?`,
-						"Warning", {
-							confirmButtonText: "OK",
-							cancelButtonText: "Cancel",
-							type: "warning"
-						}
-					)
+					`Are you sure want to remove ${admin.email} from admin list' ?`,
+					"Warning", {
+						confirmButtonText: "OK",
+						cancelButtonText: "Cancel",
+						type: "warning"
+					}
+				)
 					.then(() => {
 						axios
 							.post(`/api/admin-remove.php`, {
@@ -441,14 +454,14 @@
 									this.$message({
 										message: "Removed",
 										type: "success",
-										center : true
+										center: true
 									});
 									this.admins.splice(index, 1);
 								} else {
 									this.$message({
 										message: result.data.message,
 										type: "error",
-										center : true
+										center: true
 									});
 								}
 							})
@@ -457,7 +470,7 @@
 								this.$message({
 									message: `Problem while removing ${admin.email} from admins list`,
 									type: "error",
-									center : true
+									center: true
 								});
 							});
 					})
@@ -465,7 +478,7 @@
 						this.$message({
 							message: `Problem while removing ${row.email} from admins list`,
 							type: "error",
-							center : true
+							center: true
 						});
 					});
 			},
@@ -492,7 +505,7 @@
 						this.$message({
 							message: "Unable to fetch table information",
 							type: "error",
-							center : true
+							center: true
 						});
 					});
 			}

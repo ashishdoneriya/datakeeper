@@ -91,39 +91,39 @@
 					mode: 'history',
 					routes: [{
 						path: '/',
-						component: httpVueLoader('/components/Signin.vue'),
+						component: httpVueLoader('/components/signin.html'),
 						alias: '/signin'
 					}, {
 						path: '/signup',
-						component: httpVueLoader('/components/Signup.vue')
+						component: httpVueLoader('/components/signup.html')
 					}, {
 						path: '/user',
-						component: httpVueLoader('/components/User.vue'),
+						component: httpVueLoader('/components/user.html'),
 						children: [
 							{
 								path: 'dashboard',
 								alias: '',
-								component: httpVueLoader('/components/UserDashboard.vue')
+								component: httpVueLoader('/components/user-dashboard.html')
 							},
 							{
 								path: 'form-builder',
-								component: httpVueLoader('/components/FormBuilder.vue')
+								component: httpVueLoader('/components/form-builder.html')
 							},
 							{
 								path: 'form-builder/:tableName',
-								component: httpVueLoader('/components/FormBuilder.vue')
+								component: httpVueLoader('/components/form-builder.html')
 							},
 							{
 								path :'table/:tableName',
-								component: httpVueLoader('/components/Search.vue')
+								component: httpVueLoader('/components/search.html')
 							},
 							{
 								path : 'table/:tableName/add-record',
-								component : httpVueLoader('/components/AddRecord.vue')
+								component : httpVueLoader('/components/add-record.html')
 							},
 							{
 								path : 'table/:tableName/permissions',
-								component : httpVueLoader('/components/Permissions.vue')
+								component : httpVueLoader('/components/permissions.html')
 							}
 						]
 					}]
