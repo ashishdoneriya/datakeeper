@@ -48,7 +48,7 @@
 			return {
 				user: {},
 				selectedTable: "",
-				isLoggedIn : false
+				isLoggedIn : Cookies.get("email") ? true : false
 			};
 		},
 		computed: {
@@ -57,9 +57,6 @@
 			},
 			tablesList() {
 				return this.$store.state.list;
-			},
-			isLoggedIn() {
-				return this.$store.state.isLoggedIn;
 			}
 		},
 		watch: {
@@ -68,6 +65,7 @@
 			}
 		},
 		created: function() {
+			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				return;
 			}

@@ -147,15 +147,12 @@
 						value: 'Date Time',
 						label: 'Date Time'
 					}
-				]
+				],
+				isLoggedIn : Cookies.get("email") ? true : false
 			};
 		},
-		computed : {
-			isLoggedIn() {
-				return this.$store.state.isLoggedIn;
-			}
-		},
 		created: function() {
+			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				this.$router.push("/login");
 			}

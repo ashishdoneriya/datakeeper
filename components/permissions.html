@@ -208,15 +208,12 @@
 						approval: true,
 						loginRequired: true
 					}
-				}
+				},
+				isLoggedIn : Cookies.get("email") ? true : false
 			};
 		},
-		computed: {
-			isLoggedIn() {
-				return this.$store.state.isLoggedIn;
-			}
-		},
 		created() {
+			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				this.$router.push("/");
 			}

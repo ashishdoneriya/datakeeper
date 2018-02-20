@@ -22,15 +22,16 @@
 
 <script>
 	module.exports = {
+		data : {
+			isLoggedIn : Cookies.get("email") ? true : false
+		},
 		computed: {
 			tablesList() {
 				return this.$store.state.list;
-			},
-			isLoggedIn() {
-				return this.$store.state.isLoggedIn;
 			}
 		},
 		created() {
+			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				this.$router.push("/");
 			}
@@ -93,7 +94,7 @@
 </script>
 
 
-<style>
+<style scoped>
 	.text {
 		font-size: 14px;
 	}
