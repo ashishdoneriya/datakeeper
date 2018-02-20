@@ -12,7 +12,7 @@ $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
 $searchQuery = htmlspecialchars(strip_tags($_GET['searchQuery']));
 
 $finalFields = getFields($db, $userId, $tableName);
-if ($finalFields == null){
+if ($finalFields == null) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
@@ -32,29 +32,29 @@ function getSearchQuery($query, $fields) {
 		return "";
 	}
 	$searchArr = array();
-	foreach($fields as $field) {
+	foreach ($fields as $field) {
 		switch ($field['type']) {
-			case 'Text' :
-			case 'Select' :
-			case 'Checkbox' :
-			case 'Radio Button' :
-				array_push($searchArr, $field['id'] . " like '%". $query . "%'");
-				continue;
-			case 'Number' :
-			case 'Id' :
-				if (is_numeric($query) == true) {
-					array_push($searchArr, $field['id'] . "=". $query);
-				}
-				continue;
-			case 'Decimal Number' :
-				if (is_float($query) == true) {
-					array_push($searchArr, $field['id'] . "=". $query);
-				}
-				continue;
-			case 'Date' :
-			case 'Time' :
-			case 'Date Time' :
-				array_push($searchArr, $field['id'] . "='". $query . "'");
+		case 'Text':
+		case 'Select':
+		case 'Checkbox':
+		case 'Radio Button':
+			array_push($searchArr, $field['fieldId'] . " like '%" . $query . "%'");
+			continue;
+		case 'Number':
+		case 'Id':
+			if (is_numeric($query) == true) {
+				array_push($searchArr, $field['fieldId'] . "=" . $query);
+			}
+			continue;
+		case 'Decimal Number':
+			if (is_float($query) == true) {
+				array_push($searchArr, $field['fieldId'] . "=" . $query);
+			}
+			continue;
+		case 'Date':
+		case 'Time':
+		case 'Date Time':
+			array_push($searchArr, $field['fieldId'] . "='" . $query . "'");
 		}
 	}
 	return " where " . join(" or ", $searchArr) . " ";
