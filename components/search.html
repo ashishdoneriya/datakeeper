@@ -8,7 +8,7 @@
 			</el-col>
 		</el-row>
 		<el-row type="flex" class="row-bg" justify="end" style="margin-top:20px">
-			<el-col :span="24" style="float:right">
+			<el-col :span="24" style="float:right;text-align:right">
 				<el-select v-model="allowedFields" multiple collapse-tags placeholder="Filter Columns">
 					<el-option v-for="field in fields" :key="field.name" :label="field.name" :value="field.name">
 					</el-option>
