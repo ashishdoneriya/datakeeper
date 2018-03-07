@@ -13,7 +13,7 @@ $loggedInUserId = $_SESSION['userId'];
 
 $access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'delete');
 
-if (!$access['allowed']) {
+if (!$access['allowed'] || ($access['allowed'] && $access['loginRequired'] && $loggedInUserId == null)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
@@ -22,43 +22,19 @@ if (!$access['allowed']) {
 $id = htmlspecialchars(strip_tags($data['id']));
 if ($access['approval']) {
 	$rows = null;
-	if ($loggedInUserId == null) {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$id', 'delete')");
-	} else {
+	if ($access['loginRequired']) {
 		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$id', 'delete')");
-	}
-	if ($rows == true) {
-		echo '{"status" : "success"}';
 	} else {
-		echo '{"status" : "failed", "message" : "Unable to create request to remove data"}';
+		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$id', 'delete')");
 	}
-	return;
+} else {
+	$rows = $db->query("delete from $tableName where primaryKey=$id");
 }
 
-$query = "insert into $tableName ($fieldsString) values ($valuesString)";
-$result = $db->query($query);
 if ($rows == true) {
 	echo '{"status" : "success"}';
 } else {
 	echo '{"status" : "failed", "message" : "Unable to remove data, internal server problem"}';
-}
-function toAddQuotes ($type) {
-	switch ($type) {
-		case 'Text' :
-		case 'Select' :
-		case 'Checkbox' :
-		case 'Radio Button' :
-		case 'Date' :
-		case 'Time' :
-		case 'Date Time' :
-			return true;
-		case 'Number' :
-		case 'Decimal Number' :
-		case 'primaryKey';
-			return false;
-		default :
-			return true;
-	}
 }
 
 ?>

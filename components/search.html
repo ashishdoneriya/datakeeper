@@ -84,13 +84,13 @@
 				return this.canUpdate || this.canDelete;
 			},
 			canAdd() {
-				return canPermission('add');
+				return this.canPermission('add');
 			},
 			canUpdate() {
-				return canPermission('update');
+				return this.canPermission('update');
 			},
 			canDelete() {
-				return canPermission('delete');
+				return this.canPermission('delete');
 			}
 		},
 		methods: {
@@ -143,7 +143,7 @@
 					}).catch(error => {
 						console.log(error);
 						this.$message({
-							message: 'Unable to delete the record',
+							message: 'Unable to delete the record' + error,
 							type: 'error',
 							center : true
 						});
