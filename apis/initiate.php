@@ -24,16 +24,16 @@ $query = "create table if not exists tables_info ( tableName varchar(100) primar
 $db->query($query);
 
 // Creating table 'table_admins'
-$query = "create table if not exists table_admins (userId int not null, tableName varchar(100) not null, isSuperAdmin int(1) not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
+$query = "create table if not exists table_admins (userId int not null, tableName varchar(100) not null, isSuperAdmin int(1) not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName) ON DELETE CASCADE)";
 $db->query($query);
 
 // Creating table 'guests_permissions'
-$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(100) not null, permissions text not null, foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
+$query = "create table if not exists guest_permissions ( userId int not null, tableName varchar(100) not null, permissions text not null, foreign key (userId) references users(userId) ON DELETE CASCADE, foreign key (tableName) references tables_info(tableName) ON DELETE CASCADE)";
 $db->query($query);
 
 // Creating table 'data_requests'
 // requestType = add / update /delete
-$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(100) not null, fields text not null, oldId int, requestType varchar(6) not null, foreign key (userId) references users(userId), foreign key (userId) references users(userId), foreign key (tableName) references tables_info(tableName))";
+$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(100) not null, fields text not null, oldId int, requestType varchar(6) not null, foreign key (userId) references users(userId) ON DELETE CASCADE, foreign key (userId) references users(userId) ON DELETE CASCADE, foreign key (tableName) references tables_info(tableName) ON DELETE CASCADE)";
 $db->query($query);
 
 echo "success";

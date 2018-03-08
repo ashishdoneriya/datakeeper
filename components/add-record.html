@@ -46,7 +46,7 @@
 			}
 		},
 		created() {
-			axios.get(`/api/table-info.php?tableName=${this.tableName}`)
+			axios.get(`/apis/table-info.php?tableName=${this.tableName}`)
 				.then(result => {
 					this.fields = result.data.fields;
 					for (var field of this.fields) {
@@ -67,7 +67,7 @@
 				this.$router.go(-1);
 			},
 			addRecord() {
-				axios.post('/api/record-add.php', {
+				axios.post('/apis/record-add.php', {
 						tableName: this.tableName,
 						fields: this.fields
 					})

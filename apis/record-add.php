@@ -9,23 +9,30 @@ $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
-$loggedInUserId = $_SESSION['userId'];
+$loggedInUserId = htmlspecialchars(strip_tags($_SESSION['userId']));
 
-$access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'update');
+$access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'add');
 
 if (!$access['allowed']) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
 }
-$oldId=htmlspecialchars(strip_tags($data['oldId']));
+
+$fields = $data['fields'];
+$fields = json_decode(json_encode($fields));
+foreach($fields as $field) {
+	$field->value = escape_string($db, htmlspecialchars(strip_tags($field->value)));
+}
+$fields = json_decode(json_encode($fields), true);
+
 if ($access['approval']) {
 	$rows = null;
-	$encodedFields = htmlspecialchars(strip_tags(json_encode($data['fields'])));
+	$encodedFields = json_encode($fields);
 	if ($loggedInUserId == null) {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType, oldId) values ('$tableName', '$encodedFields', 'update', $oldId)");
+		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$encodedFields', 'add')");
 	} else {
-		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType, oldId) values ($loggedInUserId, '$tableName', '$encodedFields', 'update', $oldId)");
+		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$encodedFields', 'add')");
 	}
 	if ($rows == true) {
 		echo '{"status" : "success"}';
@@ -36,23 +43,25 @@ if ($access['approval']) {
 }
 
 $fieldsIdArr = array();
-$fields = $data['fields'];
+$valuesArr = array();
+
 foreach($fields as $field) {
 	if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
 		continue;
-    }
-    $temp = $field['fieldId'];
-	array_push($fieldsIdArr, $field['fieldId'] . "=");
+	}
+	array_push($fieldsIdArr, $field['fieldId']);
 	if (toAddQuotes($field['type'])) {
-		$temp = $temp . "'" . $field['value'] . "'";
+		array_push($valuesArr, "'" . $field['value'] . "'");
 	} else {
-		$temp = $temp . $field['value'];
+		array_push($valuesArr, $field['value']);
 	}
 }
-$fieldsString = join(", " , $fieldsIdArr);
+$fieldsString = join("," , $fieldsIdArr);
+$valuesString = join(",", $valuesArr);
 
-$query = "update $tableName set ($fieldsString) where id=$oldId";
-$result = $db->query($query);
+$query = "insert into $tableName ($fieldsString) values ($valuesString)";
+
+$rows = $db->query($query);
 if ($rows == true) {
 	echo '{"status" : "success"}';
 } else {

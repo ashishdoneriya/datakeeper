@@ -72,7 +72,7 @@
 					},
 					mutations: {
 						update() {
-							axios.get('/api/tables-list.php')
+							axios.get('/apis/tables-list.php')
 								.then(result => {
 									this.state.list = result.data;
 								}).catch(error => {
@@ -162,6 +162,6 @@ TODO :
 [ ] Forget password using email id
 [ ] Make UI mobile friendly
 [ ] adding records check all fields visibility on both ui and server side and add record check id field
-
+wpdb
 make primary keys whereever possible (composite key) because of the possibility of adding duplicate keys
 -->

@@ -158,7 +158,7 @@
 			}
 			this.tableName = this.$route.params.tableName;
 			if (this.tableName) {
-				axios.get(`/api/table-info.php?tableName=${this.tableName}`)
+				axios.get(`/apis/table-info.php?tableName=${this.tableName}`)
 					.then(result => {
 						this.displayedTableName = result.data.displayedTableName;
 						this.fields = result.data.fields;
@@ -221,7 +221,7 @@
 			},
 
 			addTable() {
-				axios.post('/api/table-add.php', {
+				axios.post('/apis/table-add.php', {
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields
 				}).then(response => {
@@ -255,7 +255,7 @@
 				});
 			},
 			updateTable() {
-				axios.post('/api/table-update-fields.php', {
+				axios.post('/apis/table-update-fields.php', {
 					'tableName': this.tableName,
 					'displayedTableName': this.displayedTableName,
 					'fields': this.fields

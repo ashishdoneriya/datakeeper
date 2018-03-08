@@ -60,7 +60,7 @@
 					cancelButtonText: 'Cancel',
 					type: 'warning'
 				}).then(() => {
-					axios.post('/api/table-delete.php', {
+					axios.post('/apis/table-delete.php', {
 						tableName: table.tableName
 					}).then((result => {
 						if (result.data.status == 'success') {

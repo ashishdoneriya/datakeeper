@@ -236,7 +236,7 @@
 							}
 						}
 					}
-					axios.post('/api/table-update-fields.php', {
+					axios.post('/apis/table-update-fields.php', {
 						'tableName': this.tableName,
 						'displayedTableName': this.displayedTableName,
 						'fields': this.fields
@@ -258,7 +258,7 @@
 				clearTimeout(this.publicPermissionsTimeout);
 				this.publicPermissionsTimeout = setTimeout(() => {
 					axios
-						.post("/api/table-update-permissions.php", {
+						.post("/apis/table-update-permissions.php", {
 							tableName: this.tableName,
 							permissions: this.publicPermissions
 						})
@@ -282,7 +282,7 @@
 			},
 			updatePermissions(guest) {
 				axios
-					.post("/api/table-update-permissions.php", {
+					.post("/apis/table-update-permissions.php", {
 						tableName: this.tableName,
 						permissions: guest.permission,
 						userId: guest.userId
@@ -306,7 +306,7 @@
 			},
 			removeGuest(guest, index) {
 				axios
-					.post(`/api/guest-remove.php`, {
+					.post(`/apis/guest-remove.php`, {
 						tableName: this.tableName,
 						userId: guest.userId
 					})
@@ -337,7 +337,7 @@
 			},
 			addGuest() {
 				axios
-					.post(`/api/guest-add.php`, {
+					.post(`/apis/guest-add.php`, {
 						email: this.newGuestEmail,
 						tableName: this.tableName,
 						permissions: this.guestPermissionTemp
@@ -352,7 +352,7 @@
 							this.newGuestEmail = "";
 							this.guestAddDialog = false;
 							axios
-								.get(`/api/table-permissions.php?tableName=${this.tableName}`)
+								.get(`/apis/table-permissions.php?tableName=${this.tableName}`)
 								.then(result => {
 									this.guestPermissions = result.data.guestPermissions;
 								})
@@ -388,7 +388,7 @@
 
 						var email = value.value;
 						axios
-							.post(`/api/admin-add.php`, {
+							.post(`/apis/admin-add.php`, {
 								email: email,
 								tableName: this.tableName
 							})
@@ -400,7 +400,7 @@
 										center: true
 									});
 									axios
-										.get(`/api/table-permissions.php?tableName=${this.tableName}`)
+										.get(`/apis/table-permissions.php?tableName=${this.tableName}`)
 										.then(result => {
 											this.admins = result.data.admins;
 										})
@@ -442,7 +442,7 @@
 				)
 					.then(() => {
 						axios
-							.post(`/api/admin-remove.php`, {
+							.post(`/apis/admin-remove.php`, {
 								userId: admin.userId,
 								tableName: this.tableName
 							})
@@ -482,7 +482,7 @@
 			fetchPermissions() {
 				this.tableName = this.$route.params.tableName;
 				axios
-					.get(`/api/table-permissions.php?tableName=${this.tableName}`)
+					.get(`/apis/table-permissions.php?tableName=${this.tableName}`)
 					.then(result => {
 						this.displayedTableName = result.data.displayedTableName;
 						this.fields = result.data.fields;
@@ -492,7 +492,7 @@
 						if (this.publicPermissions.read.allowed) {
 							for (var field of this.fields) {
 								if (field.isVisible) {
-									this.allowedFields.push(field.id);
+									this.allowedFields.push(field.fieldId);
 								}
 							}
 						}

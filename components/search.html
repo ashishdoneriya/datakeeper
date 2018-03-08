@@ -1,5 +1,7 @@
 <template>
 	<el-main>
+
+		<!-- Search Bar -->
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="12">
 				<el-input placeholder="Search.." v-model="searchQuery">
@@ -7,6 +9,8 @@
 				</el-input>
 			</el-col>
 		</el-row>
+
+		<!-- Filter Columns -->
 		<el-row type="flex" class="row-bg" justify="end" style="margin-top:20px">
 			<el-col :span="24" style="float:right;text-align:right">
 				<el-select v-model="allowedFields" multiple collapse-tags placeholder="Filter Columns">
@@ -15,6 +19,8 @@
 				</el-select>
 			</el-col>
 		</el-row>
+
+		<!-- Table -->
 		<el-row style="margin-top:30px">
 			<el-col :span="24">
 				<el-table :data="tableData" @sort-change="sortChange">
@@ -22,24 +28,65 @@
 					</el-table-column>
 					<el-table-column fixed="right" label="Operations" v-if="canChange">
 						<template slot-scope="scope">
-							<el-button size="small" v-if="canUpdate">Edit</el-button>
+							<el-button size="small" v-if="canUpdate" @click=edit(scope.row)>Edit</el-button>
 							<el-button type="danger" size="small" v-if="canDelete" @click="deleteRecord(scope.row)">Delete</el-button>
 						</template>
 					</el-table-column>
 				</el-table>
 			</el-col>
 		</el-row>
+
+		<!-- Pagination -->
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="8">
 				<el-pagination v-if="totalResults > 0" @size-change="handlePageSizeChange" @current-change="handleCurrentPageChange" :current-page.sync="currentPage" :page-sizes="[10, 20, 50, 100, 200, 500]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalResults">
 				</el-pagination>
 			</el-col>
 		</el-row>
+
+		<!-- Floating Plus Button at the bottom right-->
 		<el-tooltip class="item" effect="dark" content="Add Record" placement="top" v-if="canAdd">
 			<router-link :to="'/user/table/' + tableName + '/add-record'" class="float">
 				<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
 			</router-link>
 		</el-tooltip>
+
+		<!-- Record editing Dialog -->
+		<el-dialog title="Edit Record" :visible.sync="dialogRecordVisible">
+			<el-row type="flex" class="row-bg" justify="center">
+				<el-col :lg="18" :md="20" :sm="24" :xs="24">
+					<table v-if="rowToChange">
+						<tr v-for="field in fields" :key="field">
+							<td class="label">{{field.name}}</td>
+							<td>
+								<el-input v-if="field.type=='Text' || field.type=='Number' || field.type=='Deimal Number' || field.type=='primaryKey'" v-model="rowToChange[field.fieldId]" :ref="field.fieldId"></el-input>
+								<el-select v-if="field.type=='Select'" placeholder="Select" v-model="rowToChange[field.fieldId]" :ref="field.fieldId">
+									<el-option v-for="item in field.options" :key="item.value" :label="item.value" :value="item.value">
+									</el-option>
+								</el-select>
+								<el-checkbox-group v-if="field.type=='Checkbox'" v-model="rowToChange[field.fieldId]" :ref="field.fieldId">
+									<el-checkbox v-for="option in field.options" :key="option.value" :label="option.value"></el-checkbox>
+								</el-checkbox-group>
+								<el-radio-group :ref="field.fieldId" v-if="field.type=='Radio Button' && field.options.length > 0" v-model="rowToChange[field.fieldId]">
+									<el-radio v-for="(option, j) in field.options" :key="option.value" :label="option.value">{{option.value}}</el-radio>
+								</el-radio-group>
+								<el-date-picker :ref="field.fieldId" v-if="field.type=='Date'" v-model="rowToChange[field.fieldId]" type="date" placeholder="Pick a day" value-format="yyyy-MM-dd">
+								</el-date-picker>
+								<el-time-select :ref="field.fieldId" v-if="field.type=='Time'" v-model="rowToChange[field.fieldId]" value-format="HH:mm:ss" :picker-options="{start: '00:15',step: '00:15',end: '23:45'}" placeholder="Select time">
+								</el-time-select>
+								<el-date-picker :ref="field.fieldId" v-if="field.type=='Date Time'" v-model="rowToChange[field.fieldId]" type="datetime" placeholder="Select date and time" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+							</td>
+						</tr>
+					</table>
+				</el-col>
+
+			</el-row>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="dialogRecordVisible = false">Cancel</el-button>
+				<el-button type="primary" @click="dialogRecordVisible = false;doEdit()">Update</el-button>
+			</span>
+		</el-dialog>
+
 	</el-main>
 </template>
 <script>
@@ -59,7 +106,10 @@
 				currentPage: 1,
 				timer: 0,
 				allowedFields: [],
-				isLoggedIn : Cookies.get("email") ? true : false
+				isLoggedIn: Cookies.get("email") ? true : false,
+				dialogRecordVisible: false,
+				rowToChange: undefined,
+				rowToChangePrimaryKey: undefined
 			};
 		},
 		created() {
@@ -76,11 +126,12 @@
 				}, 400);
 			}
 		},
+
 		computed: {
-			visibleFields () {
+			visibleFields() {
 				return this.fields.filter(field => this.allowedFields.indexOf(field.name) != -1);
 			},
-			canChange () {
+			canChange() {
 				return this.canUpdate || this.canDelete;
 			},
 			canAdd() {
@@ -93,7 +144,53 @@
 				return this.canPermission('delete');
 			}
 		},
+
 		methods: {
+
+			edit(row) {
+				this.rowToChange = row;
+				this.rowToChangePrimaryKey = row.primaryKey;
+				this.dialogRecordVisible = true;
+			},
+
+			doEdit() {
+				axios.post('/apis/record-update.php', {
+					tableName: this.tableName,
+					oldPrimaryKey : this.rowToChangePrimaryKey,
+					row: JSON.stringify(this.rowToChange)
+				}).then(result => {
+					if (result.data.status == 'success') {
+						if (this.permissions.update.approval) {
+							this.$message({
+								message: 'A request has been sent to update this record',
+								type: 'success',
+								center: true
+							});
+						} else {
+							this.$message({
+								message: 'Record successfully updated',
+								type: 'success',
+								center: true
+							});
+							this.getTotal();
+						}
+					} else {
+						this.$message({
+							message: 'Unable to update the record',
+							type: 'error',
+							center: true
+						});
+					}
+				}).catch(error => {
+					console.log(error);
+					this.$message({
+						message: 'Unable to add data',
+						type: 'error',
+						center: true
+					});
+				});
+			},
+
 			canPermission(operation) {
 				if (!this.permissions || !this.permissions.delete) {
 					return false;
@@ -113,23 +210,23 @@
 			},
 
 			deleteRecord(row) {
-				axios.post('/api/record-delete.php', {
-						tableName: this.tableName,
-						id: row.primaryKey
-					})
+				axios.post('/apis/record-delete.php', {
+					tableName: this.tableName,
+					id: row.primaryKey
+				})
 					.then(result => {
 						if (result.data.status == 'success') {
 							if (this.permissions.delete.approval) {
 								this.$message({
 									message: 'A request has been sent to delete this record',
 									type: 'success',
-									center : true
-							});
+									center: true
+								});
 							} else {
 								this.$message({
-									message: 'Record successfull deleted',
+									message: 'Record successfully deleted',
 									type: 'success',
-									center : true
+									center: true
 								});
 								this.getTotal();
 							}
@@ -137,7 +234,7 @@
 							this.$message({
 								message: 'Unable to delete the record',
 								type: 'error',
-								center : true
+								center: true
 							});
 						}
 					}).catch(error => {
@@ -145,7 +242,7 @@
 						this.$message({
 							message: 'Unable to delete the record' + error,
 							type: 'error',
-							center : true
+							center: true
 						});
 					});
 			},
@@ -162,7 +259,7 @@
 			},
 
 			getTotal() {
-				axios.get(`/api/search-total.php?tableName=${this.tableName}&searchQuery=${this.searchQuery}`)
+				axios.get(`/apis/search-total.php?tableName=${this.tableName}&searchQuery=${this.searchQuery}`)
 					.then(result => {
 						this.totalResults = result.data;
 						if (this.totalResults != 0) {
@@ -199,7 +296,7 @@
 			},
 
 			search() {
-				axios.get(`/api/search.php?tableName=${this.tableName}&pageNumber=${this.currentPage}&maximumResults=${this.pageSize}&sortBy=${this.sortBy}&order=${this.order}&searchQuery=${this.searchQuery}`)
+				axios.get(`/apis/search.php?tableName=${this.tableName}&pageNumber=${this.currentPage}&maximumResults=${this.pageSize}&sortBy=${this.sortBy}&order=${this.order}&searchQuery=${this.searchQuery}`)
 					.then(result => {
 						this.tableData = result.data;
 					}).catch(error => {
@@ -212,7 +309,7 @@
 			},
 
 			getTableInfo() {
-				axios.get(`/api/table-info.php?tableName=${this.tableName}`)
+				axios.get(`/apis/table-info.php?tableName=${this.tableName}`)
 					.then(result => {
 						this.displayedTableName = result.data.displayedTableName;
 						this.permissions = result.data.permissions;
@@ -258,5 +355,13 @@
 
 	.my-float {
 		margin-top: 22px;
+	}
+
+	table {
+		width: 100%;
+	}
+
+	tr>td {
+		padding-bottom: 10px;
 	}
 </style>

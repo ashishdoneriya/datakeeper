@@ -90,7 +90,7 @@
 			},
 			fetchUserInfo() {
 				axios
-					.get("/api/user/info.php")
+					.get("/apis/user/info.php")
 					.then(result => {
 						this.user = result.data;
 					})
@@ -104,7 +104,7 @@
 			},
 			signout() {
 				// Signout from server
-				axios.post("/api/signout.php");
+				axios.post("/apis/signout.php");
 				// Remove browser cookies
 				Cookies.expire("email");
 				// change global variable value
