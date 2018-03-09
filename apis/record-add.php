@@ -73,7 +73,7 @@ foreach ($fields as $field) {
     if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
         continue;
     }
-    $ps->bindValue(':' + $field['fieldId'], $field['value'], getPdoParamType($field['type']));
+    $ps->bindValue(':' . $field['fieldId'], $field['value'], getPdoParamType($field['type']));
 }
 
 $result = $ps->execute();
