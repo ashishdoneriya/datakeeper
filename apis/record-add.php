@@ -10,6 +10,11 @@ $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = htmlspecialchars(strip_tags($_SESSION['userId']));
 
+if (!doesTableExist($db, $tableName)) {
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
+
 $access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'add');
 
 if (! $access['allowed']) {
@@ -26,7 +31,7 @@ foreach ($fields as $field) {
 $fields = json_decode(json_encode($fields), true);
 
 if ($access['approval']) {
-    $rows = null;
+    $result = null;
     $encodedFields = json_encode($fields);
     if ($loggedInUserId == null) {
         $ps = $db->query(
@@ -51,16 +56,16 @@ if ($access['approval']) {
 }
 
 $fieldsIdArr = array();
-$valuesNames = array();
+$fieldsIdColonArr = array();
 foreach ($fields as $field) {
     if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
         continue;
     }
     array_push($fieldsIdArr, $field['fieldId']);
-    array_push($valuesNames, ':' + $field['fieldId']);
+    array_push($fieldsIdColonArr, ':' . $field['fieldId']);
 }
 $fieldsString = join(",", $fieldsIdArr);
-$valuesString = join(",", $valuesNames);
+$valuesString = join(",", $fieldsIdColonArr);
 
 $ps = $db->prepare( "insert into $tableName ($fieldsString) values ($valuesString)");
 

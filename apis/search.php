@@ -9,93 +9,114 @@ $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
-$searchQuery = htmlspecialchars(strip_tags($_GET['searchQuery']));
-
-$finalFields = getFields($db, $userId, $tableName);
-if ($finalFields == null){
-	header('HTTP/1.0 401 Unauthorized');
-	echo 'You are not authorized.';
-	return;
-}
-
-
-$fieldsArr = array();
-foreach($finalFields as $field) {
-	array_push($fieldsArr, $field['fieldId']);
-}
-
-$fieldsString = join(',', $fieldsArr);
+$query = trim(htmlspecialchars(strip_tags($_GET['searchQuery'])));
 $searchQuery = htmlspecialchars(strip_tags($_GET['searchQuery']));
 $pageNumber = htmlspecialchars(strip_tags($_GET['pageNumber']));
 $maximumResults = htmlspecialchars(strip_tags($_GET['maximumResults']));
 $sortBy = htmlspecialchars(strip_tags($_GET['sortBy']));
 $order = htmlspecialchars(strip_tags($_GET['order']));
 
-$whereAdded = false;
-
-if ($sortBy == null) {
-	$sortBy = $finalFields[0]['fieldId'];
-}
-if ($order == null) {
-	$order = 'asc';
-}
-$searchQuery = getSearchQuery($searchQuery, $finalFields);
-$query = "select $fieldsString from $tableName $searchQuery order by $sortBy $order";
-if ($pageNumber != null && $maximumResults != null) {
-	$max = (int) $maximumResults;
-	$firstRow = ((int) $pageNumber - 1)  * $max;
-	$query = $query . " limit " . $firstRow . "," . $max;
+if (!doesTableExist($db, $tableName)) {
+	header('HTTP/1.0 500 Internal Server Error');
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
 }
 
-
-$rows = $db->query($query);
-$result = array();
-while($row = $rows->fetch()) {
-	$temp = array();
-	foreach ($finalFields as $field) {
-		$temp[$field['fieldId']] = $row[$field['fieldId']];
-	}
-	array_push($result, $temp);
+$finalFields = getFields($db, $userId, $tableName);
+if ($finalFields == null) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
 }
-echo json_encode($result);
 
-function getSearchQuery($query, $fields) {
+$fieldsArr = array();
+foreach($finalFields as $field) {
+	array_push($fieldsArr, $field['fieldId']);
+}
+$fieldsString = join(',', $fieldsArr);
 
-	if ($query == null) {
-		return "";
-	}
-	$query = strval($query);
-	$query = trim($query . "");
-
-	if (strlen($query) == 0) {
-		return "";
-	}
-	$searchArr = array();
-	foreach($fields as $field) {
-		switch ($field['type']) {
-			case 'Text' :
-			case 'Select' :
-			case 'Checkbox' :
-			case 'Radio Button' :
-				array_push($searchArr, $field['fieldId'] . " like '%". $query . "%'");
-				continue;
-			case 'Number' :
-			case 'primaryKey' :
-				if (is_numeric($query) == true) {
-					array_push($searchArr, $field['fieldId'] . "=". $query);
-				}
-				continue;
-			case 'Decimal Number' :
-				if (is_float($query) == true || is_numeric($query) == true) {
-					array_push($searchArr, $field['fieldId'] . "=". $query);
-				}
-				continue;
-			case 'Date' :
-			case 'Time' :
-			case 'Date Time' :
-				array_push($searchArr, $field['fieldId'] . "='". $query . "'");
+$searchArr = array();
+$isQueryNumeric = is_numeric($query) ;
+if ($query) {
+	foreach ($fields as $field) {
+		if ($field['type'] == 'Id') {
+			array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+			continue;
 		}
+		
+		if ($field['type'] == 'Number' || $field['type'] == 'Decimal Number') {
+			if ($isQueryNumeric) {
+				array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+			} else {
+				array_push($searchArr, 'cast(' . $field['fieldId'] . 'as text)' . ' like :' . $field['fieldId'] );
+			}
+			continue;
+		}
+		
+		if ($field['type'] == 'Date' || $field['type'] == 'Time'|| $field['type'] == 'Date Time') {
+			array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+			array_push($searchArr, 'cast(' . $field['fieldId'] . 'as text)' . ' like :' . $field['fieldId'] . 'Str' );
+			continue;
+		}
+		
+		array_push($searchArr, $field['fieldId'] . ' like :' . $field['fieldId'] );
 	}
-	return " where " . join(" or ", $searchArr) . " ";
 }
-?>
+
+$whereSearch = '';
+if (count($searchArr) > 0) {
+	$whereSearch = ' where ' . join(" or ", $searchArr);
+}
+
+$query = "select $fieldsString from $tableName $whereSearch";
+
+if ($pageNumber != null && $maximumResults != null
+		&& is_numeric($pageNumber) && is_numeric($maximumResults)) {
+			$query = $query . " limit :firstRow :max";
+		}
+		
+		$pd = $db->prepare($query);
+		
+		if ($pageNumber != null && $maximumResults != null
+				&& is_numeric($pageNumber) && is_numeric($maximumResults)) {
+					$max = (int) $maximumResults;
+					$firstRow = ((int) $pageNumber - 1)  * $max;
+					$pd->bindValue(':max', $max, PDO::PARAM_INT);
+					$pd->bindValue(':firstRow', $firstRow, PDO::PARAM_INT);
+				}
+				
+				if ($query && count($searchArr) > 0) {
+					foreach ($fields as $field) {
+						if ($field['type'] == 'Id') {
+							$pd->bindValue(':' . $field['fieldId'] , $query, PDO::PARAM_INT);
+							continue;
+						}
+						
+						if ($field['type'] == 'Number' || $field['type'] == 'Decimal Number') {
+							if ($isQueryNumeric) {
+								$pd->bindValue(':' . $field['fieldId'] , $query, PDO::PARAM_INT);
+							} else {
+								$pd->bindValue(':' . $field['fieldId'] ,  '%' . $query . '%' , PDO::PARAM_STR);
+							}
+							continue;
+						}
+						
+						if ($field['type'] == 'Date' || $field['type'] == 'Time'|| $field['type'] == 'Date Time') {
+							$pd->bindValue(':' . $field['fieldId'] ,  $query , PDO::PARAM_STR);
+							$pd->bindValue(':' . $field['fieldId'] . 'Str' ,  '%' . $query . '%' , PDO::PARAM_STR);
+							continue;
+						}
+						
+						$pd->bindValue(':' . $field['fieldId'] ,  '%' . $query . '%' , PDO::PARAM_STR);
+					}
+				}
+				
+				$result = $pd->execute();
+				if (!$result) {
+					header('HTTP/1.0 500 Internal Server Error');
+					echo '{"status" : "failed", "message" : "Unable to fetch data"}';
+				}
+				$rows = $pd->fetchAll(PDO::FETCH_ASSOC);
+				echo json_encode($rows);
+				
+				?>

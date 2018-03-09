@@ -1,5 +1,4 @@
 <?php
-
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
@@ -12,12 +11,19 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = $_SESSION['userId'];
-$oldId=htmlspecialchars(strip_tags($data['oldPrimaryKey']));
+$oldId = htmlspecialchars(strip_tags($data['oldPrimaryKey']));
 $row = json_decode($data['row'], true);
+
+if (!doesTableExist($db, $tableName)) {
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
 
 $access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'update');
 
-if (!$access['allowed'] || ($access['allowed'] && $access['loginRequired'] && $loggedInUserId == null)) {
+if (! $access['allowed'] ||
+		 ($access['allowed'] && $access['loginRequired'] &&
+		 $loggedInUserId == null)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
@@ -25,56 +31,73 @@ if (!$access['allowed'] || ($access['allowed'] && $access['loginRequired'] && $l
 
 $finalFields = getFields($db, $loggedInUserId, $tableName);
 $finalFields = json_decode(json_encode($finalFields));
-foreach($finalFields as $field) {
-	$field->value = htmlspecialchars(strip_tags($row[$field->fieldId]));
+foreach ($finalFields as $field) {
+	$field->value = $row[$field->fieldId];
 }
 $finalFields = json_decode(json_encode($finalFields), true);
 
 if ($access['approval']) {
-	$rows = null;
+	$result = null;
 	$encodedFields = json_encode($finalFields);
 	if ($access['loginRequired']) {
-		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType, oldId) values ($loggedInUserId, '$tableName', '$encodedFields', 'update', $oldId)");
+		$ps = $db->prepare(
+				"insert into data_requests (userId, tableName, fields, requestType, oldId) values (:loggedInUserId, :tableName, :encodedFields, 'update', :oldId)");
+		$ps->bindValue(':loggedInUserId', $loggedInUserId, PDO::PARAM_INT);
+		$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+		$ps->bindValue(':encodedFields', $encodedFields, PDO::PARAM_STR);
+		$ps->bindValue(':oldId', $oldId, PDO::PARAM_INT);
+		$result = $ps->execute();
 	} else {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType, oldId) values ('$tableName', '$encodedFields', 'update', $oldId)");
+		$ps = $db->prepare(
+				"insert into data_requests (tableName, fields, requestType, oldId) values (:tableName, :encodedFields, 'update', :oldId)");
+		$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+		$ps->bindValue(':encodedFields', $encodedFields, PDO::PARAM_STR);
+		$ps->bindValue(':oldId', $oldId, PDO::PARAM_INT);
+		$result = $ps->execute();
 	}
-	if ($rows == true) {
+	if ($result) {
 		echo '{"status" : "success"}';
 	} else {
 		echo '{"status" : "failed", "message" : "Unable to create request to add data"}';
 	}
 } else {
 	$fieldsIdArr = array();
-	foreach($finalFields as $field) {
+	foreach ($finalFields as $field) {
 		$temp = $field['fieldId'];
-		array_push($fieldsIdArr, $field['fieldId'] . "=" . (toAddQuotes($field['type']) ? "'" . $field['value'] . "'" : $field['value'] ));
+		array_push($fieldsIdArr, $field['fieldId'] . '=:' . $field['fieldId'] );
 	}
-	$fieldsString = join(", " , $fieldsIdArr);
-
-	$rows = $db->query("update $tableName set $fieldsString where primaryKey=$oldId");
-	if ($rows == true) {
+	$fieldsString = join(", ", $fieldsIdArr);
+	
+	$ps = $db->prepare("update $tableName set $fieldsString where primaryKey=:oldId");
+	$ps->bindValue(':oldId', $oldId, PDO::PARAM_INT);
+	foreach ($finalFields as $field) {
+		$ps->bindValue(':' + $field['fieldId'], $field['value'], getPdoParamType($field['type']));
+	}
+	$result = $ps->execute();
+	if ($result) {
 		echo '{"status" : "success"}';
 	} else {
 		echo '{"status" : "failed", "message" : "Unable to add data, internal server problem"}';
 	}
 }
 
-function toAddQuotes ($type) {
+function getPdoParamType ($type)
+{
 	switch ($type) {
-		case 'Text' :
-		case 'Select' :
-		case 'Checkbox' :
-		case 'Radio Button' :
-		case 'Date' :
-		case 'Time' :
-		case 'Date Time' :
-			return true;
-		case 'Number' :
-		case 'Decimal Number' :
-		case 'primaryKey';
-			return false;
-		default :
-			return true;
+		case 'Text':
+		case 'Select':
+		case 'Checkbox':
+		case 'Radio Button':
+		case 'Date':
+		case 'Time':
+		case 'Date Time':
+			return PDO::PARAM_STR;
+		case 'Number':
+		case 'Decimal Number':
+		case 'primaryKey':
+			return PDO::PARAM_NUM;
+		default:
+			return PDO::PARAM_STR;
 	}
 }
 

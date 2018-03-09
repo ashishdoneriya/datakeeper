@@ -26,9 +26,12 @@ if ($ps->rowCount() == 0) {
 }
 
 $ps = $db->prepare("insert into users (name, email, password) value (:name, :email, :password)");
-$result = $ps->execute([':name'=> $name, ':email' => $email, ':password'=> $password]);
-
-if ($result == true) {
+$ps->bindValue(':name', $name, PDO::PARAM_STR);
+$ps->bindValue(':email', $email, PDO::PARAM_STR);
+$ps->bindValue(':password', $password, PDO::PARAM_STR);
+$succeed = $ps->execute();
+$result = array();
+if ($succeed) {
 	$result['status'] = 'success';
 	$result['message'] = "Registration Successful";
 } else {

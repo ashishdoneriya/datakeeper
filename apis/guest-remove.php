@@ -11,6 +11,11 @@ $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $guestId = htmlspecialchars(strip_tags($data['userId']));
 
+if (!doesTableExist($db, $tableName)) {
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
+
 // Checking if logged in user is admin
 if (! isAdmin($db, $userId, $tableName)) {
     header('HTTP/1.0 401 Unauthorized');
