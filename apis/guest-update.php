@@ -20,6 +20,14 @@ if (!isAdmin($db, $userId, $tableName)) {
 
 // updating guest permissions
 $encodedJson = json_encode($data['permissions']);
-$rows = $db->query("update guest_permissions set permissions='$encodedJson' where userId=$guestId)");
-echo '{ "status" : "success"}';
+$ps = $db->prepare("update guest_permissions set permissions=:encodedJson where userId=:guestId)");
+$ps->bindValue(':encodedJson', $encodedJson, PDO::PARAM_STR);
+$ps->bindValue(':guestId', $guestId, PDO::PARAM_INT);
+$result = $ps->execute();
+if ($result) {
+    echo '{ "status" : "success"}';
+} else {
+    echo '{ "status" : "failed", "Unable to update information, internal server error"}';
+}
+
 ?>

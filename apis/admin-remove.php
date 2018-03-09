@@ -1,5 +1,4 @@
 <?php
-
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
@@ -13,17 +12,23 @@ $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $userIdToRemove = htmlspecialchars(strip_tags($data['userId']));
 
 // Checking if logged in user is admin
-if (!isAdmin($db, $userId, $tableName)) {
-	header('HTTP/1.0 401 Unauthorized');
-	echo 'You are not authorized.';
-	return;
+if (! isAdmin($db, $userId, $tableName)) {
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'You are not authorized.';
+    return;
 }
 
 // removing user from admin
-$rows = $db->query("delete from table_admins where userId=$userIdToRemove and tableName='$tableName'");
-if ($rows == false) {
-	echo '{"status" : "failed", "message" : "unable to remove $email from admins, server error"}';
+
+$ps = $db->prepare(
+        "delete from table_admins where userId=:userIdToRemove and tableName=:$tableName");
+$ps->bindValue(':userIdToRemove', $userIdToRemove, PDO::PARAM_INT);
+$ps->bindValue(':tableName', tableName, PDO::PARAM_STR);
+$result = $ps->execute();
+
+if ($result == false) {
+    echo '{"status" : "failed", "message" : "unable to remove $email from admins, server error"}';
 } else {
-	echo '{"status" : "success"}';
+    echo '{"status" : "success"}';
 }
 ?>

@@ -26,6 +26,15 @@ if ($guestId == null) {
 }
 // Adding guest
 $encodedJson = $data['permissions'];
-$rows = $db->query("insert into guest_permissions (userId, tableName, permissions) values ($loggedInUserId, '$tableName', '$encodedJson')");
-echo '{ "status" : "success"}';
+$ps = $db->prepare("insert into guest_permissions (userId, tableName, permissions) values (:loggedInUserId, :tableName, :encodedJson)");
+$ps->bindValue(":loggedInUserId", $loggedInUserId, PDO::PARAM_INT);
+$ps->bindValue(":tableName", $tableName, PDO::PARAM_STR);
+$ps->bindValue(":encodedJson", $encodedJson, PDO::PARAM_STR);
+$result = $ps->execute();
+if ($result) {
+    echo '{ "status" : "success"}';
+} else {
+    echo '{ "status" : "failed", "message" : "Unable to add guest, internal server error"}';
+}
+
 ?>

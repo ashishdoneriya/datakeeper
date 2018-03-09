@@ -1,5 +1,4 @@
 <?php
-
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
@@ -13,78 +12,90 @@ $loggedInUserId = htmlspecialchars(strip_tags($_SESSION['userId']));
 
 $access = isAllowedToAccessTable($db, $loggedInUserId, $tableName, 'add');
 
-if (!$access['allowed']) {
-	header('HTTP/1.0 401 Unauthorized');
-	echo 'You are not authorized.';
-	return;
+if (! $access['allowed']) {
+    header('HTTP/1.0 401 Unauthorized');
+    echo 'You are not authorized.';
+    return;
 }
 
 $fields = $data['fields'];
 $fields = json_decode(json_encode($fields));
-foreach($fields as $field) {
-	$field->value = escape_string($db, htmlspecialchars(strip_tags($field->value)));
+foreach ($fields as $field) {
+    $field->value = htmlspecialchars(strip_tags($field->value));
 }
 $fields = json_decode(json_encode($fields), true);
 
 if ($access['approval']) {
-	$rows = null;
-	$encodedFields = json_encode($fields);
-	if ($loggedInUserId == null) {
-		$rows = $db->query("insert into data_requests (tableName, fields, requestType) values ('$tableName', '$encodedFields', 'add')");
-	} else {
-		$rows = $db->query("insert into data_requests (userId, tableName, fields, requestType) values ($loggedInUserId, '$tableName', '$encodedFields', 'add')");
-	}
-	if ($rows == true) {
-		echo '{"status" : "success"}';
-	} else {
-		echo '{"status" : "failed", "message" : "Unable to create request to add data"}';
-	}
-	return;
+    $rows = null;
+    $encodedFields = json_encode($fields);
+    if ($loggedInUserId == null) {
+        $ps = $db->query(
+                "insert into data_requests (tableName, fields, requestType) values (:tableName, :encodedFields, 'add')");
+        $ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+        $ps->bindValue(':encodedFields', $encodedFields, PDO::PARAM_STR);
+        $result = $ps->execute();
+    } else {
+        $rows = $db->query(
+                "insert into data_requests (userId, tableName, fields, requestType) values (:loggedInUserId, :tableName, :encodedFields, 'add')");
+        $ps->bindValue(':loggedInUserId', $loggedInUserId, PDO::PARAM_INT);
+        $ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+        $ps->bindValue(':encodedFields', $encodedFields, PDO::PARAM_STR);
+        $result = $ps->execute();
+    }
+    if ($result) {
+        echo '{"status" : "success"}';
+    } else {
+        echo '{"status" : "failed", "message" : "Unable to create request to add data"}';
+    }
+    return;
 }
 
 $fieldsIdArr = array();
-$valuesArr = array();
-
-foreach($fields as $field) {
-	if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
-		continue;
-	}
-	array_push($fieldsIdArr, $field['fieldId']);
-	if (toAddQuotes($field['type'])) {
-		array_push($valuesArr, "'" . $field['value'] . "'");
-	} else {
-		array_push($valuesArr, $field['value']);
-	}
+$valuesNames = array();
+foreach ($fields as $field) {
+    if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
+        continue;
+    }
+    array_push($fieldsIdArr, $field['fieldId']);
+    array_push($valuesNames, ':' + $field['fieldId']);
 }
-$fieldsString = join("," , $fieldsIdArr);
-$valuesString = join(",", $valuesArr);
+$fieldsString = join(",", $fieldsIdArr);
+$valuesString = join(",", $valuesNames);
 
-$query = "insert into $tableName ($fieldsString) values ($valuesString)";
+$ps = $db->prepare( "insert into $tableName ($fieldsString) values ($valuesString)");
 
-$rows = $db->query($query);
-if ($rows == true) {
-	echo '{"status" : "success"}';
+foreach ($fields as $field) {
+    if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
+        continue;
+    }
+    $ps->bindValue(':' + $field['fieldId'], $field['value'], getPdoParamType($field['type']));
+}
+
+$result = $ps->execute();
+if ($result) {
+    echo '{"status" : "success"}';
 } else {
-	echo '{"status" : "failed", "message" : "Unable to add data, internal server problem"}';
+    echo '{"status" : "failed", "message" : "Unable to add data, internal server problem"}';
 }
 
-function toAddQuotes ($type) {
-	switch ($type) {
-		case 'Text' :
-		case 'Select' :
-		case 'Checkbox' :
-		case 'Radio Button' :
-		case 'Date' :
-		case 'Time' :
-		case 'Date Time' :
-			return true;
-		case 'Number' :
-		case 'Decimal Number' :
-		case 'primaryKey';
-			return false;
-		default :
-			return true;
-	}
+function getPdoParamType ($type)
+{
+    switch ($type) {
+        case 'Text':
+        case 'Select':
+        case 'Checkbox':
+        case 'Radio Button':
+        case 'Date':
+        case 'Time':
+        case 'Date Time':
+            return PDO::PARAM_STR;
+        case 'Number':
+        case 'Decimal Number':
+        case 'primaryKey':
+            return PDO::PARAM_NUM;
+        default:
+            return PDO::PARAM_STR;
+    }
 }
 
 ?>
