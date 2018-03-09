@@ -9,7 +9,7 @@ $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
-$query = trim(htmlspecialchars(strip_tags($_GET['searchQuery'])));
+$searchQuery = trim(htmlspecialchars(strip_tags($_GET['searchQuery'])));
 
 if (!doesTableExist($db, $tableName)) {
 	header('HTTP/1.0 500 Internal Server Error');
@@ -25,11 +25,13 @@ if ($finalFields == null) {
 }
 
 $searchArr = array();
-$isQueryNumeric = is_numeric($query) ;
-if ($query) {
-	foreach ($fields as $field) {
-		if ($field['type'] == 'Id') {
-			array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+$isQueryNumeric = is_numeric($searchQuery) ;
+if ($searchQuery) {
+	foreach ($finalFields as $field) {
+		if ($field['type'] == 'primaryKey') {
+			if ($isQueryNumeric) {
+				array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+			}
 			continue;
 		}
 		
@@ -37,14 +39,14 @@ if ($query) {
 			if ($isQueryNumeric) {
 				array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
 			} else {
-				array_push($searchArr, 'cast(' . $field['fieldId'] . 'as text)' . ' like :' . $field['fieldId'] );
+				array_push($searchArr, 'cast(' . $field['fieldId'] . ' as char)' . ' like :' . $field['fieldId'] );
 			}
 			continue;
 		}
 		
 		if ($field['type'] == 'Date' || $field['type'] == 'Time'|| $field['type'] == 'Date Time') {
 			array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
-			array_push($searchArr, 'cast(' . $field['fieldId'] . 'as text)' . ' like :' . $field['fieldId'] . 'Str' );
+			array_push($searchArr, 'cast(' . $field['fieldId'] . ' as char)' . ' like :' . $field['fieldId'] . 'Str' );
 			continue;
 		}
 		
@@ -61,29 +63,31 @@ $query = "select count(*) from " . $tableName . $whereSearch;
 
 $pd = $db->prepare($query);
 
-if ($query && count($searchArr) > 0) {
-	foreach ($fields as $field) {
-		if ($field['type'] == 'Id') {
-			$pd->bindValue(':' . $field['fieldId'] , $query, PDO::PARAM_INT);
+if ($searchQuery && count($searchArr) > 0) {
+	foreach ($finalFields as $field) {
+		if ($field['type'] == 'primaryKey') {
+			if ($isQueryNumeric) {
+				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
+			}
 			continue;
 		}
 		
 		if ($field['type'] == 'Number' || $field['type'] == 'Decimal Number') {
 			if ($isQueryNumeric) {
-				$pd->bindValue(':' . $field['fieldId'] , $query, PDO::PARAM_INT);
+				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
 			} else {
-				$pd->bindValue(':' . $field['fieldId'] ,  '%' . $query . '%' , PDO::PARAM_STR);
+				$pd->bindValue(':' . $field['fieldId'] ,  '%' . $searchQuery . '%' , PDO::PARAM_STR);
 			}
 			continue;
 		}
 		
 		if ($field['type'] == 'Date' || $field['type'] == 'Time'|| $field['type'] == 'Date Time') {
-			$pd->bindValue(':' . $field['fieldId'] ,  $query , PDO::PARAM_STR);
-			$pd->bindValue(':' . $field['fieldId'] . 'Str' ,  '%' . $query . '%' , PDO::PARAM_STR);
+			$pd->bindValue(':' . $field['fieldId'] ,  $searchQuery , PDO::PARAM_STR);
+			$pd->bindValue(':' . $field['fieldId'] . 'Str' ,  '%' . $searchQuery . '%' , PDO::PARAM_STR);
 			continue;
 		}
 		
-		$pd->bindValue(':' . $field['fieldId'] ,  '%' . $query . '%' , PDO::PARAM_STR);
+		$pd->bindValue(':' . $field['fieldId'] ,  '%' . $searchQuery . '%' , PDO::PARAM_STR);
 	}
 }
 

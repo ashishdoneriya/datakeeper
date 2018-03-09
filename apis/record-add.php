@@ -97,7 +97,7 @@ function getPdoParamType ($type)
         case 'Number':
         case 'Decimal Number':
         case 'primaryKey':
-            return PDO::PARAM_NUM;
+        	return PDO::PARAM_INT;
         default:
             return PDO::PARAM_STR;
     }

@@ -12,38 +12,24 @@ if ($userId == null) {
 	echo 'You are not authorized.';
 	return;
 }
-
-$query = "select ut.tableName as tableName, ut.displayedTableName as displayedTableName from tables_info ut, table_admins ta where ut.tableName=ta.tableName and ta.userId=$userId";
-$rows = $db->query($query);
 $result = array();
-$ddArray = array();
-if (gettype($rows) != 'boolean') {
-	while($row = $rows->fetch()) {
-		$arr = array();
-		$arr['tableName'] = $row['tableName'];
-		$arr['displayedTableName'] = $row['displayedTableName'];
-		array_push($ddArray, $arr);
-	}
-}
+$query = "select tables_info.tableName as tableName, tables_info.displayedTableName as displayedTableName";
+$query = $query . " from tables_info, table_admins where tables_info.tableName=table_admins.tableName and table_admins.userId=:userId";
+$ps = $db->prepare($query);
+$ps->bindValue(':userId', $userId, PDO::PARAM_INT);
+$ps->execute();
+$ddArray = $ps->fetchAll(PDO::FETCH_ASSOC);
 $result['personalTables'] = array('label' => 'Personal Tables', 'list'=> $ddArray);
 
-$query = "select tables_info.tableName as tableName, tables_info.displayedTableName as displayedTableName, guest_permissions.permissions as permissions from tables_info, guest_permissions where tables_info.tableName=guest_permissions.tableName and tables_info.userId=$userId";
-
-$rows = $db->query($query);
-$ddArray = array();
-if (gettype($rows) != 'boolean') {
-	while($row = $rows->fetch()) {
-		if (gettype($row) == 'boolean') {
-			break;
-		}
-		$arr = array();
-		$arr['tableName'] = $row['tableName'];
-		$arr['displayedTableName'] = $row['displayedTableName'];
-		$arr['permissions'] = $row['permissions'];
-		array_push($ddArray, $arr);
-	}
-}
-
+$query = "select tables_info.tableName as tableName, tables_info.displayedTableName as displayedTableName, guest_permissions.permissions as permissions from tables_info, guest_permissions where tables_info.tableName=guest_permissions.tableName and guest_permissions.userId=:userId";
+$ps = $db->prepare($query);
+$ps->bindValue(':userId', $userId, PDO::PARAM_INT);
+$ps->execute();
+$rows = $ps->fetchAll(PDO::FETCH_ASSOC);
+$ps = $db->prepare($query);
+$ps->bindValue(':userId', $userId, PDO::PARAM_INT);
+$ps->execute();
+$ddArray = $ps->fetchAll(PDO::FETCH_ASSOC);
 $result['otherTables'] = array('label' => 'Other Tables', 'list'=> $ddArray);
 
 echo json_encode($result);

@@ -71,7 +71,7 @@ if ($access['approval']) {
 	$ps = $db->prepare("update $tableName set $fieldsString where primaryKey=:oldId");
 	$ps->bindValue(':oldId', $oldId, PDO::PARAM_INT);
 	foreach ($finalFields as $field) {
-		$ps->bindValue(':' + $field['fieldId'], $field['value'], getPdoParamType($field['type']));
+		$ps->bindValue(':' . $field['fieldId'], $field['value'], getPdoParamType($field['type']));
 	}
 	$result = $ps->execute();
 	if ($result) {
@@ -95,7 +95,7 @@ function getPdoParamType ($type)
 		case 'Number':
 		case 'Decimal Number':
 		case 'primaryKey':
-			return PDO::PARAM_NUM;
+			return PDO::PARAM_INT;
 		default:
 			return PDO::PARAM_STR;
 	}

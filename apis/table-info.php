@@ -10,16 +10,23 @@ $database = new Database();
 $db = $database->getConnection();
 
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
-$rows = $db->query("select displayedTableName from tables_info where tableName='$tableName'");
-$row = $rows->fetch();
-$result = array();
-$result['displayedTableName'] = $row['displayedTableName'];
+if (!doesTableExist($db, $tableName)) {
+	header('HTTP/1.0 500 Internal Server Error');
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
 $finalFields = getFields($db, $userId, $tableName);
 if ($finalFields == null){
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
 }
+$ps = $db->prepare("select displayedTableName from tables_info where tableName=:tableName");
+$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+$ps->execute();
+
+$result = array();
+$result['displayedTableName'] = $ps->fetch(PDO::FETCH_COLUMN);
 $result['fields'] = $finalFields;
 $result['permissions'] = getPermissionsJson($db, $userId, $tableName);
 echo json_encode($result);
