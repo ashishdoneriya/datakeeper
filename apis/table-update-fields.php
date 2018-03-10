@@ -64,7 +64,7 @@ for ($x = 0; $x < $length; $x++) {
 	$newField = (object) $newFields[$x];
 	if (!property_exists($newField, 'fieldId')) {
 		$prevCount ++;
-		$temp = preg_replace("[^A-Za-z0-9 ]", "", $newField->name);
+		$temp = preg_replace("/\W|_/", "", $newField->name);
 		if (strlen($temp) > 10) {
 			$temp = substr($temp, 0, 10);
 		}

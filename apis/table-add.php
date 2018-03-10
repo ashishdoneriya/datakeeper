@@ -29,7 +29,7 @@ for ($x = 0; $x < $length; $x ++) {
 		$idsFound ++;
 	} else {
 		$count ++;
-		$temp = preg_replace("[^A-Za-z0-9 ]", "", $field->name);
+		$temp = preg_replace("/\W|_/", "", $field->name);
 		if (strlen($temp) > 10) {
 			$temp = substr($temp, 0, 10);
 		}

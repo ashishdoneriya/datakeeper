@@ -51,10 +51,6 @@ if ($result) {
 
 function isJsonValid($permissionsJson) {
 	$permissions = json_decode($permissionsJson, true);
-	$count = count($permissions);
-	if ($count != 4) {
-		return false;
-	}
 	foreach ($permissions as  $key => $value) {
 		if ($key != "read" && $key != "add" && $key != "update" && $key != "delete") {
 			return false;

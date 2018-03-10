@@ -18,7 +18,7 @@ $password = htmlspecialchars(strip_tags($data['password']));
 $ps = $db->prepare("select userId from users where email=:email");
 $ps->fetchAll([':email' => $email]);
 
-if ($ps->rowCount() == 0) {
+if ($ps->rowCount() != 0) {
 	$result['status'] = 'failed';
 	$result['message'] = "Email Id already registered";
 	echo json_encode($result);
