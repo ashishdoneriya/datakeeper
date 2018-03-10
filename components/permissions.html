@@ -61,40 +61,9 @@
 			<el-card class="box-card" v-for="(guest, index) in guestPermissions" :key="guest.userId">
 				<div slot="header" class="clearfix" style="text-align:center">
 					<span>Name : {{guest.name}} | Email : {{guest.email}}</span>
+					<el-button @click="guestToUpdate=guest;guestPermUpdateDialog=true" style="float: right; padding: 3px 5px;margin-right:10px;" type="text"><i class="material-icons" style="margin-right: 5px;font-size: 17px;position: relative;top: -2px;">account_circle</i><span style="margin-top: 0px;padding-top: 0px;position: relative;top: -5px;">Change Permissions</span></el-button>
 					<el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-delete" @click="removeGuest(guest, index)">Remove Guest</el-button>
 				</div>
-				<el-form label-position="top">
-					<el-form-item label="Allow this person to view records of this Table">
-						<el-radio-group v-model="guest.permission.read.allowed" @change="updatePermissions(guest)">
-							<el-radio :label="true">Yes</el-radio>
-							<el-radio :label="false">No</el-radio>
-						</el-radio-group>
-					</el-form-item>
-					<el-form-item label="Allow this person to ADD record to this table">
-						<el-radio-group v-model="guest.permission.add.allowed" @change="updatePermissions(guest)" style="margin-right:30px">
-							<el-radio :label="true">Yes</el-radio>
-							<el-radio :label="false">No</el-radio>
-						</el-radio-group>
-						<el-checkbox v-model="guest.permission.add.approval" :disabled="!guest.permission.add.allowed" @change="updatePermissions(guest)">You have to
-							<u>approve</u> first, after that the record will be added</el-checkbox>
-					</el-form-item>
-					<el-form-item label="Allow this person to MODIFY records of this table">
-						<el-radio-group v-model="guest.permission.update.allowed" @change="updatePermissions(guest)" style="margin-right:30px">>
-							<el-radio :label="true">Yes</el-radio>
-							<el-radio :label="false">No</el-radio>
-						</el-radio-group>
-						<el-checkbox v-model="guest.permission.update.approval" :disabled="!guest.permission.update.allowed" @change="updatePermissions(guest)">You have to
-							<u>approve</u> first, after that the record will be modified</el-checkbox>
-					</el-form-item>
-					<el-form-item label="Allow this person to REMOVE records from this table">
-						<el-radio-group v-model="guest.permission.delete.allowed" @change="updatePermissions(guest)" style="margin-right:30px">>
-							<el-radio :label="true">Yes</el-radio>
-							<el-radio :label="false">No</el-radio>
-						</el-radio-group>
-						<el-checkbox v-model="guest.permission.delete.approval" :disabled="!guest.permission.delete.allowed" @change="updatePermissions(guest)">You have to
-							<u>approve</u> first, after that the record will be deleted</el-checkbox>
-					</el-form-item>
-				</el-form>
 			</el-card>
 		</el-row>
 		<el-row>
@@ -108,6 +77,7 @@
 				</div>
 			</el-card>
 		</el-row>
+
 		<el-dialog title="Add Guest" :visible.sync="guestAddDialog">
 			<el-row style="height:300px;overflow-y:auto">
 				<el-form label-position="top">
@@ -152,6 +122,46 @@
 			</el-row>
 		</el-dialog>
 
+		<el-dialog v-if="guestToUpdate" :title="guestToUpdate.email + ' Permissions'" :visible.sync="guestPermUpdateDialog">
+			<el-row style="height:300px;overflow-y:auto">
+				<el-form label-position="top">
+					<el-form-item label="Allow this person to view records of this Table">
+						<el-radio-group v-model="guestToUpdate.permissions.read.allowed" @change="updatePermissions(guestToUpdate)">
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="Allow this person to ADD record to this table">
+						<el-radio-group v-model="guestToUpdate.permissions.add.allowed" @change="updatePermissions(guestToUpdate)" style="margin-right:30px">
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+						<el-checkbox v-model="guestToUpdate.permissions.add.approval" :disabled="!guestToUpdate.permissions.add.allowed" @change="updatePermissions(guestToUpdate)">You have to
+							<u>approve</u> first, after that the record will be added</el-checkbox>
+					</el-form-item>
+					<el-form-item label="Allow this person to MODIFY records of this table">
+						<el-radio-group v-model="guestToUpdate.permissions.update.allowed" @change="updatePermissions(guestToUpdate)" style="margin-right:30px">>
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+						<el-checkbox v-model="guestToUpdate.permissions.update.approval" :disabled="!guestToUpdate.permissions.update.allowed" @change="updatePermissions(guestToUpdate)">You have to
+							<u>approve</u> first, after that the record will be modified</el-checkbox>
+					</el-form-item>
+					<el-form-item label="Allow this person to REMOVE records from this table">
+						<el-radio-group v-model="guestToUpdate.permissions.delete.allowed" @change="updatePermissions(guestToUpdate)" style="margin-right:30px">>
+							<el-radio :label="true">Yes</el-radio>
+							<el-radio :label="false">No</el-radio>
+						</el-radio-group>
+						<el-checkbox v-model="guestToUpdate.permissions.delete.approval" :disabled="!guestToUpdate.permissions.delete.allowed" @change="updatePermissions(guestToUpdate)">You have to
+							<u>approve</u> first, after that the record will be deleted</el-checkbox>
+					</el-form-item>
+					<el-form-item>
+						<el-button @click="guestPermUpdateDialog = false">Close</el-button>
+					</el-form-item>
+				</el-form>
+			</el-row>
+		</el-dialog>
+
 	</el-main>
 </template>
 
@@ -188,6 +198,7 @@
 				guestPermissions: [],
 				admins: [],
 				guestAddDialog: false,
+				guestPermUpdateDialog: false,
 				newGuestEmail: "",
 				guestPermissionTemp: {
 					read: {
@@ -209,7 +220,8 @@
 						loginRequired: true
 					}
 				},
-				isLoggedIn : Cookies.get("email") ? true : false
+				guestToUpdate: undefined,
+				isLoggedIn: Cookies.get("email") ? true : false
 			};
 		},
 		created() {
@@ -281,10 +293,12 @@
 				}, 1000);
 			},
 			updatePermissions(guest) {
+				console.log('updating');
+				console.log(guest);
 				axios
 					.post("/apis/table-update-permissions.php", {
 						tableName: this.tableName,
-						permissions: guest.permission,
+						permissions: guest.permissions,
 						userId: guest.userId
 					})
 					.then(result => {
@@ -381,9 +395,9 @@
 			},
 			addAdmin() {
 				this.$prompt("Please input e-mail", "Add Administrator", {
-					confirmButtonText: "OK",
-					cancelButtonText: "Cancel"
-				})
+						confirmButtonText: "OK",
+						cancelButtonText: "Cancel"
+					})
 					.then((value) => {
 
 						var email = value.value;
@@ -433,13 +447,13 @@
 			},
 			removeAdmin(index, admin) {
 				this.$confirm(
-					`Are you sure want to remove ${admin.email} from admin list' ?`,
-					"Warning", {
-						confirmButtonText: "OK",
-						cancelButtonText: "Cancel",
-						type: "warning"
-					}
-				)
+						`Are you sure want to remove ${admin.email} from admin list' ?`,
+						"Warning", {
+							confirmButtonText: "OK",
+							cancelButtonText: "Cancel",
+							type: "warning"
+						}
+					)
 					.then(() => {
 						axios
 							.post(`/apis/admin-remove.php`, {
@@ -508,4 +522,5 @@
 			}
 		}
 	};
+
 </script>

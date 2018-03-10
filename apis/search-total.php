@@ -9,7 +9,7 @@ $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
-$searchQuery = trim(htmlspecialchars(strip_tags($_GET['searchQuery'])));
+$searchQuery = trim($_GET['searchQuery']);
 
 if (!doesTableExist($db, $tableName)) {
 	header('HTTP/1.0 500 Internal Server Error');
@@ -29,7 +29,12 @@ $isQueryNumeric = is_numeric($searchQuery) ;
 if ($searchQuery) {
 	foreach ($finalFields as $field) {
 		if ($field['type'] == 'primaryKey') {
-			if ($isQueryNumeric) {
+			if ( $field['autoIncrement']) {
+				if ($isQueryNumeric) {
+					array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+				}
+				
+			} else {
 				array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
 			}
 			continue;
@@ -65,12 +70,19 @@ $pd = $db->prepare($query);
 
 if ($searchQuery && count($searchArr) > 0) {
 	foreach ($finalFields as $field) {
+		
 		if ($field['type'] == 'primaryKey') {
-			if ($isQueryNumeric) {
-				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
+			if ( $field['autoIncrement']) {
+				if ($isQueryNumeric) {
+					$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
+				}
+				
+			} else {
+				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_STR);
 			}
 			continue;
 		}
+		
 		
 		if ($field['type'] == 'Number' || $field['type'] == 'Decimal Number') {
 			if ($isQueryNumeric) {

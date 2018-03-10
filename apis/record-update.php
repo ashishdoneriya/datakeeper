@@ -11,8 +11,14 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = $_SESSION['userId'];
-$oldId = htmlspecialchars(strip_tags($data['oldPrimaryKey']));
+$oldPrimaryKey = htmlspecialchars(strip_tags($data['oldPrimaryKey']));
 $row = json_decode($data['row'], true);
+
+if (!$tableName || !$oldPrimaryKey || !$row) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
+}
 
 if (!doesTableExist($db, $tableName)) {
 	echo '{"status" : "failed", "message" : "No such table"}';
@@ -41,11 +47,11 @@ if ($access['approval']) {
 	$encodedFields = json_encode($finalFields);
 	if ($access['loginRequired']) {
 		$ps = $db->prepare(
-				"insert into data_requests (userId, tableName, fields, requestType, oldId) values (:loggedInUserId, :tableName, :encodedFields, 'update', :oldId)");
+				"insert into data_requests (userId, tableName, fields, requestType, oldPrimaryKey) values (:loggedInUserId, :tableName, :encodedFields, 'update', :oldPrimaryKey)");
 		$ps->bindValue(':loggedInUserId', $loggedInUserId, PDO::PARAM_INT);
 		$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
 		$ps->bindValue(':encodedFields', $encodedFields, PDO::PARAM_STR);
-		$ps->bindValue(':oldId', $oldId, PDO::PARAM_INT);
+		$ps->bindValue(':oldId', $oldPrimaryKey, PDO::PARAM_INT);
 		$result = $ps->execute();
 	} else {
 		$ps = $db->prepare(
@@ -68,8 +74,19 @@ if ($access['approval']) {
 	}
 	$fieldsString = join(", ", $fieldsIdArr);
 	
-	$ps = $db->prepare("update $tableName set $fieldsString where primaryKey=:oldId");
-	$ps->bindValue(':oldId', $oldId, PDO::PARAM_INT);
+	$ps = $db->prepare("update $tableName set $fieldsString where primaryKey=:oldPrimaryKey");
+	$varType = null;
+	foreach ($finalFields as $field) {
+		if ($field['type'] == 'primaryKey') {
+			if ($field['autoIncrement']) {
+				$varType = PDO::PARAM_INT;
+			} else {
+				$varType = PDO::PARAM_STR;
+			}
+			break;
+		}
+	}
+	$ps->bindValue(':oldPrimaryKey', $oldPrimaryKey, $varType);
 	foreach ($finalFields as $field) {
 		$ps->bindValue(':' . $field['fieldId'], $field['value'], getPdoParamType($field['type']));
 	}

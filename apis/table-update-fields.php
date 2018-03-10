@@ -17,16 +17,28 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $displayedTableName = htmlspecialchars(strip_tags($data['displayedTableName']));
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
+$newFields = $data['fields'];
+
+if (!$displayedTableName || $tableName || !$newFields) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
+}
+
 if (!doesTableExist($db, $tableName)) {
 	header('HTTP/1.0 500 Internal Server Error');
 	echo '{"status" : "failed", "message" : "No such table"}';
 	return;
 }
-$newFields = $data['fields'];
 
 if (!isSuperAdmin($db, $userId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
+	return;
+}
+
+if (! isFieldsArrayValid($newFields)) {
+	echo '{"status" : "failed", "message" : "Invalid json format" }';
 	return;
 }
 
@@ -62,6 +74,9 @@ $prevCount = count($oldFields) + 1;
 $length = count($newFields);
 for ($x = 0; $x < $length; $x++) {
 	$newField = (object) $newFields[$x];
+	if ($newField->type == 'primaryKey') {
+		continue;
+	}
 	if (!property_exists($newField, 'fieldId')) {
 		$prevCount ++;
 		$temp = preg_replace("/\W|_/", "", $newField->name);
@@ -107,6 +122,45 @@ if ($result) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 }
 
+function isFieldsArrayValid ($fields)
+{
+	foreach ($fields as $field) {
+		foreach ($field as $key => $value) {
+			$type = gettype($value);
+			switch ($key) {
+				case 'name':
+				case 'fieldId':
+					if ($type != 'string') {
+						return false;
+					}
+					break;
+				case 'type':
+					if ($type != 'string' || ! isValidFieldType($value)) {
+						return false;
+					}
+					break;
+				case 'required':
+				case 'isVisible':
+				case 'autoIncrement':
+					if ($type != 'boolean') {
+						return false;
+					}
+					break;
+				case 'options':
+					if ($type != 'array') {
+						return false;
+					}
+					break;
+				case 'value':
+					continue;
+				default:
+					return false;
+			}
+		}
+	}
+	return true;
+}
+
 function isValidFieldType ($type)
 {
 	switch ($type) {
@@ -134,6 +188,8 @@ function getRequired($required) {
 }
 function getMysqlFieldType($type) {
 	switch ($type) {
+		case 'primaryKey':
+			return 'BIGINT primary key auto_increment';
 		case 'Text' :
 		case 'Select' :
 		case 'Checkbox' :

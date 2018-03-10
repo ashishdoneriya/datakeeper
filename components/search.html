@@ -212,7 +212,7 @@
 			deleteRecord(row) {
 				axios.post('/apis/record-delete.php', {
 					tableName: this.tableName,
-					id: row.primaryKey
+					primaryKey: row.primaryKey
 				})
 					.then(result => {
 						if (result.data.status == 'success') {

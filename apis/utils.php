@@ -39,6 +39,9 @@ function isAdmin (PDO $db, int $userId, String $tableName)
 function isAllowedToAccessTable (PDO $db, int $userId, String $tableName,
 		String $accessType)
 {
+	if (!$tableName){
+		return false;
+	}
 	$result = array();
 	if (isAdmin($db, $userId, $tableName)) {
 		$result['allowed'] = true;
@@ -178,6 +181,9 @@ function getPermissionsJson (PDO $db, int $userId, String $tableName)
 
 function doesTableExist (PDO $db, String $tableName)
 {
+	if (!$tableName) {
+		return false;
+	}
 	$ps = $db->prepare(
 			'select displayedTableName from tables_info where tableName=:tableName');
 	$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);

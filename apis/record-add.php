@@ -9,6 +9,13 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = htmlspecialchars(strip_tags($_SESSION['userId']));
+$row = json_decode($data['row'], true);
+
+if (!$tableName || !$oldId) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
+}
 
 if (!doesTableExist($db, $tableName)) {
 	echo '{"status" : "failed", "message" : "No such table"}';
@@ -23,16 +30,21 @@ if (! $access['allowed']) {
     return;
 }
 
-$fields = $data['fields'];
-$fields = json_decode(json_encode($fields));
-foreach ($fields as $field) {
-    $field->value = htmlspecialchars(strip_tags($field->value));
+$finalFields = getFields($db, $loggedInUserId, $tableName);
+$finalFields = json_decode(json_encode($finalFields));
+foreach ($finalFields as $field) {
+	$field->value = $row[$field->fieldId];
 }
-$fields = json_decode(json_encode($fields), true);
+$finalFields = json_decode(json_encode($finalFields), true);
+
+foreach ($finalFields as $field) {
+	$field->value = $row[$field->fieldId];
+}
+$finalFields = json_decode(json_encode($finalFields), true);
 
 if ($access['approval']) {
     $result = null;
-    $encodedFields = json_encode($fields);
+    $encodedFields = json_encode($finalFields);
     if ($loggedInUserId == null) {
         $ps = $db->query(
                 "insert into data_requests (tableName, fields, requestType) values (:tableName, :encodedFields, 'add')");
@@ -57,7 +69,7 @@ if ($access['approval']) {
 
 $fieldsIdArr = array();
 $fieldsIdColonArr = array();
-foreach ($fields as $field) {
+foreach ($finalFields as $field) {
     if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
         continue;
     }
@@ -69,11 +81,17 @@ $valuesString = join(",", $fieldsIdColonArr);
 
 $ps = $db->prepare( "insert into $tableName ($fieldsString) values ($valuesString)");
 
-foreach ($fields as $field) {
-    if ($field['type'] == 'primaryKey' && $field['autoIncrement'] == true) {
-        continue;
+foreach ($finalFields as $field) {
+    if ($field['type'] == 'primaryKey') {
+    	if ($field['autoIncrement']) {
+    		continue;
+    	} else {
+    		$ps->bindValue(':' . $field['fieldId'], $field['value'], PDO::PARAM_STR);
+    	}
+    } else {
+    	$ps->bindValue(':' . $field['fieldId'], $field['value'], getPdoParamType($field['type']));
     }
-    $ps->bindValue(':' . $field['fieldId'], $field['value'], getPdoParamType($field['type']));
+    
 }
 
 $result = $ps->execute();

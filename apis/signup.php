@@ -12,11 +12,13 @@ $name = htmlspecialchars(strip_tags($data['name']));
 $email = htmlspecialchars(strip_tags($data['email']));
 $password = htmlspecialchars(strip_tags($data['password']));
 
-$data = json_decode(file_get_contents('php://input'), TRUE);
-$email = htmlspecialchars(strip_tags($data['email']));
-$password = htmlspecialchars(strip_tags($data['password']));
+if (!$name || !$email || !$password) {
+	echo '{"status" : "failed", "message" : "Please enter valid information"}';
+	return;
+}
 $ps = $db->prepare("select userId from users where email=:email");
-$ps->fetchAll([':email' => $email]);
+$ps->bindValue(':email', $email, PDO::PARAM_STR);
+$ps->execute();
 
 if ($ps->rowCount() != 0) {
 	$result['status'] = 'failed';

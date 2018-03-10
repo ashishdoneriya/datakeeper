@@ -16,14 +16,21 @@ $displayedTableName = $data['displayedTableName'];
 $fields = $data['fields'];
 $length = count($fields);
 
+if (!$fields || $displayedTableName) {
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You are not authorized.';
+	return;
+}
+
 $idsFound = 0;
 $count = 0;
+
+if (! isFieldsArrayValid($fields)) {
+	echo '{"status" : "failed", "message" : "Invalid json format" }';
+	return;
+}
 for ($x = 0; $x < $length; $x ++) {
 	$field = (object) $fields[$x];
-	if (!isValidFieldType($field->type)) {
-		echo '{"status" : "failed", "message" : "Invalid field type(s)" }';
-		return;
-	}
 	if ($field->type == 'primaryKey') {
 		$field->fieldId = "primaryKey";
 		$idsFound ++;
@@ -75,9 +82,16 @@ if (! $result) {
 // Creating table
 $tempFields = array();
 foreach ($fields as $field) {
-	array_push($tempFields,
-			'' . $field['fieldId'] . ' ' . getMysqlFieldType($field['type']) .
-					 getRequired($field['required']));
+	if ($field['type'] == 'primaryKey') {
+		if ($field['autoIncrement']) {
+			array_push($tempFields, 'primaryKey INT primary key auto_increment not null');
+		} else {
+			array_push($tempFields, 'primaryKey varchar(100) primary key not null');
+		}
+		
+	} else {
+		array_push($tempFields, $field['fieldId'] . ' ' . getMysqlFieldType($field['type']) . getRequired($field['required']));
+	}
 }
 
 $query = 'create table ' . $tableName . ' (' . join(", ", $tempFields) . ')';
@@ -92,10 +106,57 @@ if ($result) {
 
 function getRequired ($required)
 {
-	if ($required == true) {
-		return ' NOT NULL';
+	return $required ? 'NOT NULL' : '';
+}
+
+function isFieldsArrayValid ($fields)
+{
+	if (! fields) {
+		return false;
 	}
-	return '';
+	foreach ($fields as $field) {
+		foreach ($field as $key => $value) {
+			$type = gettype($value);
+			switch ($key) {
+				case 'name':
+					if ($type != 'string') {
+						return false;
+					}
+					break;
+				case 'type':
+					if ($type != 'string' || ! isValidFieldType($value)) {
+						return false;
+					}
+					break;
+				case 'required':
+					if ($type != 'boolean') {
+						return false;
+					}
+					break;
+				case 'isVisible':
+					if ($type != 'boolean') {
+						return false;
+					}
+					
+					break;
+				case 'autoIncrement':
+					if ($type != 'boolean') {
+						return false;
+					}
+					break;
+				case 'options':
+					if ($type != 'array') {
+						return false;
+					}
+					break;
+				case 'value':
+					continue;
+				default:
+					return false;
+			}
+		}
+	}
+	return true;
 }
 
 function isValidFieldType ($type)
@@ -136,7 +197,7 @@ function getMysqlFieldType ($type)
 		case 'Date Time':
 			return 'DATETIME';
 		case 'primaryKey':
-			return 'BIGINT primary key auto_increment';
+			return 'INT primary key auto_increment';
 		default:
 			return 'TEXT';
 	}

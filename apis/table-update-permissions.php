@@ -24,12 +24,16 @@ if (!isAdmin($db, $loggedInUserId, $tableName)) {
 	return;
 }
 $permissions = json_encode($data['permissions']);
-if (!isJsonValid($permissions)) {
+if (!isPermissionJsonValid($permissions)) {
 	header('HTTP/1.0 500 Internal Server Error');
-	echo '{"status" : "failed", "message" : "IInvalid permissions"}';
+	echo '{"status" : "failed", "message" : "Invalid permissions"}';
 	return;
 }
-$userId = $data['userId'];
+$userId = null;
+if (array_key_exists('userId', $data)) {
+	$userId = $data['userId'];
+}
+
 $result = null;
 if ($userId == null) {
 	$ps = $db->prepare("update tables_info set publicPermissions=:permissions where tableName=:tableName");
@@ -49,17 +53,17 @@ if ($result) {
 	echo '{"status" : "failed", "message" : "Problem while updating permissions"}';
 }
 
-function isJsonValid($permissionsJson) {
+function isPermissionJsonValid($permissionsJson) {
 	$permissions = json_decode($permissionsJson, true);
 	foreach ($permissions as  $key => $value) {
 		if ($key != "read" && $key != "add" && $key != "update" && $key != "delete") {
 			return false;
 		}
 		foreach ($value as  $subKey => $subValue) {
-			if ($subKey != "allow" && $subKey != "approval" && $subKey != "loginRequired") {
+			if ($subKey != "allowed" && $subKey != "approval" && $subKey != "loginRequired") {
 				return false;
 			}
-			if(gettype($value) != "boolean") {
+			if(gettype($subValue) != "boolean") {
 				return false;
 			}
 		}

@@ -9,7 +9,7 @@ $database = new Database();
 $db = $database->getConnection();
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
 $query = trim(htmlspecialchars(strip_tags($_GET['searchQuery'])));
-$searchQuery = htmlspecialchars(strip_tags($_GET['searchQuery']));
+$searchQuery = trim($_GET['searchQuery']);
 $pageNumber = htmlspecialchars(strip_tags($_GET['pageNumber']));
 $maximumResults = htmlspecialchars(strip_tags($_GET['maximumResults']));
 $sortBy = htmlspecialchars(strip_tags($_GET['sortBy']));
@@ -67,7 +67,12 @@ $isQueryNumeric = is_numeric($searchQuery);
 if ($searchQuery) {
 	foreach ($finalFields as $field) {
 		if ($field['type'] == 'primaryKey') {
-			if ($isQueryNumeric) {
+			if ( $field['autoIncrement']) {
+				if ($isQueryNumeric) {
+					array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
+				}
+				
+			} else {
 				array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
 			}
 			continue;
@@ -122,8 +127,13 @@ if ($pageNumber != null && $maximumResults != null && is_numeric($pageNumber) &&
 if ($searchQuery && count($searchArr) > 0) {
 	foreach ($finalFields as $field) {
 		if ($field['type'] == 'primaryKey') {
-			if ($isQueryNumeric) {
-				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
+			if ( $field['autoIncrement']) {
+				if ($isQueryNumeric) {
+					$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
+				}
+				
+			} else {
+				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_STR);
 			}
 			continue;
 		}

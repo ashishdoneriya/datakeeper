@@ -33,7 +33,7 @@ if ($userIdToAdd == null) {
 $ps = $db->prepare(
         "insert table_admins (userId, tableName, isSuperAdmin) values (:userIdToAdd, :tableName, 0)");
 $ps->bindValue(':userIdToAdd', $userIdToAdd, PDO::PARAM_INT);
-$ps->bindValue(':tableName', tableName, PDO::PARAM_STR);
+$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
 $result = $ps->execute();
 
 if ($result == false) {

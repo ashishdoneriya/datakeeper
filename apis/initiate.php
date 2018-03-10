@@ -33,7 +33,7 @@ $db->query($query);
 
 // Creating table 'data_requests'
 // requestType = add / update /delete
-$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(100) not null, fields text not null, oldId int, requestType varchar(6) not null, constraint foreign key (userId) references users(userId) ON DELETE CASCADE, constraint foreign key (userId) references users(userId) ON DELETE CASCADE, constraint foreign key (tableName) references tables_info(tableName) ON DELETE CASCADE)";
+$query = "create table if not exists data_requests (reqId int primary key not null auto_increment, userId int, tableName varchar(100) not null, fields text not null, oldPrimaryKey text, requestType varchar(6) not null, constraint foreign key (userId) references users(userId) ON DELETE CASCADE, constraint foreign key (userId) references users(userId) ON DELETE CASCADE, constraint foreign key (tableName) references tables_info(tableName) ON DELETE CASCADE)";
 $db->query($query);
 
 echo "success";
