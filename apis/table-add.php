@@ -1,5 +1,4 @@
 <?php
-
 header("Access-Control-Allow-Methods: POST");
 
 include_once './config/database.php';
@@ -13,20 +12,28 @@ if ($userId == null) {
 $database = new Database();
 $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
-$displayedTableName = htmlspecialchars(strip_tags($data['displayedTableName']));
+$displayedTableName = $data['displayedTableName'];
 $fields = $data['fields'];
 $length = count($fields);
 
 $idsFound = 0;
 $count = 0;
-for ($x = 0; $x < $length; $x++) {
+for ($x = 0; $x < $length; $x ++) {
 	$field = (object) $fields[$x];
+	if (!isValidFieldType($field->type)) {
+		echo '{"status" : "failed", "message" : "Invalid field type(s)" }';
+		return;
+	}
 	if ($field->type == 'primaryKey') {
 		$field->fieldId = "primaryKey";
-		$idsFound++;
+		$idsFound ++;
 	} else {
-		$count++;
-		$field->fieldId = str_replace(' ', '_', $field->name) . $count;
+		$count ++;
+		$temp = preg_replace("[^A-Za-z0-9 ]", "", $field->name);
+		if (strlen($temp) > 10) {
+			$temp = substr($temp, 0, 10);
+		}
+		$field->fieldId = 'col_' . $temp . $count;
 	}
 	$fields[$x] = (array) $field;
 }
@@ -44,61 +51,93 @@ $encodedFields = json_encode($fields);
 
 $tableName = $userId . '_' . time();
 $permissionsJson = '{"read" : {"allowed" : false, "approval" : true, "loginRequired" : false},"add" : {"allowed" : false, "approval" : true, "loginRequired" : true},"update" : {"allowed" : false, "approval" : true, "loginRequired" : true},"delete" : {"allowed" : false, "approval" : true, "loginRequired" : true}}';
-$query = "insert into tables_info (tableName, displayedTableName, fields, publicPermissions ) values ('$tableName', '$displayedTableName', '$encodedFields', '$permissionsJson')";
-$rows = $db->query($query);
-if ($rows == false) {
+$query = "insert into tables_info (tableName, displayedTableName, fields, publicPermissions ) values (:tableName, :displayedTableName, :encodedFields, :permissionsJson)";
+$ps = $db->prepare($query);
+$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+$ps->bindValue(':displayedTableName', $displayedTableName, PDO::PARAM_STR);
+$ps->bindValue(':encodedFields', $encodedFields, PDO::PARAM_STR);
+$ps->bindValue(':permissionsJson', $permissionsJson, PDO::PARAM_STR);
+$result = $ps->execute();
+if (! $result) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 	return;
 }
-$query = "insert into table_admins (userId, tableName, isSuperAdmin) values ($userId, '$tableName', 1)";
-$rows = $db->query($query);
-if ($rows == false) {
+$ps = $db->prepare(
+		"insert into table_admins (userId, tableName, isSuperAdmin) values (:userId, :tableName, 1)");
+$ps->bindValue(':userId', $userId, PDO::PARAM_INT);
+$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
+$result = $ps->execute();
+if (! $result) {
 	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 	return;
 }
 
 // Creating table
 $tempFields = array();
-foreach($fields as $field) {
-	array_push($tempFields, '' . $field['fieldId'] . ' ' . getMysqlFieldType($field['type']) . getRequired($field['required']));
+foreach ($fields as $field) {
+	array_push($tempFields,
+			'' . $field['fieldId'] . ' ' . getMysqlFieldType($field['type']) .
+					 getRequired($field['required']));
 }
 
-$query = 'create table ' . $tableName .  ' ('. join(", ", $tempFields) . ')';
+$query = 'create table ' . $tableName . ' (' . join(", ", $tempFields) . ')';
 
-$rows = $db->query($query);
+$result = $db->query($query);
 
-if ($rows == false) {
-	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
-} else {
+if ($result) {
 	echo '{"status" : "success"}';
+} else {
+	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
 }
 
-function getRequired($required) {
+function getRequired ($required)
+{
 	if ($required == true) {
 		return ' NOT NULL';
 	}
 	return '';
 }
-function getMysqlFieldType($type) {
+
+function isValidFieldType ($type)
+{
 	switch ($type) {
-		case 'Text' :
-		case 'Select' :
-		case 'Checkbox' :
-		case 'Radio Button' :
+		case 'Text':
+		case 'Select':
+		case 'Checkbox':
+		case 'Radio Button':
+		case 'Number':
+		case 'Decimal Number':
+		case 'Date':
+		case 'Time':
+		case 'Date Time':
+		case 'primaryKey':
+			return true;
+		default:
+			return false;
+	}
+}
+
+function getMysqlFieldType ($type)
+{
+	switch ($type) {
+		case 'Text':
+		case 'Select':
+		case 'Checkbox':
+		case 'Radio Button':
 			return 'TEXT';
-		case 'Number' :
+		case 'Number':
 			return 'BIGINT';
-		case 'Decimal Number' :
+		case 'Decimal Number':
 			return 'DOUBLE(M,D)';
-		case 'Date' :
+		case 'Date':
 			return 'DATE';
-		case 'Time' :
+		case 'Time':
 			return 'TIME';
-		case 'Date Time' :
+		case 'Date Time':
 			return 'DATETIME';
-		case 'primaryKey' :
+		case 'primaryKey':
 			return 'BIGINT primary key auto_increment';
-		default :
+		default:
 			return 'TEXT';
 	}
 }

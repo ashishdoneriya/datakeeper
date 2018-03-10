@@ -17,6 +17,11 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $displayedTableName = htmlspecialchars(strip_tags($data['displayedTableName']));
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
+if (!doesTableExist($db, $tableName)) {
+	header('HTTP/1.0 500 Internal Server Error');
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
 $newFields = $data['fields'];
 
 if (!isSuperAdmin($db, $userId, $tableName)) {
@@ -31,6 +36,10 @@ for ($x = 0; $x < $length; $x++) {
 	$field = (object) $newFields[$x];
 	if ($field->type == 'primaryKey') {
 		$idsFound++;
+	}
+	if (!isValidFieldType($field->type)) {
+		echo '{"status" : "failed", "message" : "Invalid field type(s)" }';
+		return;
 	}
 }
 
@@ -49,12 +58,18 @@ if ($oldFields == null) {
 	echo 'You are not authorized.';
 	return;
 }
+$prevCount = count($oldFields) + 1;
 $length = count($newFields);
 for ($x = 0; $x < $length; $x++) {
 	$newField = (object) $newFields[$x];
 	if (!property_exists($newField, 'fieldId')) {
-		$newField->fieldId = str_replace(' ', '_', $newField->name);
-		// Adding column
+		$prevCount ++;
+		$temp = preg_replace("[^A-Za-z0-9 ]", "", $newField->name);
+		if (strlen($temp) > 10) {
+			$temp = substr($temp, 0, 10);
+		}
+		$newField->fieldId = 'col_' . $temp . $prevCount;
+		
 		$db->query("alter table " . $tableName . " add " . $newField->fieldId . " " . getMysqlFieldType($newField->type) . getRequired($newField->required));
 	} else {
 		// Modifying column
@@ -79,12 +94,36 @@ foreach($oldFields as $oldField) {
 // updating tables_info
 $encodedFields = json_encode($newFields);
 $query = "update tables_info set displayedTableName='$displayedTableName',fields='$encodedFields' where tableName='$tableName'";
+$ps = $db->prepare("update tables_info set displayedTableName=:displayedTableName, fields=:encodedFields where tableName=:tableName");
+$ps->bindValue(':displayedTableName', $displayedTableName);
+$ps->bindValue(':encodedFields', $encodedFields);
+$ps->bindValue(':tableName', $tableName);
+$result = $ps->execute();
 $rows = $db->query($query);
 
-if ($rows == false) {
-	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
-} else {
+if ($result) {
 	echo '{"status" : "success"}';
+} else {
+	echo '{"status" : "failed", "message" : "Unable to add the table, internal error" }';
+}
+
+function isValidFieldType ($type)
+{
+	switch ($type) {
+		case 'Text':
+		case 'Select':
+		case 'Checkbox':
+		case 'Radio Button':
+		case 'Number':
+		case 'Decimal Number':
+		case 'Date':
+		case 'Time':
+		case 'Date Time':
+		case 'primaryKey':
+			return true;
+		default:
+			return false;
+	}
 }
 
 function getRequired($required) {

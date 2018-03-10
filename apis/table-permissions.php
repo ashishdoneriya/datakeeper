@@ -10,7 +10,12 @@ $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
 
-$tableName = htmlspecialchars(strip_tags($_GET['tableName']));
+$tableName = $_GET['tableName'];
+
+if (!doesTableExist($db, $tableName)) {
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
 
 if (!isAdmin($db, $userId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');

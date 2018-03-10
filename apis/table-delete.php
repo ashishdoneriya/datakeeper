@@ -11,18 +11,26 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 
+if (!doesTableExist($db, $tableName)) {
+	echo '{"status" : "failed", "message" : "No such table"}';
+	return;
+}
+
 if (!isSuperAdmin($db, $userId, $tableName)) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
 }
 
-if (!doesTableExist($db, $tableName)) {
-	echo '{"status" : "failed", "message" : "No such table"}';
+$result = $db->exec("delete from tables_info where tableName='$tableName'");
+if (!$result) {
+	echo '{"status" : "failed", "message" : "Unable to delete the table, internal server error" }';
 	return;
 }
-
-$db->query("delete from tables_info where tableName='$tableName'");
-$db->query("drop table $tableName");
+$result = $db->exec("drop table $tableName");
+if (!$result) {
+	echo '{"status" : "failed", "message" : "Unable to delete the table, internal server error" }';
+	return;
+}
 echo '{"status" : "success"}';
 ?>

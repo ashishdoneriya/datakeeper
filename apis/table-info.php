@@ -8,8 +8,8 @@ session_start();
 $userId = $_SESSION['userId'];
 $database = new Database();
 $db = $database->getConnection();
-
 $tableName = htmlspecialchars(strip_tags($_GET['tableName']));
+
 if (!doesTableExist($db, $tableName)) {
 	header('HTTP/1.0 500 Internal Server Error');
 	echo '{"status" : "failed", "message" : "No such table"}';

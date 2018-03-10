@@ -11,14 +11,13 @@ $data = json_decode(file_get_contents('php://input'), TRUE);
 $email = htmlspecialchars(strip_tags($data['email']));
 $password = htmlspecialchars(strip_tags($data['password']));
 $ps = $db->prepare("select userId, name from users where email=:email");
-$ps->execute([':email' => $email]);
-
+$ps->bindValue(':email', $email, PDO::PARAM_STR);
+$ps->execute();
 if($ps->rowCount() == 0) {
 	echo '{"status" : "failed", "message" : "Email not registered"}';
 	return;
 } else {
-	$arr = $ps->fetchAll(PDO::FETCH_ASSOC );
-	$row = $arr[0];
+	$row = $ps->fetch(PDO::FETCH_ASSOC );
 	session_start();
 	$_SESSION["userId"] = $row["userId"];
 	$_SESSION["name"] = $row["name"];
