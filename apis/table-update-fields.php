@@ -84,7 +84,7 @@ for ($x = 0; $x < $length; $x++) {
 			$temp = substr($temp, 0, 10);
 		}
 		$newField->fieldId = 'col_' . $temp . $prevCount;
-		
+
 		$db->query("alter table " . $tableName . " add " . $newField->fieldId . " " . getMysqlFieldType($newField->type) . getRequired($newField->required));
 	} else {
 		// Modifying column
@@ -108,13 +108,12 @@ foreach($oldFields as $oldField) {
 
 // updating tables_info
 $encodedFields = json_encode($newFields);
-$query = "update tables_info set displayedTableName='$displayedTableName',fields='$encodedFields' where tableName='$tableName'";
+
 $ps = $db->prepare("update tables_info set displayedTableName=:displayedTableName, fields=:encodedFields where tableName=:tableName");
 $ps->bindValue(':displayedTableName', $displayedTableName);
 $ps->bindValue(':encodedFields', $encodedFields);
 $ps->bindValue(':tableName', $tableName);
 $result = $ps->execute();
-$rows = $db->query($query);
 
 if ($result) {
 	echo '{"status" : "success"}';

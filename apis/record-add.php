@@ -40,12 +40,14 @@ foreach ($finalFields as $field) {
 	}else {
 		$field->value = $row[$field->fieldId];
 	}
-	
+
 }
 $finalFields = json_decode(json_encode($finalFields), true);
 
 foreach ($finalFields as $field) {
-	$field->value = $row[$field->fieldId];
+	if (array_key_exists($field->fieldId, $row)) {
+		$field->value = $row[$field->fieldId];
+	}
 }
 $finalFields = json_decode(json_encode($finalFields), true);
 
@@ -98,7 +100,7 @@ foreach ($finalFields as $field) {
     } else {
     	$ps->bindValue(':' . $field['fieldId'], $field['value'], getPdoParamType($field['type']));
     }
-    
+
 }
 
 $result = $ps->execute();

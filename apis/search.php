@@ -33,7 +33,7 @@ if (!$sortBy) {
 } else {
 	$foundOrderBy = false;
 	foreach ($finalFields as $field) {
-		if ($field['Id'] == $sortBy) {
+		if ($field['fieldId'] == $sortBy) {
 			$foundOrderBy = true;
 			break;
 		}
@@ -53,7 +53,7 @@ if (!$order) {
 		echo 'You are not authorized.';
 		return;
 	}
-	
+
 }
 
 $fieldsArr = array();
@@ -71,13 +71,13 @@ if ($searchQuery) {
 				if ($isQueryNumeric) {
 					array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
 				}
-				
+
 			} else {
 				array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId'] );
 			}
 			continue;
 		}
-		
+
 		if ($field['type'] == 'Number' || $field['type'] == 'Decimal Number') {
 			if ($isQueryNumeric) {
 				array_push($searchArr,
@@ -89,7 +89,7 @@ if ($searchQuery) {
 			}
 			continue;
 		}
-		
+
 		if ($field['type'] == 'Date' || $field['type'] == 'Time' ||
 				 $field['type'] == 'Date Time') {
 			array_push($searchArr, $field['fieldId'] . '=:' . $field['fieldId']);
@@ -97,7 +97,7 @@ if ($searchQuery) {
 							 $field['fieldId'] . 'Str');
 			continue;
 		}
-		
+
 		array_push($searchArr, $field['fieldId'] . ' like :' . $field['fieldId']);
 	}
 }
@@ -131,13 +131,13 @@ if ($searchQuery && count($searchArr) > 0) {
 				if ($isQueryNumeric) {
 					$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_INT);
 				}
-				
+
 			} else {
 				$pd->bindValue(':' . $field['fieldId'] , $searchQuery, PDO::PARAM_STR);
 			}
 			continue;
 		}
-		
+
 		if ($field['type'] == 'Number' || $field['type'] == 'Decimal Number') {
 			if ($isQueryNumeric) {
 				$pd->bindValue(':' . $field['fieldId'], $searchQuery, PDO::PARAM_INT);
@@ -147,7 +147,7 @@ if ($searchQuery && count($searchArr) > 0) {
 			}
 			continue;
 		}
-		
+
 		if ($field['type'] == 'Date' || $field['type'] == 'Time' ||
 				 $field['type'] == 'Date Time') {
 				 	$pd->bindValue(':' . $field['fieldId'], $searchQuery, PDO::PARAM_STR);
@@ -155,7 +155,7 @@ if ($searchQuery && count($searchArr) > 0) {
 					PDO::PARAM_STR);
 			continue;
 		}
-		
+
 		$pd->bindValue(':' . $field['fieldId'], '%' . $searchQuery . '%',
 				PDO::PARAM_STR);
 	}
