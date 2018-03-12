@@ -89,7 +89,7 @@ foreach ($fields as $field) {
 		} else {
 			array_push($tempFields, 'primaryKey varchar(100) primary key not null');
 		}
-		
+
 	} else {
 		array_push($tempFields, $field['fieldId'] . ' ' . getMysqlFieldType($field['type']) . getRequired($field['required']));
 	}
@@ -112,7 +112,7 @@ function getRequired ($required)
 
 function isFieldsArrayValid ($fields)
 {
-	if (! fields) {
+	if (! $fields) {
 		return false;
 	}
 	foreach ($fields as $field) {
@@ -138,7 +138,7 @@ function isFieldsArrayValid ($fields)
 					if ($type != 'boolean') {
 						return false;
 					}
-					
+
 					break;
 				case 'autoIncrement':
 					if ($type != 'boolean') {

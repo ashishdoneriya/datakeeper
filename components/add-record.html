@@ -67,9 +67,15 @@
 				this.$router.go(-1);
 			},
 			addRecord() {
+				var map = {};
+				this.fields.forEach(element => {
+					if (element.type != 'primaryKey' || element.autoIncrement) {
+						map[element.fieldId] = element.value;
+					}
+				});
 				axios.post('/apis/record-add.php', {
 						tableName: this.tableName,
-						row: this.fields
+						row: map
 					})
 					.then(result => {
 						if (result.data.status == 'success') {
