@@ -19,7 +19,7 @@ $displayedTableName = htmlspecialchars(strip_tags($data['displayedTableName']));
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $newFields = $data['fields'];
 
-if (!$displayedTableName || $tableName || !$newFields) {
+if (!$displayedTableName || !$tableName || !$newFields) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;

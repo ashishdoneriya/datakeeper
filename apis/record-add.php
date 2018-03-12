@@ -9,9 +9,9 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = htmlspecialchars(strip_tags($_SESSION['userId']));
-$row = json_decode($data['row'], true);
+$row = $data['row'];
 
-if (!$tableName || !$oldId) {
+if (!$tableName) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
@@ -33,7 +33,14 @@ if (! $access['allowed']) {
 $finalFields = getFields($db, $loggedInUserId, $tableName);
 $finalFields = json_decode(json_encode($finalFields));
 foreach ($finalFields as $field) {
-	$field->value = $row[$field->fieldId];
+	if ($field->fieldId == 'primaryKey') {
+		if (array_key_exists('primaryKey', $row)) {
+			$field->value = $row[$field->fieldId];
+		}
+	}else {
+		$field->value = $row[$field->fieldId];
+	}
+	
 }
 $finalFields = json_decode(json_encode($finalFields), true);
 

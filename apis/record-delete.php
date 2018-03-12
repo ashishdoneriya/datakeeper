@@ -60,7 +60,7 @@ if ($access['approval']) {
 		}
 	}
 	$ps = $db->prepare("delete from $tableName where primaryKey=:primaryKey");
-	$ps->bindValue(':primaryKey', $loggedInUserId, $varType);
+	$ps->bindValue(':primaryKey', $primaryKey, $varType);
 	$result = $ps->execute();
 }
 

@@ -12,7 +12,7 @@ $data = json_decode(file_get_contents('php://input'), TRUE);
 $tableName = htmlspecialchars(strip_tags($data['tableName']));
 $loggedInUserId = $_SESSION['userId'];
 $oldPrimaryKey = htmlspecialchars(strip_tags($data['oldPrimaryKey']));
-$row = json_decode($data['row'], true);
+$row = $data['row'];
 
 if (!$tableName || !$oldPrimaryKey || !$row) {
 	header('HTTP/1.0 401 Unauthorized');

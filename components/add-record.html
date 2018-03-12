@@ -69,7 +69,7 @@
 			addRecord() {
 				axios.post('/apis/record-add.php', {
 						tableName: this.tableName,
-						fields: this.fields
+						row: this.fields
 					})
 					.then(result => {
 						if (result.data.status == 'success') {

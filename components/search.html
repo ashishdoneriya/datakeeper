@@ -157,7 +157,7 @@
 				axios.post('/apis/record-update.php', {
 					tableName: this.tableName,
 					oldPrimaryKey : this.rowToChangePrimaryKey,
-					row: JSON.stringify(this.rowToChange)
+					row: this.rowToChange
 				}).then(result => {
 					if (result.data.status == 'success') {
 						if (this.permissions.update.approval) {

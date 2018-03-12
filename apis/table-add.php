@@ -14,9 +14,9 @@ $db = $database->getConnection();
 $data = json_decode(file_get_contents('php://input'), TRUE);
 $displayedTableName = $data['displayedTableName'];
 $fields = $data['fields'];
-$length = count($fields);
 
-if (!$fields || $displayedTableName) {
+
+if (!$fields || !$displayedTableName) {
 	header('HTTP/1.0 401 Unauthorized');
 	echo 'You are not authorized.';
 	return;
@@ -29,6 +29,7 @@ if (! isFieldsArrayValid($fields)) {
 	echo '{"status" : "failed", "message" : "Invalid json format" }';
 	return;
 }
+$length = count($fields);
 for ($x = 0; $x < $length; $x ++) {
 	$field = (object) $fields[$x];
 	if ($field->type == 'primaryKey') {
