@@ -108,7 +108,7 @@
 	module.exports = {
 		data() {
 			return {
-				tableName: '',
+				tableName: this.$route.params.tableName ? this.$route.params.tableName : '',
 				displayedTableName: '',
 				fields: [],
 				fieldTypes: [{
@@ -147,16 +147,18 @@
 						value: 'Date Time',
 						label: 'Date Time'
 					}
-				],
-				isLoggedIn : Cookies.get("email") ? true : false
+				]
 			};
 		},
+		computed : {
+			isLoggedIn() {
+				return this.$store.getters.isLoggedIn;
+			}
+		},
 		created: function() {
-			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				this.$router.push("/login");
 			}
-			this.tableName = this.$route.params.tableName;
 			if (this.tableName) {
 				axios.get(`/apis/table-info.php?tableName=${this.tableName}`)
 					.then(result => {

@@ -93,7 +93,6 @@
 	module.exports = {
 		data() {
 			return {
-				tableName: this.$route.params.tableName,
 				fields: [],
 				permissions: [],
 				tableData: [],
@@ -106,15 +105,19 @@
 				currentPage: 1,
 				timer: 0,
 				allowedFields: [],
-				isLoggedIn: Cookies.get("email") ? true : false,
 				dialogRecordVisible: false,
 				rowToChange: undefined,
-				rowToChangePrimaryKey: undefined
+				rowToChangePrimaryKey: undefined,
+				tableName: this.$route.params.tableName
 			};
 		},
-		created() {
-			this.getTableInfo();
+
+		beforeRouteUpdate(to, from, next) {
+			this.tableName = to.params.tableName;
+			this.fetchTableInfo();
+			next();
 		},
+
 		watch: {
 			searchQuery: function (newQuery) {
 				// clears the timer on a call so there is always x seconds in between calls
@@ -124,10 +127,13 @@
 				this.timer = setTimeout(() => {
 					this.getTotal()
 				}, 400);
-			}
+			},
 		},
 
 		computed: {
+			isLoggedIn() {
+				return this.$store.getters.isLoggedIn;
+			},
 			visibleFields() {
 				return this.fields.filter(field => this.allowedFields.indexOf(field.name) != -1);
 			},
@@ -145,6 +151,10 @@
 			}
 		},
 
+		created() {
+			this.fetchTableInfo();
+		},
+
 		methods: {
 
 			edit(row) {
@@ -156,7 +166,7 @@
 			doEdit() {
 				axios.post('/apis/record-update.php', {
 					tableName: this.tableName,
-					oldPrimaryKey : this.rowToChangePrimaryKey,
+					oldPrimaryKey: this.rowToChangePrimaryKey,
 					row: this.rowToChange
 				}).then(result => {
 					if (result.data.status == 'success') {
@@ -308,7 +318,7 @@
 					});
 			},
 
-			getTableInfo() {
+			fetchTableInfo() {
 				axios.get(`/apis/table-info.php?tableName=${this.tableName}`)
 					.then(result => {
 						this.displayedTableName = result.data.displayedTableName;

@@ -6,38 +6,30 @@
 					<a>Home</a>
 				</el-menu-item>
 				<el-menu-item index="2" v-if="tablesList.personalTables.list.length > 0 || tablesList.otherTables.list.length > 0">
-					<el-select v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length == 0" v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
+					<el-select v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length == 0" v-model="currentTable" @change="openCurrentTable" placeholder="Select Table">
 						<el-option key="" label="Select Table" value="" disabled="true"></el-option>
-						<el-option
-							v-for="table in tablesList.personalTables.list"
-							:key="table"
-							:label="table.displayedTableName"
-							:value="table.tableName"
-						></el-option>
+						<el-option v-for="table in tablesList.personalTables.list" :key="table" :label="table.displayedTableName" :value="table.tableName"></el-option>
 					</el-select>
-					<el-select v-if="tablesList.personalTables.list.length == 0 && tablesList.otherTables.list.length > 0" v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
+					<el-select v-if="tablesList.personalTables.list.length == 0 && tablesList.otherTables.list.length > 0" v-model="currentTable" @change="openCurrentTable" placeholder="Select Table">
 						<el-option key="" label="Select Table" value="" disabled="true"></el-option>
-						<el-option
-							v-for="table in tablesList.otherTables.list"
-							:key="table"
-							:label="table.displayedTableName"
-							:value="table.tableName"
-						></el-option>
+						<el-option v-for="table in tablesList.otherTables.list" :key="table" :label="table.displayedTableName" :value="table.tableName"></el-option>
 					</el-select>
-					<el-select v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length > 0" v-model="selectedTable" @change="openTable(this.selectedTable)" placeholder="Select Table">
-						<el-option-group
-							v-for="(value, key) in tablesList" :key="key" :label="value.label" v-if="value.list.length > 0">
+					<el-select v-if="tablesList.personalTables.list.length > 0 && tablesList.otherTables.list.length > 0" v-model="currentTable" @change="openCurrentTable" placeholder="Select Table">
+						<el-option-group v-for="(value, key) in tablesList" :key="key" :label="value.label" v-if="value.list.length > 0">
 							<el-option v-for="table in value.list" :key="table" :label="table.displayedTableName" :value="table.tableName">
 							</el-option>
 						</el-option-group>
 					</el-select>
 				</el-menu-item>
 				<el-submenu index="3" style="float:right;min-width:75px;text-align:right">
-					<template slot="title"><span>Hi {{user.name}}</span></template>
+					<template slot="title">
+						<span>Hi {{user.name}}</span>
+					</template>
 					<el-menu-item index="3-1" @click="signout()" style="max-width:75px;min-width:75px;">Logout</el-menu-item>
 				</el-submenu>
 			</el-menu>
 		</el-header>
+		<h1 v-show="!isLoggedIn" style="width:100%;text-align: center;font-size:40px">{{displayedTableName}}</h1>
 		<router-view></router-view>
 	</el-container>
 </template>
@@ -47,46 +39,54 @@
 		data() {
 			return {
 				user: {},
-				selectedTable: "",
-				isLoggedIn : Cookies.get("email") ? true : false
+				currentTable: '',
+				displayedTableName : ''
 			};
 		},
 		computed: {
-			storeCurrentTable() {
-				return this.$store.state.currentTable;
-			},
 			tablesList() {
 				return this.$store.state.list;
+			},
+			isLoggedIn() {
+				return this.$store.getters.isLoggedIn;
 			}
 		},
-		watch: {
-			storeCurrentTable(newTable, oldTable) {
-				this.selectedTable = newTable;
-			}
-		},
-		created: function() {
-			this.isLoggedIn = Cookies.get("email") ? true : false;
-			if (!this.isLoggedIn) {
-				return;
-			}
-			this.isLoggedIn = true;
-			this.fetchUserInfo();
-			this.$store.commit("update");
+		created: function () {
 			var tableName = this.$route.params.tableName;
 			if (tableName) {
-				this.selectedTable = tableName;
+				this.currentTable = tableName;
 			}
+			if (!this.isLoggedIn) {
+				if (!this.currentTable) {
+					return;
+				}
+				axios.get(`/apis/table-info.php?tableName=${this.currentTable}`)
+					.then(result => {
+						this.displayedTableName = result.data.displayedTableName;
+					}).catch(error => {
+						console.log(error);
+						this.$message({
+							message: 'Unable to fetch table information',
+							type: 'error',
+							center: true
+						});
+					});
+				return;
+			}
+			this.fetchUserInfo();
+			this.$store.commit("update");
+
 		},
 		methods: {
 			goToHome() {
-				this.selectedTable = "";
+				this.currentTable = '';
 				this.$router.push("/user/dashboard");
 			},
-			openTable(tableName) {
-				if (this.selectedTable == "") {
+			openCurrentTable() {
+				if (this.currentTable == '') {
 					return;
 				}
-				this.$router.push("/user/table/" + this.selectedTable);
+				this.$router.push(`/user/table/${this.currentTable}`);
 			},
 			fetchUserInfo() {
 				axios
@@ -98,7 +98,7 @@
 						this.$message({
 							message: "Unable to fetch your details",
 							type: "error",
-							center : true
+							center: true
 						});
 					});
 			},

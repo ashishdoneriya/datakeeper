@@ -22,27 +22,24 @@
 
 <script>
 	module.exports = {
-		data : {
-			isLoggedIn : Cookies.get("email") ? true : false
-		},
 		computed: {
 			tablesList() {
 				return this.$store.state.list;
+			},
+			isLoggedIn() {
+				return this.$store.getters.isLoggedIn;
 			}
 		},
 		created() {
-			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				this.$router.push("/");
 			}
-			this.$store.commit('setCurrentTable', '');
 		},
 		methods: {
 			addRecord(table) {
 				this.$router.push(`/user/table/${table.tableName}/add-record`);
 			},
 			openTable(tableName) {
-				this.$store.commit('setCurrentTable', tableName);
 				this.$router.push(`/user/table/${tableName}`);
 			},
 			changePermissions(table) {

@@ -43,6 +43,12 @@
 			i {
 				cursor: pointer;
 			}
+
+			.el-table, .el-table thead, .el-input-group__append, .el-input-group__prepend {
+				color : #222;
+			}
+
+
 		</style>
 	</head>
 
@@ -58,17 +64,24 @@
 				store: new Vuex.Store({
 					state: {
 						list: {
-							personalTables : {
-								label : 'Personal Tables',
-								list : []
+							personalTables: {
+								label: 'Personal Tables',
+								list: []
 							},
-							otherTables : {
-								label : 'Other Tables',
-								list : []
+							otherTables: {
+								label: 'Other Tables',
+								list: []
 							}
 						},
-						currentTable : '',
-						isLoggedIn : Cookies.get("email") ? true : false
+						loggedIn: undefined
+					},
+					getters: {
+						isLoggedIn: (state) => {
+							if (!state.loggedIn) {
+								state.loggedIn = Cookies.get("email") ? true : false;
+							}
+							return state.loggedIn;
+						}
 					},
 					mutations: {
 						update() {
@@ -79,11 +92,8 @@
 									console.error(error);
 								});
 						},
-						setCurrentTable(state, table) {
-							state.currentTable = table;
-						},
-						setLoggedIn(state, loggedIn) {
-							state.isLoggedIn = loggedIn;
+						setLoggedIn(state, value) {
+							state.isLoggedIn = value;
 						}
 					}
 				}),
@@ -114,16 +124,16 @@
 								component: httpVueLoader('/components/form-builder.html')
 							},
 							{
-								path :'table/:tableName',
+								path: 'table/:tableName',
 								component: httpVueLoader('/components/search.html')
 							},
 							{
-								path : 'table/:tableName/add-record',
-								component : httpVueLoader('/components/add-record.html')
+								path: 'table/:tableName/add-record',
+								component: httpVueLoader('/components/add-record.html')
 							},
 							{
-								path : 'table/:tableName/permissions',
-								component : httpVueLoader('/components/permissions.html')
+								path: 'table/:tableName/permissions',
+								component: httpVueLoader('/components/permissions.html')
 							}
 						]
 					}]
@@ -143,7 +153,6 @@ TODO :
 [ ] UI side set cookies and on logout remve cookies also. (remove go back from adding records) and handle case if cookies are disables and maintain a global vuex state so that every component should not suffer.
 [ ] Search filter, pagination, ordering
 [ ] Table manage permissions (add a role feeder in while global users can submit form but not see others' data)
-[ ] Record adding focus.
 [ ] Record adding go back.
 [ ] UserDashboard addrecord button.
 [ ] table permissions page

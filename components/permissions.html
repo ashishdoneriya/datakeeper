@@ -169,7 +169,7 @@
 	module.exports = {
 		data: function () {
 			return {
-				tableName: "",
+				tableName: this.$route.params.tableName,
 				displayedTableName: "",
 				publicPermissions: {
 					read: {
@@ -221,11 +221,14 @@
 					}
 				},
 				guestToUpdate: undefined,
-				isLoggedIn: Cookies.get("email") ? true : false
 			};
 		},
+		computed : {
+			isLoggedIn() {
+				return this.$store.getters.isLoggedIn;
+			}
+		},
 		created() {
-			this.isLoggedIn = Cookies.get("email") ? true : false;
 			if (!this.isLoggedIn) {
 				this.$router.push("/");
 			}
@@ -494,7 +497,6 @@
 					});
 			},
 			fetchPermissions() {
-				this.tableName = this.$route.params.tableName;
 				axios
 					.get(`/apis/table-permissions.php?tableName=${this.tableName}`)
 					.then(result => {

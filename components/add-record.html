@@ -1,6 +1,6 @@
 <template>
 	<el-main>
-		<el-button @click="goBack()"  icon="el-icon-back" type="primary" round>Go Back</el-button>
+		<el-button @click="goBack()" icon="el-icon-back" type="primary" round>Go Back</el-button>
 		<el-row type="flex" class="row-bg" justify="center">
 			<el-col :span="18">
 				<table>
@@ -58,7 +58,7 @@
 					this.$message({
 						message: 'Unable to fetch table information',
 						type: 'error',
-						center : true
+						center: true
 					});
 				});
 		},
@@ -74,15 +74,15 @@
 					}
 				});
 				axios.post('/apis/record-add.php', {
-						tableName: this.tableName,
-						row: map
-					})
+					tableName: this.tableName,
+					row: map
+				})
 					.then(result => {
 						if (result.data.status == 'success') {
 							this.$message({
 								message: 'Record successfull added',
 								type: 'success',
-								center : true
+								center: true
 							});
 							for (var field of this.fields) {
 								field['value'] = undefined;
@@ -92,7 +92,7 @@
 							this.$message({
 								message: result.data.message,
 								type: 'error',
-								center : true
+								center: true
 							});
 						}
 					}).catch(error => {
@@ -100,7 +100,7 @@
 						this.$message({
 							message: 'Unable to add data',
 							type: 'error',
-							center : true
+							center: true
 						});
 					});
 			}
