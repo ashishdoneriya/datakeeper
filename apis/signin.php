@@ -14,11 +14,21 @@ if (!$email || !$password) {
 	echo '{"status" : "failed", "message" : "Please enter valid information"}';
 	return;
 }
-$ps = $db->prepare("select userId, name from users where email=:email");
+
+$ps = $db->prepare("select count(*) from users where email=:email");
 $ps->bindValue(':email', $email, PDO::PARAM_STR);
 $ps->execute();
 if($ps->rowCount() == 0) {
 	echo '{"status" : "failed", "message" : "Email not registered"}';
+	return;
+}
+
+$ps = $db->prepare("select userId, name from users where email=:email and password=:password");
+$ps->bindValue(':email', $email, PDO::PARAM_STR);
+$ps->bindValue(':password', sha1($password), PDO::PARAM_STR);
+$ps->execute();
+if($ps->rowCount() == 0) {
+	echo '{"status" : "failed", "message" : "Invalid password"}';
 	return;
 } else {
 	$row = $ps->fetch(PDO::FETCH_ASSOC );

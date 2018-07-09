@@ -32,7 +32,7 @@ try {
     $ps = $db->prepare("insert into users (name, email, password) value (:name, :email, :password)");
     $ps->bindValue(':name', $name, PDO::PARAM_STR);
     $ps->bindValue(':email', $email, PDO::PARAM_STR);
-    $ps->bindValue(':password', $password, PDO::PARAM_STR);
+    $ps->bindValue(':password', sha1($password), PDO::PARAM_STR);
     $succeed = $ps->execute();
     $result = array();
     if ($succeed) {
