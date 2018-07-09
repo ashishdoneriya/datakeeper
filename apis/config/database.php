@@ -1,7 +1,7 @@
 <?php
 class Database {
 	private $host = "localhost";
-	private $port = "80";
+	private $port = "3306";
 	private $username = "root";
 	private $password = "root";
 	private $database = "datakeeper";

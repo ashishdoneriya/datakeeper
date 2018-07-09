@@ -30,4 +30,5 @@ $result['displayedTableName'] = $ps->fetch(PDO::FETCH_COLUMN);
 $result['fields'] = $finalFields;
 $result['permissions'] = getPermissionsJson($db, $userId, $tableName);
 echo json_encode($result);
+
 ?>

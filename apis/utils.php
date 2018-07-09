@@ -3,11 +3,11 @@
 /**
  * Checks if the user is super admin or not
  * @param PDO $db
- * @param int $userId
- * @param String $tableName
+ * @param $userId
+ * @param $tableName
  * @return boolean
  */
-function isSuperAdmin (PDO $db, int $userId, String $tableName)
+function isSuperAdmin (PDO $db, $userId, $tableName)
 {
 	if ($userId == null || $tableName == null) {
 		return false;
@@ -21,7 +21,7 @@ function isSuperAdmin (PDO $db, int $userId, String $tableName)
 	return $row != null && $row == 1;
 }
 
-function isAdmin (PDO $db, int $userId, String $tableName)
+function isAdmin (PDO $db, $userId, $tableName)
 {
 	if ($userId == null || $tableName == null) {
 		return false;
@@ -36,8 +36,8 @@ function isAdmin (PDO $db, int $userId, String $tableName)
 }
 
 // add /update / delete / read
-function isAllowedToAccessTable (PDO $db, int $userId, String $tableName,
-		String $accessType)
+function isAllowedToAccessTable (PDO $db, $userId, $tableName,
+		$accessType)
 {
 	if (!$tableName){
 		return false;
@@ -85,12 +85,12 @@ function isAllowedToAccessTable (PDO $db, int $userId, String $tableName,
 }
 
 // TODO in case of a unique person is allowed to read table
-function getFields (PDO $db, int $userId, String $tableName)
+function getFields (PDO $db, $userId, $tableName)
 {
 	if ($tableName == null) {
 		return null;
 	}
-	
+
 	if (isAdmin($db, $userId, $tableName)) {
 		$ps = $db->prepare(
 				"select fields from tables_info where tableName=:tableName");
@@ -99,9 +99,9 @@ function getFields (PDO $db, int $userId, String $tableName)
 		$row = $ps->fetch(PDO::FETCH_COLUMN);
 		return json_decode($row, true);
 	}
-	
+
 	$access = isAllowedToAccessTable($db, $userId, $tableName, 'read');
-	
+
 	if (! $access['allowed']) {
 		$access = isAllowedToAccessTable($db, $userId, $tableName, 'add');
 		if (! $access['allowed']) {
@@ -113,14 +113,14 @@ function getFields (PDO $db, int $userId, String $tableName)
 			}
 		}
 	}
-	
+
 	$ps = $db->prepare(
 			"select fields from tables_info where tableName=:tableName");
 	$ps->bindValue(':tableName', $tableName, PDO::PARAM_STR);
 	$ps->execute();
 	$row = $ps->fetch(PDO::FETCH_COLUMN);
 	$fields = json_decode($row, true);
-	
+
 	$finalFields = array();
 	foreach ($fields as $field) {
 		if ($userId == null && ! $field['isVisible']) {
@@ -140,7 +140,7 @@ function getUserId (PDO $db, String $email)
 	return $row;
 }
 
-function getPermissionsJson (PDO $db, int $userId, String $tableName)
+function getPermissionsJson (PDO $db, $userId, $tableName)
 {
 	if (isAdmin($db, $userId, $tableName)) {
 		$permissions = array(
@@ -179,7 +179,7 @@ function getPermissionsJson (PDO $db, int $userId, String $tableName)
 	return json_decode($row, true);
 }
 
-function doesTableExist (PDO $db, String $tableName)
+function doesTableExist (PDO $db, $tableName)
 {
 	if (!$tableName) {
 		return false;
