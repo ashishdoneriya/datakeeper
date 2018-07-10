@@ -9,7 +9,7 @@ $db = $database->getConnection();
 $db->beginTransaction();
 try {
 // Creating table 'users'
-    $query = "create table if not exists users ( userId int primary key not null auto_increment, name varchar(80), email varchar(70) not null, password varchar(15) not null)";
+    $query = "create table if not exists users ( userId int primary key not null auto_increment, name varchar(80), email varchar(70) not null, password varchar(50) not null)";
     $db->query($query);
 
 /*
