@@ -43,6 +43,12 @@
 				displayedTableName : ''
 			};
 		},
+
+		beforeRouteUpdate(to, from, next) {
+			this.currentTable = to.params.tableName;
+			next();
+		},
+
 		computed: {
 			tablesList() {
 				return this.$store.state.list;
