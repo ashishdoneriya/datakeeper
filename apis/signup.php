@@ -44,7 +44,7 @@ try {
 	echo json_encode($result);
 	$db->commit();
 } catch (Exception $ex) {
-	echo 'Message: ' .$ex->getMessage();
+	echo 'Error: ' .$ex->getMessage();
     if ($db->inTransaction()) {
         $db->rollBack();
     }

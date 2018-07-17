@@ -45,7 +45,7 @@
 		</el-row>
 
 		<!-- Floating Plus Button at the bottom right-->
-		<el-tooltip class="item" effect="dark" content="Add Record" placement="top" v-if="canAdd">
+		<el-tooltip class="item" effect="dark" content="Add Record" placement="top" v-if="canAdd" style="z-index:999">
 			<router-link :to="'/user/table/' + tableName + '/add-record'" class="float">
 				<i class="material-icons my-float" style="font-size: 40px;margin-top: 11px;margin-left: 2px;">add</i>
 			</router-link>

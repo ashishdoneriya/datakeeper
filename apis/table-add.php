@@ -108,6 +108,7 @@ try {
     $db->commit();
 
 } catch (Exception $ex) {
+	echo 'Error: ' .$ex->getMessage();
     if ($db->inTransaction()) {
         $db->rollBack();
     }

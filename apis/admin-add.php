@@ -47,6 +47,7 @@ try {
     $db->commit();
 
 } catch (Exception $ex) {
+	echo 'Error: ' .$ex->getMessage();
     if ($dbh->inTransaction()) {
         $dbh->rollBack();
     }

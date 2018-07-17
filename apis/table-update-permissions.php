@@ -54,29 +54,31 @@ try {
     } else {
         echo '{"status" : "failed", "message" : "Problem while updating permissions"}';
     }
-
-    function isPermissionJsonValid($permissionsJson)
-    {
-        $permissions = json_decode($permissionsJson, true);
-        foreach ($permissions as $key => $value) {
-            if ($key != "read" && $key != "add" && $key != "update" && $key != "delete") {
-                return false;
-            }
-            foreach ($value as $subKey => $subValue) {
-                if ($subKey != "allowed" && $subKey != "approval" && $subKey != "loginRequired") {
-                    return false;
-                }
-                if (gettype($subValue) != "boolean") {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }$db->commit();
+		$db->commit();
 
 } catch (Exception $ex) {
+	echo 'Error: ' .$ex->getMessage();
     if ($db->inTransaction()) {
         $db->rollBack();
     }
     echo '{"status" : "error"}';
+}
+
+function isPermissionJsonValid($permissionsJson)
+{
+		$permissions = json_decode($permissionsJson, true);
+		foreach ($permissions as $key => $value) {
+				if ($key != "read" && $key != "add" && $key != "update" && $key != "delete") {
+						return false;
+				}
+				foreach ($value as $subKey => $subValue) {
+						if ($subKey != "allowed" && $subKey != "approval" && $subKey != "loginRequired") {
+								return false;
+						}
+						if (gettype($subValue) != "boolean") {
+								return false;
+						}
+				}
+		}
+		return true;
 }
